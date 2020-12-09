@@ -47,9 +47,10 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     setTextFont(QFont("Courier",10)); // TODO Check "Menlo"
 #endif
 
-    addColumn((8+2)*getCharWidth(),tr("Address"));          // COLUMN_ADDRESS
-    addColumn((g_nBytesProLine*3+1)*getCharWidth(),"HEX");  // COLUMN_HEX
-    addColumn((g_nBytesProLine+2)*getCharWidth(),"ANSI");   // COLUMN_SYMBOLS
+    addColumn((8+2)*getCharWidth(),tr("Address"));              // COLUMN_ADDRESS
+    addColumn((8+2)*getCharWidth(),tr("Offset"));               // COLUMN_OFFSET
+    addColumn((g_nBytesProLine*3+1)*getCharWidth(),"HEX");      // COLUMN_HEX
+    addColumn((g_nBytesProLine+2)*getCharWidth(),tr("Disasm")); // COLUMN_DISASM
 }
 
 void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
