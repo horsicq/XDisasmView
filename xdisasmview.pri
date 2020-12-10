@@ -16,3 +16,8 @@ SOURCES += \
     XCONFIG += xabstracttableview
     include($$PWD/../Controls/xabstracttableview.pri)
 }
+
+!contains(XCONFIG, xcapstone) {
+    XCONFIG += xcapstone
+    include($$PWD/../XCapstone/xcapstone.pri)
+}

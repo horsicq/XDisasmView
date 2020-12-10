@@ -21,6 +21,7 @@
 #ifndef XDISASMVIEW_H
 #define XDISASMVIEW_H
 
+#include "xcapstone.h"
 #include "xabstracttableview.h"
 #include "dialoggotoaddress.h"
 #include "dialogsearch.h"
@@ -33,13 +34,41 @@ class XDisasmView : public XAbstractTableView
     Q_OBJECT
 
 public:
+    enum MODE
+    {
+        MODE_UNKNOWN=0,
+        MODE_X86_16,
+        MODE_X86_32,
+        MODE_X86_64
+    };
+
     struct OPTIONS
     {
         XBinary::_MEMORY_MAP memoryMap;
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);
+    ~XDisasmView();
     void setData(QIODevice *pDevice,OPTIONS options={});
+    void setMode(MODE mode);
+    void goToAddress(qint64 nAddress);
+
+private:
+    enum COLUMN
+    {
+        COLUMN_ADDRESS=0,
+        COLUMN_OFFSET,
+        COLUMN_HEX,
+        COLUMN_DISASM
+    };
+
+    struct RECORD
+    {
+        QString sAddress;
+        QString sOffset;
+        QString sHEX;
+        QString sDisasm;
+    };
 
 protected:
     virtual bool isOffsetValid(qint64 nOffset);
@@ -51,16 +80,17 @@ protected:
     virtual void paintCell(qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void endPainting();
     virtual void goToOffset(qint64 nOffset);
+    virtual qint64 getVerticalScrollBarOffset();
+    virtual void setVerticalScrollBarOffset(qint64 nOffset);
 
 private:
     QIODevice *g_pDevice;
     OPTIONS g_options;
     qint64 g_nDataSize;
     qint32 g_nBytesProLine;
-    qint32 g_nDataBlockSize;
-    QByteArray g_baDataBuffer;
-    QByteArray g_baDataHexBuffer;
-    QList<QString> g_listAddresses;
+    QList<RECORD> g_listRecords;
+    MODE g_mode;
+    csh g_handle;
     SearchProcess::SEARCHDATA g_searchData;
     QShortcut *g_scGoToAddress;
     QShortcut *g_scDumpToFile;
