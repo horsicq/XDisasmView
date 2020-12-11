@@ -68,6 +68,7 @@ private:
         QString sOffset;
         QString sHEX;
         QString sDisasm;
+        qint64 nOffset;
     };
 
 protected:
@@ -79,9 +80,8 @@ protected:
     virtual void paintColumn(qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void paintCell(qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void endPainting();
-    virtual void goToOffset(qint64 nOffset);
-    virtual qint64 getVerticalScrollBarOffset();
-    virtual void setVerticalScrollBarOffset(qint64 nOffset);
+    virtual qint64 getScrollValue();
+    virtual void setScrollValue(qint64 nOffset);
 
 private:
     QIODevice *g_pDevice;
