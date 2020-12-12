@@ -47,10 +47,10 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     setTextFont(QFont("Courier",10)); // TODO Check "Menlo"
 #endif
 
-    addColumn((8+2)*getCharWidth(),tr("Address"));              // COLUMN_ADDRESS
-    addColumn((8+2)*getCharWidth(),tr("Offset"));               // COLUMN_OFFSET
-    addColumn((15*2)*getCharWidth(),"HEX");                     // COLUMN_HEX
-    addColumn(40*getCharWidth(),tr("Disasm"));                  // COLUMN_DISASM
+    addColumn((8+2)*getCharWidth(),tr("Address"));
+    addColumn((8+2)*getCharWidth(),tr("Offset"));
+    addColumn((15*2)*getCharWidth(),tr("Bytes"));
+    addColumn(40*getCharWidth(),tr("Opcode"));
 }
 
 XDisasmView::~XDisasmView()
@@ -72,7 +72,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
         g_options.memoryMap=binary.getMemoryMap();
     }
 
-    setMode(MODE_X86_16);
+    setMode(XBinary::DM_X86_16);
 
     g_nDataSize=pDevice->size();
 
@@ -88,9 +88,9 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
     reload(true);
 }
 
-void XDisasmView::setMode(XDisasmView::MODE mode)
+void XDisasmView::setMode(XBinary::DM disasmMode)
 {
-    g_mode=mode;
+    g_disasmMode=disasmMode;
 
     if(g_handle)
     {
@@ -100,13 +100,14 @@ void XDisasmView::setMode(XDisasmView::MODE mode)
 
     cs_err error=CS_ERR_HANDLE;
 
-    if      (mode==MODE_X86_16)     error=cs_open(CS_ARCH_X86,CS_MODE_16,&g_handle);
-    else if (mode==MODE_X86_32)     error=cs_open(CS_ARCH_X86,CS_MODE_32,&g_handle);
-    else if (mode==MODE_X86_64)     error=cs_open(CS_ARCH_X86,CS_MODE_64,&g_handle);
+    if      (disasmMode==XBinary::DM_X86_16)        error=cs_open(CS_ARCH_X86,CS_MODE_16,&g_handle);
+    else if (disasmMode==XBinary::DM_X86_32)        error=cs_open(CS_ARCH_X86,CS_MODE_32,&g_handle);
+    else if (disasmMode==XBinary::DM_X86_64)        error=cs_open(CS_ARCH_X86,CS_MODE_64,&g_handle);
 
     if(error==CS_ERR_OK)
     {
         cs_option(g_handle,CS_OPT_DETAIL,CS_OPT_ON);
+        // TODO Syntax
     }
     else
     {
@@ -153,12 +154,12 @@ qint64 XDisasmView::cursorPositionToOffset(XAbstractTableView::CURSOR_POSITION c
         {
             nOffset=nBlockOffset;
         }
-        else if(cursorPosition.nColumn==COLUMN_HEX)
+        else if(cursorPosition.nColumn==COLUMN_BYTES)
         {
             // TODO
             nOffset=nBlockOffset;
         }
-        else if(cursorPosition.nColumn==COLUMN_DISASM)
+        else if(cursorPosition.nColumn==COLUMN_OPCODE)
         {
             nOffset=nBlockOffset;
         }
@@ -286,11 +287,11 @@ void XDisasmView::paintCell(qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nT
         {
             getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOffset); // TODO Text Optional
         }
-        else if(nColumn==COLUMN_HEX)
+        else if(nColumn==COLUMN_BYTES)
         {
             getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sHEX); // TODO Text Optional
         }
-        else if(nColumn==COLUMN_DISASM)
+        else if(nColumn==COLUMN_OPCODE)
         {
             getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sDisasm); // TODO Text Optional
         }

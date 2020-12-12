@@ -34,13 +34,6 @@ class XDisasmView : public XAbstractTableView
     Q_OBJECT
 
 public:
-    enum MODE
-    {
-        MODE_UNKNOWN=0,
-        MODE_X86_16,
-        MODE_X86_32,
-        MODE_X86_64
-    };
 
     struct OPTIONS
     {
@@ -50,7 +43,7 @@ public:
     explicit XDisasmView(QWidget *pParent=nullptr);
     ~XDisasmView();
     void setData(QIODevice *pDevice,OPTIONS options={});
-    void setMode(MODE mode);
+    void setMode(XBinary::DM disasmMode);
     void goToAddress(qint64 nAddress);
 
 private:
@@ -58,8 +51,8 @@ private:
     {
         COLUMN_ADDRESS=0,
         COLUMN_OFFSET,
-        COLUMN_HEX,
-        COLUMN_DISASM
+        COLUMN_BYTES,
+        COLUMN_OPCODE
     };
 
     struct RECORD
@@ -89,7 +82,7 @@ private:
     qint64 g_nDataSize;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-    MODE g_mode;
+    XBinary::DM g_disasmMode;
     csh g_handle;
     SearchProcess::SEARCHDATA g_searchData;
     QShortcut *g_scGoToAddress;

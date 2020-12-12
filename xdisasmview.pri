@@ -2,10 +2,12 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 HEADERS += \
-    $$PWD/xdisasmview.h
+    $$PWD/xdisasmview.h \
+    $$PWD/xmultidisasmwidget.h
 
 SOURCES += \
-    $$PWD/xdisasmview.cpp
+    $$PWD/xdisasmview.cpp \
+    $$PWD/xmultidisasmwidget.cpp
 
 !contains(XCONFIG, xformats) {
     XCONFIG += xformats
@@ -21,3 +23,6 @@ SOURCES += \
     XCONFIG += xcapstone
     include($$PWD/../XCapstone/xcapstone.pri)
 }
+
+FORMS += \
+    $$PWD/xmultidisasmwidget.ui
