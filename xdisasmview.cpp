@@ -103,6 +103,8 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
     if      (disasmMode==XBinary::DM_X86_16)        error=cs_open(CS_ARCH_X86,CS_MODE_16,&g_handle);
     else if (disasmMode==XBinary::DM_X86_32)        error=cs_open(CS_ARCH_X86,CS_MODE_32,&g_handle);
     else if (disasmMode==XBinary::DM_X86_64)        error=cs_open(CS_ARCH_X86,CS_MODE_64,&g_handle);
+    else if (disasmMode==XBinary::DM_ARM_LE)        error=cs_open(CS_ARCH_ARM,CS_MODE_ARM|CS_MODE_LITTLE_ENDIAN,&g_handle);
+    else if (disasmMode==XBinary::DM_ARM_BE)        error=cs_open(CS_ARCH_ARM,CS_MODE_ARM|CS_MODE_BIG_ENDIAN,&g_handle);
 
     if(error==CS_ERR_OK)
     {
