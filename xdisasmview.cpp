@@ -72,7 +72,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
         g_options.memoryMap=binary.getMemoryMap();
     }
 
-    setMode(XBinary::DM_X86_16);
+    setMode(XBinary::DM_X86_32);
 
     g_nDataSize=pDevice->size();
 
@@ -84,6 +84,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
     }
 
     setTotalLineCount(nTotalLineCount);
+    setScrollValue(0);
 
     reload(true);
 }
@@ -100,11 +101,26 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 
     cs_err error=CS_ERR_HANDLE;
 
-    if      (disasmMode==XBinary::DM_X86_16)        error=cs_open(CS_ARCH_X86,CS_MODE_16,&g_handle);
-    else if (disasmMode==XBinary::DM_X86_32)        error=cs_open(CS_ARCH_X86,CS_MODE_32,&g_handle);
-    else if (disasmMode==XBinary::DM_X86_64)        error=cs_open(CS_ARCH_X86,CS_MODE_64,&g_handle);
+    if      (disasmMode==XBinary::DM_X86_16)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_16),&g_handle);
+    else if (disasmMode==XBinary::DM_X86_32)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_32),&g_handle);
+    else if (disasmMode==XBinary::DM_X86_64)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_64),&g_handle);
     else if (disasmMode==XBinary::DM_ARM_LE)        error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_LITTLE_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_ARM_BE)        error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_ARM64_LE)      error=cs_open(CS_ARCH_ARM64,cs_mode(CS_MODE_ARM|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_ARM64_BE)      error=cs_open(CS_ARCH_ARM64,cs_mode(CS_MODE_ARM|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_CORTEXM)       error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_MCLASS),&g_handle);
+    else if (disasmMode==XBinary::DM_THUMB_LE)      error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_THUMB_BE)      error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_MIPS_LE)       error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS32|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_MIPS_BE)       error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS32|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_MIPS64_LE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_MIPS64_BE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_PPC64_LE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_PPC64_BE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_SPARC)         error=cs_open(CS_ARCH_SPARC,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_S390X)         error=cs_open(CS_ARCH_SYSZ,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_XCORE)         error=cs_open(CS_ARCH_XCORE,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_M68K)          error=cs_open(CS_ARCH_M68K,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
 
     if(error==CS_ERR_OK)
     {
@@ -146,29 +162,34 @@ qint64 XDisasmView::cursorPositionToOffset(XAbstractTableView::CURSOR_POSITION c
 
     if((cursorPosition.bIsValid)&&(cursorPosition.ptype==PT_CELL))
     {
-        qint64 nBlockOffset=getViewStart()+(cursorPosition.nRow*g_nBytesProLine);
-
-        if(cursorPosition.nColumn==COLUMN_ADDRESS)
+        if(cursorPosition.nRow<g_listRecords.count())
         {
-            nOffset=nBlockOffset;
+            qint64 nBlockOffset=0;
+            nBlockOffset=g_listRecords.at(cursorPosition.nRow).nOffset;
+            if(cursorPosition.nColumn==COLUMN_ADDRESS)
+            {
+                nOffset=nBlockOffset;
+            }
+            else if(cursorPosition.nColumn==COLUMN_OFFSET)
+            {
+                nOffset=nBlockOffset;
+            }
+            else if(cursorPosition.nColumn==COLUMN_BYTES)
+            {
+                // TODO
+                nOffset=nBlockOffset;
+            }
+            else if(cursorPosition.nColumn==COLUMN_OPCODE)
+            {
+                nOffset=nBlockOffset;
+            }
         }
-        else if(cursorPosition.nColumn==COLUMN_OFFSET)
+        else
         {
-            nOffset=nBlockOffset;
-        }
-        else if(cursorPosition.nColumn==COLUMN_BYTES)
-        {
-            // TODO
-            nOffset=nBlockOffset;
-        }
-        else if(cursorPosition.nColumn==COLUMN_OPCODE)
-        {
-            nOffset=nBlockOffset;
-        }
-
-        if(!isOffsetValid(nOffset))
-        {
-            nOffset=g_nDataSize; // TODO Check
+            if(!isOffsetValid(nOffset))
+            {
+                nOffset=g_nDataSize; // TODO Check
+            }
         }
     }
 
@@ -195,7 +216,7 @@ void XDisasmView::updateData()
             if(nCurrentOffset<g_nDataSize)
             {
                 qint32 nBufferSize=qMin(baBuffer.size(),qint32(g_nDataSize-nCurrentOffset));
-                qDebug("BufferSize: %d",nBufferSize);
+
                 nBufferSize=XBinary::read_array(g_pDevice,nCurrentOffset,baBuffer.data(),nBufferSize);
 
                 if(nBufferSize==0)
@@ -305,6 +326,73 @@ void XDisasmView::endPainting()
 
 }
 
+void XDisasmView::contextMenu(const QPoint &pos)
+{
+    QAction actionGoToAddress(tr("Go to address"),this);
+    actionGoToAddress.setShortcut(QKeySequence(XShortcuts::GOTOADDRESS));
+    connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddress()));
+
+    QAction actionDumpToFile(tr("Dump to file"),this);
+    actionDumpToFile.setShortcut(QKeySequence(XShortcuts::DUMPTOFILE));
+    connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFile()));
+
+    QAction actionSignature(tr("Signature"),this);
+    actionSignature.setShortcut(QKeySequence(XShortcuts::SIGNATURE));
+    connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signature()));
+
+    QAction actionFind(tr("Find"),this);
+    actionFind.setShortcut(QKeySequence(XShortcuts::FIND));
+    connect(&actionFind,SIGNAL(triggered()),this,SLOT(_find()));
+
+    QAction actionFindNext(tr("Find next"),this);
+    actionFindNext.setShortcut(QKeySequence(XShortcuts::FINDNEXT));
+    connect(&actionFindNext,SIGNAL(triggered()),this,SLOT(_findNext()));
+
+    QAction actionSelectAll(tr("Select all"),this);
+    actionSelectAll.setShortcut(QKeySequence(XShortcuts::SELECTALL));
+    connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAll()));
+
+    QAction actionCopyAsHex(tr("Copy as hex"),this);
+    actionCopyAsHex.setShortcut(QKeySequence(XShortcuts::COPYASHEX));
+    connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyAsHex()));
+
+    QMenu contextMenu(this);
+    QMenu menuSelect(tr("Select"),this);
+    QMenu menuCopy(tr("Copy"),this);
+
+    contextMenu.addAction(&actionGoToAddress);
+    contextMenu.addAction(&actionFind);
+    contextMenu.addAction(&actionFindNext);
+
+    STATE state=getState();
+
+    if(state.nSelectionSize)
+    {
+        contextMenu.addAction(&actionDumpToFile);
+        contextMenu.addAction(&actionSignature);
+
+        menuCopy.addAction(&actionCopyAsHex);
+        contextMenu.addMenu(&menuCopy);
+    }
+
+    menuSelect.addAction(&actionSelectAll);
+    contextMenu.addMenu(&menuSelect);
+
+    // TODO reset select
+
+    contextMenu.exec(pos);
+}
+
+void XDisasmView::wheelEvent(QWheelEvent *pEvent)
+{
+    XAbstractTableView::wheelEvent(pEvent);
+}
+
+void XDisasmView::keyPressEvent(QKeyEvent *pEvent)
+{
+    XAbstractTableView::keyPressEvent(pEvent);
+}
+
 qint64 XDisasmView::getScrollValue()
 {
     qint64 nResult=0;
@@ -327,6 +415,15 @@ qint64 XDisasmView::getScrollValue()
     else
     {
         nResult=(qint64)nValue*g_nBytesProLine;
+    }
+
+    if(nResult>getViewStart())
+    {
+        qDebug("##++");
+    }
+    else if(nResult<getViewStart())
+    {
+        qDebug("##--");
     }
 
     return nResult;
@@ -357,4 +454,93 @@ void XDisasmView::setScrollValue(qint64 nOffset)
     verticalScrollBar()->setValue(nValue);
 
     adjust(true);
+}
+
+void XDisasmView::_goToAddress()
+{
+    DialogGoToAddress da(this,&(g_options.memoryMap),DialogGoToAddress::TYPE_ADDRESS);
+    if(da.exec()==QDialog::Accepted)
+    {
+        goToAddress(da.getValue());
+        setFocus();
+        viewport()->update();
+    }
+}
+
+void XDisasmView::_dumpToFile()
+{
+    QString sFilter;
+    sFilter+=QString("%1 (*.bin)").arg(tr("Raw data"));
+    QString sSaveFileName="dump.bin"; // TODO a function
+    QString sFileName=QFileDialog::getSaveFileName(this,tr("Save dump"),sSaveFileName,sFilter);
+
+    if(!sFileName.isEmpty())
+    {
+        STATE state=getState();
+
+        DialogDumpProcess dd(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize,sFileName,DumpProcess::DT_OFFSET);
+
+        dd.exec();
+    }
+}
+
+void XDisasmView::_signature()
+{
+    STATE state=getState();
+
+    DialogHexSignature dsh(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize);
+
+    dsh.exec();
+}
+
+void XDisasmView::_find()
+{
+    STATE state=getState();
+
+    g_searchData={};
+    g_searchData.nResult=-1;
+    g_searchData.nCurrentOffset=state.nCursorOffset;
+
+    DialogSearch dialogSearch(this,g_pDevice,&g_searchData);
+
+    if(dialogSearch.exec()==QDialog::Accepted)
+    {
+        goToOffset(g_searchData.nResult);
+        setFocus();
+        viewport()->update();
+    }
+}
+
+void XDisasmView::_findNext()
+{
+    if(g_searchData.bInit)
+    {
+        g_searchData.nCurrentOffset=g_searchData.nResult+1;
+        g_searchData.startFrom=SearchProcess::SF_CURRENTOFFSET;
+
+        DialogSearchProcess dialogSearch(this,g_pDevice,&g_searchData);
+
+        if(dialogSearch.exec()==QDialog::Accepted)
+        {
+            goToOffset(g_searchData.nResult);
+            setFocus();
+            viewport()->update();
+        }
+    }
+}
+
+void XDisasmView::_selectAll()
+{
+    setSelection(0,g_nDataSize);
+}
+
+void XDisasmView::_copyAsHex()
+{
+    STATE state=getState();
+
+    qint64 nSize=qMin(state.nSelectionSize,(qint64)0x10000);
+
+    QByteArray baData=XBinary::read_array(g_pDevice,state.nSelectionOffset,nSize);
+
+    QApplication::clipboard()->setText(baData.toHex());
 }

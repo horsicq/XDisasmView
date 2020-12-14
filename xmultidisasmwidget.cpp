@@ -26,6 +26,29 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     ui(new Ui::XMultiDisasmWidget)
 {
     ui->setupUi(this);
+
+    QSignalBlocker blocker(ui->comboBoxMode);
+
+    addMode(XBinary::DM_X86_16);
+    addMode(XBinary::DM_X86_32);
+    addMode(XBinary::DM_X86_64);
+    addMode(XBinary::DM_ARM_LE);
+    addMode(XBinary::DM_ARM_BE);
+    addMode(XBinary::DM_ARM64_LE);
+    addMode(XBinary::DM_ARM64_BE);
+    addMode(XBinary::DM_CORTEXM);
+    addMode(XBinary::DM_THUMB_LE);
+    addMode(XBinary::DM_THUMB_BE);
+    addMode(XBinary::DM_MIPS_LE);
+    addMode(XBinary::DM_MIPS_BE);
+    addMode(XBinary::DM_MIPS64_LE);
+    addMode(XBinary::DM_MIPS64_BE);
+    addMode(XBinary::DM_PPC64_LE);
+    addMode(XBinary::DM_PPC64_BE);
+    addMode(XBinary::DM_SPARC);
+    addMode(XBinary::DM_S390X);
+    addMode(XBinary::DM_XCORE);
+    addMode(XBinary::DM_M68K);
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -36,4 +59,19 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 void XMultiDisasmWidget::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 {
     ui->scrollAreaHex->setData(pDevice,options);
+}
+
+void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
+{
+    ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);
+}
+
+void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
+{
+    Q_UNUSED(nIndex)
+
+    XBinary::DM disasmMode=(XBinary::DM)(ui->comboBoxMode->currentData().toInt());
+
+    ui->scrollAreaHex->setMode(disasmMode);
+    ui->scrollAreaHex->reload(true);
 }

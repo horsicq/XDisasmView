@@ -21,6 +21,7 @@
 #ifndef XMULTIDISASMWIDGET_H
 #define XMULTIDISASMWIDGET_H
 
+#include <QComboBox>
 #include "xdisasmview.h"
 
 namespace Ui {
@@ -36,6 +37,12 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice,XDisasmView::OPTIONS options={});
+
+private:
+    void addMode(XBinary::DM disasmMode);
+
+private slots:
+    void on_comboBoxMode_currentIndexChanged(int nIndex);
 
 private:
     Ui::XMultiDisasmWidget *ui;

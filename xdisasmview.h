@@ -73,8 +73,20 @@ protected:
     virtual void paintColumn(qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void paintCell(qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void endPainting();
+    virtual void contextMenu(const QPoint &pos);
+    virtual void wheelEvent(QWheelEvent *pEvent);
+    virtual void keyPressEvent(QKeyEvent *pEvent);
     virtual qint64 getScrollValue();
     virtual void setScrollValue(qint64 nOffset);
+
+private slots:
+    void _goToAddress();
+    void _dumpToFile();
+    void _signature();
+    void _find();
+    void _findNext();
+    void _selectAll();
+    void _copyAsHex();
 
 private:
     QIODevice *g_pDevice;
