@@ -37,6 +37,7 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice,XDisasmView::OPTIONS options={});
+    void goToAddress(qint64 nAddress);
 
 private:
     void addMode(XBinary::DM disasmMode);

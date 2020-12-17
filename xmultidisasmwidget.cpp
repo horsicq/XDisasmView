@@ -59,6 +59,26 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 void XMultiDisasmWidget::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 {
     ui->scrollAreaHex->setData(pDevice,options);
+
+    XBinary::DM disasmMode=XBinary::getDisasmMode(&(options.memoryMap));
+
+    int nCount=ui->comboBoxMode->count();
+
+    for(int i=0;i<nCount;i++)
+    {
+        if(ui->comboBoxMode->itemData(i).toInt()==(int)disasmMode)
+        {
+            ui->comboBoxMode->setCurrentIndex(i);
+
+            break;
+        }
+    }
+}
+
+void XMultiDisasmWidget::goToAddress(qint64 nAddress)
+{
+    ui->scrollAreaHex->goToAddress(nAddress);
+    ui->scrollAreaHex->reload(true);
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)

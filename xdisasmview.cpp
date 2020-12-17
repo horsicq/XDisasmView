@@ -72,7 +72,12 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
         g_options.memoryMap=binary.getMemoryMap();
     }
 
-    setMode(XBinary::DM_X86_32);
+    if((g_options.memoryMap.nBaseAddress==0)&&(g_options.memoryMap.listRecords.count()==1))
+    {
+        setColumnEnabled(COLUMN_OFFSET,false);
+    }
+
+    setMode(XBinary::DM_X86_16);
 
     g_nDataSize=pDevice->size();
 
