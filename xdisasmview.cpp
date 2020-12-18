@@ -47,10 +47,13 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     setTextFont(QFont("Courier",10)); // TODO Check "Menlo"
 #endif
 
-    addColumn((8+2)*getCharWidth(),tr("Address"));
-    addColumn((8+2)*getCharWidth(),tr("Offset"));
+    addColumn((10+2)*getCharWidth(),tr("Address"));
+    addColumn((10+2)*getCharWidth(),tr("Offset"));
     addColumn((15*2)*getCharWidth(),tr("Bytes"));
     addColumn(40*getCharWidth(),tr("Opcode"));
+
+    g_nAddressWidth=8;
+    g_nOpcodeSize=16;
 }
 
 XDisasmView::~XDisasmView()
@@ -77,9 +80,24 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
         setColumnEnabled(COLUMN_OFFSET,false);
     }
 
-    setMode(XBinary::DM_X86_16);
+    XBinary::DM disasmMode=XBinary::getDisasmMode(&(options.memoryMap));
+
+    setMode(disasmMode);
 
     g_nDataSize=pDevice->size();
+
+    if(XBinary::getModeFromSize(g_nDataSize)==XBinary::MODE_64)
+    {
+        g_nAddressWidth=16;
+        setColumnWidth(COLUMN_ADDRESS,(12+2)*getCharWidth());
+        setColumnWidth(COLUMN_OFFSET,(12+2)*getCharWidth());
+    }
+    else
+    {
+        g_nAddressWidth=8;
+        setColumnWidth(COLUMN_ADDRESS,(10+2)*getCharWidth());
+        setColumnWidth(COLUMN_OFFSET,(10+2)*getCharWidth());
+    }
 
     qint64 nTotalLineCount=g_nDataSize/g_nBytesProLine;
 
@@ -138,10 +156,114 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
     }
 }
 
+XBinary::DM XDisasmView::getMode()
+{
+    return g_disasmMode;
+}
+
 void XDisasmView::goToAddress(qint64 nAddress)
 {
     goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),nAddress));
     // TODO reload
+}
+
+XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
+{
+    DISASM_RESULT result={};
+
+    if(g_handle)
+    {
+        cs_insn *pInsn=0;
+
+        int nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)pData,nDataSize,nAddress,1,&pInsn);
+        if(nNumberOfOpcodes>0)
+        {
+            QString sMnemonic=pInsn->mnemonic;
+            QString sStr=pInsn->op_str;
+
+            result.sOpcode+=sMnemonic;
+
+            if(sStr!="")
+            {
+                result.sOpcode+=QString(" %1").arg(sStr);
+            }
+
+            result.nSize=pInsn->size;
+
+            cs_free(pInsn, nNumberOfOpcodes);
+        }
+        else
+        {
+            result.sOpcode=tr("Invalid opcode");
+            result.nSize=1;
+        }
+    }
+    else
+    {
+        result.nSize=1;
+    }
+
+    return result;
+}
+
+qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
+{
+    qint64 nResult=nOffset;
+
+    if(nOffset!=nOldOffset)
+    {
+        qint64 nStartOffset=nOffset-5*g_nOpcodeSize;
+        qint64 nEndOffset=nOffset+5*g_nOpcodeSize;
+
+        nStartOffset=qMax(nStartOffset,(qint64)0);
+        nEndOffset=qMin(nEndOffset,g_nDataSize);
+
+        if(nOffset>nOldOffset)
+        {
+            nStartOffset=qMax(nStartOffset,nOldOffset);
+        }
+
+        qint32 nSize=nEndOffset-nStartOffset;
+
+        QByteArray baData=XBinary::read_array(g_pDevice,nStartOffset,nSize);
+
+        nSize=baData.size();
+
+        qint64 _nCurrentOffset=0;
+
+        while(nSize>0)
+        {
+            qint64 _nOffset=nStartOffset+_nCurrentOffset;
+
+            DISASM_RESULT disasmResult=_disasm(baData.data()+_nCurrentOffset,nSize,_nCurrentOffset);
+
+            if((_nOffset<=nOffset)&&(nOffset<_nOffset+disasmResult.nSize))
+            {
+                if(_nOffset==nOffset)
+                {
+                    nResult=_nOffset;
+                }
+                else
+                {
+                    if(nOffset>nOldOffset)
+                    {
+                        nResult=_nOffset+disasmResult.nSize;
+                    }
+                    else
+                    {
+                        nResult=_nOffset;
+                    }
+                }
+
+                break;
+            }
+
+            _nCurrentOffset+=disasmResult.nSize;
+            nSize-=disasmResult.nSize;
+        }
+    }
+
+    return nResult;
 }
 
 bool XDisasmView::isOffsetValid(qint64 nOffset)
@@ -214,13 +336,13 @@ void XDisasmView::updateData()
         qint64 nCurrentOffset=nBlockOffset;
 
         QByteArray baBuffer;
-        baBuffer.resize(16); // TODO Check
+        baBuffer.resize(g_nOpcodeSize); // TODO Check
 
         for(int i=0;i<nNumberLinesProPage;i++)
         {
             if(nCurrentOffset<g_nDataSize)
             {
-                qint32 nBufferSize=qMin(baBuffer.size(),qint32(g_nDataSize-nCurrentOffset));
+                qint32 nBufferSize=qMin(g_nOpcodeSize,qint32(g_nDataSize-nCurrentOffset));
 
                 nBufferSize=XBinary::read_array(g_pDevice,nCurrentOffset,baBuffer.data(),nBufferSize);
 
@@ -234,40 +356,17 @@ void XDisasmView::updateData()
                 qint64 nCurrentAddress=XBinary::offsetToAddress(&(g_options.memoryMap),nCurrentOffset);
 
                 record.nOffset=nCurrentOffset;
-                record.sOffset=QString("%1").arg(nCurrentOffset,8,16,QChar('0')); // TODO address width
-                record.sAddress=QString("%1").arg(nCurrentAddress,8,16,QChar('0')); // TODO address width
+                record.sOffset=QString("%1").arg(nCurrentOffset,g_nAddressWidth,16,QChar('0'));
 
-                if(g_handle)
+                if(nCurrentAddress!=-1)
                 {
-                    cs_insn *pInsn=0;
-
-                    int nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)baBuffer.data(),nBufferSize,nCurrentAddress,1,&pInsn);
-                    if(nNumberOfOpcodes>0)
-                    {
-                        QString sMnemonic=pInsn->mnemonic;
-                        QString sStr=pInsn->op_str;
-
-                        record.sDisasm+=sMnemonic;
-
-                        if(sStr!="")
-                        {
-                            record.sDisasm+=QString(" %1").arg(sStr);
-                        }
-
-                        nBufferSize=pInsn->size;
-
-                        cs_free(pInsn, nNumberOfOpcodes);
-                    }
-                    else
-                    {
-                        record.sDisasm=tr("Invalid opcode");
-                        nBufferSize=1;
-                    }
+                    record.sAddress=QString("%1").arg(nCurrentAddress,g_nAddressWidth,16,QChar('0'));
                 }
-                else
-                {
-                    nBufferSize=1;
-                }
+
+                DISASM_RESULT disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress);
+
+                record.sOpcode=disasmResult.sOpcode;
+                nBufferSize=disasmResult.nSize;
 
                 baBuffer.resize(nBufferSize);
                 record.sHEX=baBuffer.toHex().data();
@@ -321,7 +420,7 @@ void XDisasmView::paintCell(qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nT
         }
         else if(nColumn==COLUMN_OPCODE)
         {
-            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sDisasm); // TODO Text Optional
+            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOpcode); // TODO Text Optional
         }
     }
 }
@@ -422,13 +521,14 @@ qint64 XDisasmView::getScrollValue()
         nResult=(qint64)nValue*g_nBytesProLine;
     }
 
-    if(nResult>getViewStart())
+
+    qint64 _nResult=getDisasmOffset(nResult,getViewStart());
+
+    if(_nResult!=nResult)
     {
-        qDebug("##++");
-    }
-    else if(nResult<getViewStart())
-    {
-        qDebug("##--");
+        nResult=_nResult;
+
+        setScrollValue(nResult);
     }
 
     return nResult;

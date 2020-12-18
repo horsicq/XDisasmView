@@ -44,6 +44,7 @@ public:
     ~XDisasmView();
     void setData(QIODevice *pDevice,OPTIONS options={});
     void setMode(XBinary::DM disasmMode);
+    XBinary::DM getMode();
     void goToAddress(qint64 nAddress);
 
 private:
@@ -60,9 +61,19 @@ private:
         QString sAddress;
         QString sOffset;
         QString sHEX;
-        QString sDisasm;
+        QString sOpcode;
         qint64 nOffset;
     };
+
+    struct DISASM_RESULT
+    {
+        bool bIsValid;
+        qint32 nSize;
+        QString sOpcode;
+    };
+
+    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress);
+    qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
 
 protected:
     virtual bool isOffsetValid(qint64 nOffset);
@@ -104,6 +115,8 @@ private:
     QShortcut *g_scFind;
     QShortcut *g_scFindNext;
     QShortcut *g_scSignature;
+    qint32 g_nAddressWidth;
+    qint32 g_nOpcodeSize;
 };
 
 #endif // XDISASMVIEW_H

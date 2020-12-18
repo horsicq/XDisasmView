@@ -58,9 +58,11 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 
 void XMultiDisasmWidget::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 {
+    QSignalBlocker blocker(ui->comboBoxMode);
+
     ui->scrollAreaHex->setData(pDevice,options);
 
-    XBinary::DM disasmMode=XBinary::getDisasmMode(&(options.memoryMap));
+    XBinary::DM disasmMode=ui->scrollAreaHex->getMode();
 
     int nCount=ui->comboBoxMode->count();
 
