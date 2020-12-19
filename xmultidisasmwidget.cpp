@@ -50,6 +50,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_XCORE);
     addMode(XBinary::DM_M68K);
     addMode(XBinary::DM_M68K40);
+    addMode(XBinary::DM_TMS320C64X);
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
