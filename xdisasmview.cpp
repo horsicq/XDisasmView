@@ -49,7 +49,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
 
     addColumn((10+2)*getCharWidth(),tr("Address"));
     addColumn((10+2)*getCharWidth(),tr("Offset"));
-    addColumn((15*2)*getCharWidth(),tr("Bytes"));
+    addColumn((15*2)*getCharWidth(),tr("Bytes")); // TODO adjust function
     addColumn(40*getCharWidth(),tr("Opcode"));
 
     g_nAddressWidth=8;
@@ -86,17 +86,19 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     g_nDataSize=pDevice->size();
 
+    const QFontMetricsF fm(getTextFont());
+
     if(XBinary::getModeFromSize(g_nDataSize)==XBinary::MODE_64)
     {
         g_nAddressWidth=16;
-        setColumnWidth(COLUMN_ADDRESS,(12+2)*getCharWidth());
-        setColumnWidth(COLUMN_OFFSET,(12+2)*getCharWidth());
+        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
+        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
     }
     else
     {
         g_nAddressWidth=8;
-        setColumnWidth(COLUMN_ADDRESS,(10+2)*getCharWidth());
-        setColumnWidth(COLUMN_OFFSET,(10+2)*getCharWidth());
+        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("00000000").width());
+        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000").width());
     }
 
     qint64 nTotalLineCount=g_nDataSize/g_nBytesProLine;
@@ -147,6 +149,17 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
     else if (disasmMode==XBinary::DM_M68K40)        error=cs_open(CS_ARCH_M68K,cs_mode(CS_MODE_M68K_040),&g_handle);
     else if (disasmMode==XBinary::DM_TMS320C64X)    error=cs_open(CS_ARCH_TMS320C64X,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_M6800)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6800),&g_handle);
+    else if (disasmMode==XBinary::DM_M6801)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6801),&g_handle);
+    else if (disasmMode==XBinary::DM_M6805)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6805),&g_handle);
+    else if (disasmMode==XBinary::DM_M6808)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6808),&g_handle);
+    else if (disasmMode==XBinary::DM_M6809)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6809),&g_handle);
+    else if (disasmMode==XBinary::DM_M6811)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6811),&g_handle);
+    else if (disasmMode==XBinary::DM_CPU12)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_CPU12),&g_handle);
+    else if (disasmMode==XBinary::DM_HD6301)        error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6301),&g_handle);
+    else if (disasmMode==XBinary::DM_HD6309)        error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6309),&g_handle);
+    else if (disasmMode==XBinary::DM_HCS08)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_HCS08),&g_handle);
+//    else if (disasmMode==XBinary::DM_EVM)           error=cs_open(CS_ARCH_M680X,cs_mode(CS_ARCH_EVM),&g_handle);
+//    else if (disasmMode==XBinary::DM_MOS65XX)       error=cs_open(CS_ARCH_M680X,cs_mode(CS_ARCH_MOS65XX),&g_handle);
 
     if(error==CS_ERR_OK)
     {
@@ -166,7 +179,7 @@ XBinary::DM XDisasmView::getMode()
 
 void XDisasmView::goToAddress(qint64 nAddress)
 {
-    goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),nAddress));
+    _goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),nAddress));
     // TODO reload
 }
 
@@ -613,7 +626,7 @@ void XDisasmView::_find()
 
     if(dialogSearch.exec()==QDialog::Accepted)
     {
-        goToOffset(g_searchData.nResult);
+        _goToOffset(g_searchData.nResult);
         setFocus();
         viewport()->update();
     }
@@ -630,7 +643,7 @@ void XDisasmView::_findNext()
 
         if(dialogSearch.exec()==QDialog::Accepted)
         {
-            goToOffset(g_searchData.nResult);
+            _goToOffset(g_searchData.nResult);
             setFocus();
             viewport()->update();
         }

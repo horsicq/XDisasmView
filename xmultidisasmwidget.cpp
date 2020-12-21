@@ -52,6 +52,17 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_M68K40);
     addMode(XBinary::DM_TMS320C64X);
     addMode(XBinary::DM_M6800);
+    addMode(XBinary::DM_M6801);
+    addMode(XBinary::DM_M6805);
+    addMode(XBinary::DM_M6808);
+    addMode(XBinary::DM_M6809);
+    addMode(XBinary::DM_M6811);
+    addMode(XBinary::DM_CPU12);
+    addMode(XBinary::DM_HD6301);
+    addMode(XBinary::DM_HD6309);
+    addMode(XBinary::DM_HCS08);
+//    addMode(XBinary::DM_EVM);
+//    addMode(XBinary::DM_MOS65XX);
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
