@@ -70,9 +70,14 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
+void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nStartAddress)
 {
-    QSignalBlocker blocker(ui->comboBoxMode);
+    QSignalBlocker blocker1(ui->comboBoxMode);
+    QSignalBlocker blocker2(ui->comboBoxType);
+
+    XDisasmView::OPTIONS options={};
+    options.nStartAddress=nStartAddress;
+    options.memoryMap=XFormats::getMemoryMap(fileType,pDevice);
 
     ui->scrollAreaHex->setData(pDevice,options);
 
@@ -89,12 +94,6 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XDisasmView::OPTIONS option
             break;
         }
     }
-}
-
-void XMultiDisasmWidget::goToAddress(qint64 nAddress)
-{
-    ui->scrollAreaHex->goToAddress(nAddress);
-    ui->scrollAreaHex->reload(true);
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)

@@ -18,34 +18,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef XMULTIDISASMWIDGET_H
-#define XMULTIDISASMWIDGET_H
+#include "dialogmultidisasm.h"
+#include "ui_dialogmultidisasm.h"
 
-#include <QComboBox>
-#include "xdisasmview.h"
-
-namespace Ui {
-class XMultiDisasmWidget;
+DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) :
+    QDialog(pParent),
+    ui(new Ui::DialogMultiDisasm)
+{
+    ui->setupUi(this);
 }
 
-class XMultiDisasmWidget : public QWidget
+DialogMultiDisasm::~DialogMultiDisasm()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
-    ~XMultiDisasmWidget();
+void DialogMultiDisasm::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nStartAddress)
+{
+    ui->widgetDisasm->setData(pDevice,fileType,nStartAddress);
+}
 
-    void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nStartAddress);
-
-private:
-    void addMode(XBinary::DM disasmMode);
-
-private slots:
-    void on_comboBoxMode_currentIndexChanged(int nIndex);
-
-private:
-    Ui::XMultiDisasmWidget *ui;
-};
-
-#endif // XMULTIDISASMWIDGET_H
+void DialogMultiDisasm::on_pushButtonClose_clicked()
+{
+    this->close();
+}

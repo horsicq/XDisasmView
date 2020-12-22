@@ -18,34 +18,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef XMULTIDISASMWIDGET_H
-#define XMULTIDISASMWIDGET_H
+#ifndef DIALOGMULTIDISASM_H
+#define DIALOGMULTIDISASM_H
 
-#include <QComboBox>
-#include "xdisasmview.h"
+#include "xmultidisasmwidget.h"
 
 namespace Ui {
-class XMultiDisasmWidget;
+class DialogMultiDisasm;
 }
 
-class XMultiDisasmWidget : public QWidget
+class DialogMultiDisasm : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
-    ~XMultiDisasmWidget();
+    explicit DialogMultiDisasm(QWidget *pParent=nullptr);
+    ~DialogMultiDisasm();
 
     void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nStartAddress);
 
-private:
-    void addMode(XBinary::DM disasmMode);
-
 private slots:
-    void on_comboBoxMode_currentIndexChanged(int nIndex);
+    void on_pushButtonClose_clicked();
 
 private:
-    Ui::XMultiDisasmWidget *ui;
+    Ui::DialogMultiDisasm *ui;
 };
 
-#endif // XMULTIDISASMWIDGET_H
+#endif // DIALOGMULTIDISASM_H

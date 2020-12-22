@@ -22,6 +22,7 @@
 #define XDISASMVIEW_H
 
 #include "xcapstone.h"
+#include "xformats.h"
 #include "xabstracttableview.h"
 #include "dialoggotoaddress.h"
 #include "dialogsearch.h"
@@ -37,6 +38,7 @@ public:
 
     struct OPTIONS
     {
+        qint64 nStartAddress;
         XBinary::_MEMORY_MAP memoryMap;
     };
 

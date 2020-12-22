@@ -109,7 +109,15 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
     }
 
     setTotalLineCount(nTotalLineCount);
-    setScrollValue(0);
+
+    if(options.nStartAddress)
+    {
+        _goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),options.nStartAddress));
+    }
+    else
+    {
+        setScrollValue(0);
+    }
 
     reload(true);
 }
