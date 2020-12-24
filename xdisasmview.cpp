@@ -37,6 +37,14 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_scFindNext      =new QShortcut(QKeySequence(XShortcuts::FINDNEXT),      this,SLOT(_findNext()));
     g_scSignature     =new QShortcut(QKeySequence(XShortcuts::SIGNATURE),     this,SLOT(_signature()));
 
+    addColumn(tr("Address"));
+    addColumn(tr("Offset"));
+    addColumn(tr("Bytes"));
+    addColumn(tr("Opcode"));
+
+    g_nAddressWidth=8;
+    g_nOpcodeSize=16;
+
 #ifdef Q_OS_WIN
     setTextFont(QFont("Courier",10));
 #endif
@@ -46,14 +54,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
 #ifdef Q_OS_OSX
     setTextFont(QFont("Courier",10)); // TODO Check "Menlo"
 #endif
-
-    addColumn((10+2)*getCharWidth(),tr("Address"));
-    addColumn((10+2)*getCharWidth(),tr("Offset"));
-    addColumn((15*2)*getCharWidth(),tr("Bytes")); // TODO adjust function
-    addColumn(40*getCharWidth(),tr("Opcode"));
-
-    g_nAddressWidth=8;
-    g_nOpcodeSize=16;
 }
 
 XDisasmView::~XDisasmView()
@@ -75,31 +75,13 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
         g_options.memoryMap=binary.getMemoryMap();
     }
 
-    if((g_options.memoryMap.nBaseAddress==0)&&(g_options.memoryMap.listRecords.count()==1))
-    {
-        setColumnEnabled(COLUMN_OFFSET,false);
-    }
-
     XBinary::DM disasmMode=XBinary::getDisasmMode(&(options.memoryMap));
 
     setMode(disasmMode);
 
     g_nDataSize=pDevice->size();
 
-    const QFontMetricsF fm(getTextFont());
-
-    if(XBinary::getModeFromSize(g_nDataSize)==XBinary::MODE_64)
-    {
-        g_nAddressWidth=16;
-        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
-        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
-    }
-    else
-    {
-        g_nAddressWidth=8;
-        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("00000000").width());
-        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000").width());
-    }
+    adjustColumns();
 
     qint64 nTotalLineCount=g_nDataSize/g_nBytesProLine;
 
@@ -255,6 +237,7 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
 
         qint64 _nCurrentOffset=0;
 
+        // TODO nOffset<nOldOffset
         while(nSize>0)
         {
             qint64 _nOffset=nStartOffset+_nCurrentOffset;
@@ -583,6 +566,39 @@ void XDisasmView::setScrollValue(qint64 nOffset)
     verticalScrollBar()->setValue(nValue);
 
     adjust(true);
+}
+
+void XDisasmView::adjustColumns()
+{
+    if((g_options.memoryMap.nBaseAddress==0)&&(g_options.memoryMap.listRecords.count()==1))
+    {
+        setColumnEnabled(COLUMN_OFFSET,false);
+    }
+
+    const QFontMetricsF fm(getTextFont());
+
+    if(XBinary::getModeFromSize(g_nDataSize)==XBinary::MODE_64)
+    {
+        g_nAddressWidth=16;
+        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
+        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
+    }
+    else
+    {
+        g_nAddressWidth=8;
+        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("00000000").width());
+        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000").width());
+    }
+
+    QString sBytes;
+
+    for(int i=0;i<g_nOpcodeSize;i++)
+    {
+        sBytes+="00";
+    }
+
+    setColumnWidth(COLUMN_BYTES,2*getCharWidth()+fm.boundingRect(sBytes).width());
+    setColumnWidth(COLUMN_OPCODE,40*getCharWidth());
 }
 
 void XDisasmView::_goToAddress()
