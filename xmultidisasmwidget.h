@@ -21,6 +21,7 @@
 #ifndef XMULTIDISASMWIDGET_H
 #define XMULTIDISASMWIDGET_H
 
+#include "xformats.h"
 #include <QComboBox>
 #include "xdisasmview.h"
 

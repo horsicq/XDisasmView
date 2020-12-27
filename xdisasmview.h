@@ -45,7 +45,7 @@ public:
 
     explicit XDisasmView(QWidget *pParent=nullptr);
     ~XDisasmView();
-    void setData(QIODevice *pDevice,OPTIONS options={});
+    void setData(QIODevice *pDevice,OPTIONS options);
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
     void goToAddress(qint64 nAddress);

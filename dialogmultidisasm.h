@@ -21,6 +21,7 @@
 #ifndef DIALOGMULTIDISASM_H
 #define DIALOGMULTIDISASM_H
 
+#include <QDialog>
 #include "xmultidisasmwidget.h"
 
 namespace Ui {
