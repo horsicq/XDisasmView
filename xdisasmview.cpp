@@ -130,6 +130,8 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
     else if (disasmMode==XBinary::DM_MIPS_BE)       error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS32|CS_MODE_BIG_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_MIPS64_LE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_LITTLE_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_MIPS64_BE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_BIG_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_PPC_LE)        error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_32|CS_MODE_LITTLE_ENDIAN),&g_handle);
+    else if (disasmMode==XBinary::DM_PPC_BE)        error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_32|CS_MODE_BIG_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_PPC64_LE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_LITTLE_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_PPC64_BE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_BIG_ENDIAN),&g_handle);
     else if (disasmMode==XBinary::DM_SPARC)         error=cs_open(CS_ARCH_SPARC,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);

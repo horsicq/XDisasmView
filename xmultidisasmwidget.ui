@@ -124,7 +124,7 @@
     </widget>
    </item>
    <item>
-    <widget class="XDisasmView" name="scrollAreaHex" native="true">
+    <widget class="XDisasmView" name="scrollAreaDisasm" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>

@@ -43,6 +43,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_MIPS_BE);
     addMode(XBinary::DM_MIPS64_LE);
     addMode(XBinary::DM_MIPS64_BE);
+    addMode(XBinary::DM_PPC_LE);
+    addMode(XBinary::DM_PPC_BE);
     addMode(XBinary::DM_PPC64_LE);
     addMode(XBinary::DM_PPC64_BE);
     addMode(XBinary::DM_SPARC);
@@ -72,6 +74,7 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 
 void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nStartAddress)
 {
+    // TODO
     QSignalBlocker blocker1(ui->comboBoxMode);
     QSignalBlocker blocker2(ui->comboBoxType);
 
@@ -79,9 +82,9 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
     options.nStartAddress=nStartAddress;
     options.memoryMap=XFormats::getMemoryMap(fileType,pDevice);
 
-    ui->scrollAreaHex->setData(pDevice,options);
+    ui->scrollAreaDisasm->setData(pDevice,options);
 
-    XBinary::DM disasmMode=ui->scrollAreaHex->getMode();
+    XBinary::DM disasmMode=ui->scrollAreaDisasm->getMode();
 
     int nCount=ui->comboBoxMode->count();
 
@@ -107,6 +110,6 @@ void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
 
     XBinary::DM disasmMode=(XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
-    ui->scrollAreaHex->setMode(disasmMode);
-    ui->scrollAreaHex->reload(true);
+    ui->scrollAreaDisasm->setMode(disasmMode);
+    ui->scrollAreaDisasm->reload(true);
 }
