@@ -73,16 +73,34 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 }
 
 void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nStartAddress)
+{ 
+    g_pDevice=pDevice;
+    g_fileType=fileType;
+    g_nStartAddress=nStartAddress;
+
+    QList<XBinary::FT> listFileTypes=XBinary::_getFileTypeListFromSet(XBinary::getFileTypes(pDevice,true));
+
+    XFormats::setFileTypeComboBox(ui->comboBoxType,&listFileTypes,fileType);
+
+    reloadFileType();
+}
+
+void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 {
-    // TODO
+    ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);
+}
+
+void XMultiDisasmWidget::reloadFileType()
+{
     QSignalBlocker blocker1(ui->comboBoxMode);
-    QSignalBlocker blocker2(ui->comboBoxType);
+
+    XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
     XDisasmView::OPTIONS options={};
-    options.nStartAddress=nStartAddress;
-    options.memoryMap=XFormats::getMemoryMap(fileType,pDevice);
+    options.nStartAddress=g_nStartAddress;
+    options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
 
-    ui->scrollAreaDisasm->setData(pDevice,options);
+    ui->scrollAreaDisasm->setData(g_pDevice,options);
 
     XBinary::DM disasmMode=ui->scrollAreaDisasm->getMode();
 
@@ -99,9 +117,11 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
     }
 }
 
-void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
+void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
 {
-    ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);
+    Q_UNUSED(nIndex)
+
+    reloadFileType();
 }
 
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)

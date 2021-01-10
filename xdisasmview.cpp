@@ -94,7 +94,14 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     if(options.nStartAddress)
     {
-        _goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),options.nStartAddress));
+        qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),options.nStartAddress);
+
+        if(nOffset==-1)
+        {
+            nOffset=0;
+        }
+
+        _goToOffset(nOffset);
     }
     else
     {

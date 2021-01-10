@@ -41,12 +41,17 @@ public:
 
 private:
     void addMode(XBinary::DM disasmMode);
+    void reloadFileType();
 
 private slots:
+    void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_comboBoxMode_currentIndexChanged(int nIndex);
 
 private:
     Ui::XMultiDisasmWidget *ui;
+    QIODevice *g_pDevice;
+    XBinary::FT g_fileType;
+    qint64 g_nStartAddress;
 };
 
 #endif // XMULTIDISASMWIDGET_H
