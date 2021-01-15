@@ -13,6 +13,11 @@ SOURCES += \
     $$PWD/xdisasmview.cpp \
     $$PWD/xmultidisasmwidget.cpp
 
+FORMS += \
+    $$PWD/dialogmultidisasm.ui \
+    $$PWD/dialogmultidisasmsignature.ui \
+    $$PWD/xmultidisasmwidget.ui
+
 !contains(XCONFIG, xformats) {
     XCONFIG += xformats
     include($$PWD/../Formats/xformats.pri)
@@ -28,7 +33,22 @@ SOURCES += \
     include($$PWD/../XCapstone/xcapstone.pri)
 }
 
-FORMS += \
-    $$PWD/dialogmultidisasm.ui \
-    $$PWD/dialogmultidisasmsignature.ui \
-    $$PWD/xmultidisasmwidget.ui
+!contains(XCONFIG, dialoggotoaddress) {
+    XCONFIG += dialoggotoaddress
+    include($$PWD/../FormatDialogs/dialoggotoaddress.pri)
+}
+
+!contains(XCONFIG, dialogsearch) {
+    XCONFIG += dialogsearch
+    include($$PWD/../FormatDialogs/dialogsearch.pri)
+}
+
+!contains(XCONFIG, dialogdump) {
+    XCONFIG += dialogdump
+    include($$PWD/../FormatDialogs/dialogdump.pri)
+}
+
+!contains(XCONFIG, dialoghexsignature) {
+    XCONFIG += dialoghexsignature
+    include($$PWD/../FormatDialogs/dialoghexsignature.pri)
+}
