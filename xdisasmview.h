@@ -41,6 +41,7 @@ public:
     {
         qint64 nStartAddress;
         XBinary::_MEMORY_MAP memoryMap;
+        bool bHideOffset;
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);
