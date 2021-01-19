@@ -579,11 +579,7 @@ void XDisasmView::setScrollValue(qint64 nOffset)
 
 void XDisasmView::adjustColumns()
 {
-    if( ((g_options.memoryMap.nBaseAddress==0)&&(g_options.memoryMap.listRecords.count()==1))||
-        (g_options.bHideOffset))
-    {
-        setColumnEnabled(COLUMN_OFFSET,false);
-    }
+    setColumnEnabled(COLUMN_OFFSET,!(g_options.bHideOffset));
 
     const QFontMetricsF fm(getTextFont());
 
