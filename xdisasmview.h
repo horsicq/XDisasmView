@@ -1,4 +1,4 @@
-// copyright (c) 2020 hors<horsicq@gmail.com>
+// copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,8 @@ private:
         COLUMN_ADDRESS=0,
         COLUMN_OFFSET,
         COLUMN_BYTES,
-        COLUMN_OPCODE
+        COLUMN_OPCODE,
+        COLUMN_COMMENT
     };
 
     struct RECORD

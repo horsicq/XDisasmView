@@ -1,4 +1,4 @@
-// copyright (c) 2020 hors<horsicq@gmail.com>
+// copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,9 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     addColumn(tr("Offset"));
     addColumn(tr("Bytes"));
     addColumn(tr("Opcode"));
+    addColumn(tr("Comment"));
+
+    setLastColumnScretch(true);
 
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
@@ -326,6 +329,10 @@ qint64 XDisasmView::cursorPositionToOffset(XAbstractTableView::CURSOR_POSITION c
             {
                 nOffset=nBlockOffset;
             }
+            else if(cursorPosition.nColumn==COLUMN_COMMENT)
+            {
+                nOffset=nBlockOffset;
+            }
         }
         else
         {
@@ -605,6 +612,7 @@ void XDisasmView::adjustColumns()
 
     setColumnWidth(COLUMN_BYTES,2*getCharWidth()+fm.boundingRect(sBytes).width());
     setColumnWidth(COLUMN_OPCODE,40*getCharWidth());
+    setColumnWidth(COLUMN_COMMENT,40*getCharWidth());
 }
 
 void XDisasmView::_goToAddress()
