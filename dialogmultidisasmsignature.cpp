@@ -1,4 +1,4 @@
-// copyright (c) 2020 hors<horsicq@gmail.com>
+// copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,21 @@
 #include "dialogmultidisasmsignature.h"
 #include "ui_dialogmultidisasmsignature.h"
 
-DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevice *pDevice) :
+DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevice *pDevice, qint64 nOffset, qint64 nAddress) :
     QDialog(pParent),
     ui(new Ui::DialogMultiDisasmSignature)
 {
     ui->setupUi(this);
 
     this->g_pDevice=pDevice;
+    this->g_nOffset=nOffset;
+    this->g_nAddress=nAddress;
 
-//    XOptions::setMonoFont(ui->tableWidgetSignature);
-//    XOptions::setMonoFont(ui->textEditSignature);
+    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
+    ui->textEditSignature->setFont(XAbstractTableView::getMonoFont(10));
 
     QSignalBlocker signalBlocker1(ui->spinBoxCount);
-    QSignalBlocker signalBlocke2r(ui->comboBoxMethod);
+    QSignalBlocker signalBlocker2(ui->comboBoxMethod);
 
 //    ui->comboBoxMethod->addItem("",XDisasm::SM_NORMAL);
 //    ui->comboBoxMethod->addItem(tr("Relative virtual address"),XDisasm::SM_RELATIVEADDRESS);
@@ -63,19 +65,19 @@ void DialogMultiDisasmSignature::reload()
 
 //    int nNumberOfRecords=g_listRecords.count();
 
-    ui->tableWidgetSignature->clear();
+//    ui->tableWidgetSignature->clear();
 
-    ui->tableWidgetSignature->setColumnCount(5);
+//    ui->tableWidgetSignature->setColumnCount(5);
 //    ui->tableWidgetSignature->setRowCount(nNumberOfRecords);
 
-    QStringList listHeaders;
-    listHeaders.append(tr("Address"));
-    listHeaders.append(tr("Bytes"));
-    listHeaders.append(tr("Opcode"));
-    listHeaders.append(tr(""));
-    listHeaders.append(tr(""));
+//    QStringList listHeaders;
+//    listHeaders.append(tr("Address"));
+//    listHeaders.append(tr("Bytes"));
+//    listHeaders.append(tr("Opcode"));
+//    listHeaders.append("");
+//    listHeaders.append("");
 
-    ui->tableWidgetSignature->setHorizontalHeaderLabels(listHeaders);
+//    ui->tableWidgetSignature->setHorizontalHeaderLabels(listHeaders);
 
 //    for(int i=0;i<nNumberOfRecords;i++)
 //    {
@@ -125,63 +127,62 @@ void DialogMultiDisasmSignature::reload()
 //    ui->tableWidgetSignature->setColumnWidth(3,nSymbolWidth*6);
 //    ui->tableWidgetSignature->setColumnWidth(4,nSymbolWidth*6);
 
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Interactive);
 
     reloadSignature();
 }
 
 void DialogMultiDisasmSignature::reloadSignature()
 {
-    QString sText;
+//    QString sText;
 
-    QChar cWild=QChar('.');
-    QString _sWild=ui->lineEditWildcard->text();
+//    QChar cWild=QChar('.');
+//    QString _sWild=ui->lineEditWildcard->text();
 
-    if(_sWild.size())
-    {
-        cWild=_sWild.at(0);
-    }
+//    if(_sWild.size())
+//    {
+//        cWild=_sWild.at(0);
+//    }
 
 //    int nNumberOfRecords=g_listRecords.count();
-    int nNumberOfRecords=0;
 
-    for(int i=0;i<nNumberOfRecords;i++)
-    {
-        bool bUse=true;
-        bool bDisp=true;
-        bool bImm=true;
+//    for(int i=0;i<nNumberOfRecords;i++)
+//    {
+//        bool bUse=true;
+//        bool bDisp=true;
+//        bool bImm=true;
 
-        QPushButton *pUseSignatureButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,2));
-        QPushButton *pDispButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,3));
-        QPushButton *pImmButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,4));
+//        QPushButton *pUseSignatureButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,2));
+//        QPushButton *pDispButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,3));
+//        QPushButton *pImmButton=dynamic_cast<QPushButton *>(ui->tableWidgetSignature->cellWidget(i,4));
 
-        if(pUseSignatureButton)
-        {
-            bUse=!(pUseSignatureButton->isChecked());
-        }
+//        if(pUseSignatureButton)
+//        {
+//            bUse=!(pUseSignatureButton->isChecked());
+//        }
 
-        if(pDispButton)
-        {
-            pDispButton->setEnabled(bUse);
-            bDisp=!(pDispButton->isChecked());
-        }
+//        if(pDispButton)
+//        {
+//            pDispButton->setEnabled(bUse);
+//            bDisp=!(pDispButton->isChecked());
+//        }
 
-        if(pImmButton)
-        {
-            pImmButton->setEnabled(bUse);
-            bImm=!(pImmButton->isChecked());
-        }
+//        if(pImmButton)
+//        {
+//            pImmButton->setEnabled(bUse);
+//            bImm=!(pImmButton->isChecked());
+//        }
 
 //        int nSize=g_listRecords.at(i).baOpcode.size();
 
-        QString sRecord;
+//        QString sRecord;
 
-        if(bUse)
-        {
+//        if(bUse)
+//        {
 //            sRecord=g_listRecords.at(i).baOpcode.toHex().data();
 
 //            if(!bDisp)
@@ -198,48 +199,48 @@ void DialogMultiDisasmSignature::reloadSignature()
 //            {
 //                sRecord=replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,QChar('$'));
 //            }
-        }
-        else
-        {
+//        }
+//        else
+//        {
 //            for(int j=0;j<nSize;j++)
 //            {
 //                sRecord+=cWild;
 //                sRecord+=cWild;
 //            }
-        }
+//        }
 
-        sText+=sRecord;
-    }
+//        sText+=sRecord;
+//    }
 
-    if(ui->checkBoxUpper->isChecked())
-    {
-        sText=sText.toUpper();
-    }
-    else
-    {
-        sText=sText.toLower();
-    }
+//    if(ui->checkBoxUpper->isChecked())
+//    {
+//        sText=sText.toUpper();
+//    }
+//    else
+//    {
+//        sText=sText.toLower();
+//    }
 
-    if(ui->checkBoxSpaces->isChecked())
-    {
-        QString _sText;
+//    if(ui->checkBoxSpaces->isChecked())
+//    {
+//        QString _sText;
 
-        int nSize=sText.size();
+//        int nSize=sText.size();
 
-        for(int i=0;i<nSize;i++)
-        {
-            _sText+=sText.at(i);
+//        for(int i=0;i<nSize;i++)
+//        {
+//            _sText+=sText.at(i);
 
-            if((i%2)&&(i!=(nSize-1)))
-            {
-                _sText+=QChar(' ');
-            }
-        }
+//            if((i%2)&&(i!=(nSize-1)))
+//            {
+//                _sText+=QChar(' ');
+//            }
+//        }
 
-        sText=_sText;
-    }
+//        sText=_sText;
+//    }
 
-    ui->textEditSignature->setText(sText);
+//    ui->textEditSignature->setText(sText);
 }
 
 void DialogMultiDisasmSignature::on_pushButtonOK_clicked()

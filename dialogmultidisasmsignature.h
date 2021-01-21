@@ -1,4 +1,4 @@
-// copyright (c) 2020 hors<horsicq@gmail.com>
+// copyright (c) 2020-2021 hors<horsicq@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include <QDialog>
 #include <QClipboard>
 #include "xlineedithex.h"
+#include "xdisasmview.h"
 
 namespace Ui {
 class DialogMultiDisasmSignature;
@@ -34,7 +35,7 @@ class DialogMultiDisasmSignature : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice);
+    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice,qint64 nOffset,qint64 nAddress);
     ~DialogMultiDisasmSignature();
     void reload();
 
@@ -53,6 +54,7 @@ private slots:
 private:
     Ui::DialogMultiDisasmSignature *ui;
     QIODevice *g_pDevice;
+    qint64 g_nOffset;
     qint64 g_nAddress;
 //    QList<XDisasm::SIGNATURE_RECORD> g_listRecords;
 };

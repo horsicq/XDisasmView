@@ -29,13 +29,14 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nBytesProLine=1;
     g_searchData={};
 
-    g_scGoToAddress   =new QShortcut(QKeySequence(XShortcuts::GOTOADDRESS),   this,SLOT(_goToAddress()));
-    g_scDumpToFile    =new QShortcut(QKeySequence(XShortcuts::DUMPTOFILE),    this,SLOT(_dumpToFile()));
-    g_scSelectAll     =new QShortcut(QKeySequence(XShortcuts::SELECTALL),     this,SLOT(_selectAll()));
-    g_scCopyAsHex     =new QShortcut(QKeySequence(XShortcuts::COPYASHEX),     this,SLOT(_copyAsHex()));
-    g_scFind          =new QShortcut(QKeySequence(XShortcuts::FIND),          this,SLOT(_find()));
-    g_scFindNext      =new QShortcut(QKeySequence(XShortcuts::FINDNEXT),      this,SLOT(_findNext()));
-    g_scSignature     =new QShortcut(QKeySequence(XShortcuts::SIGNATURE),     this,SLOT(_signature()));
+    g_scGoToAddress     =new QShortcut(QKeySequence(XShortcuts::GOTOADDRESS),   this,SLOT(_goToAddress()));
+    g_scDumpToFile      =new QShortcut(QKeySequence(XShortcuts::DUMPTOFILE),    this,SLOT(_dumpToFile()));
+    g_scSelectAll       =new QShortcut(QKeySequence(XShortcuts::SELECTALL),     this,SLOT(_selectAll()));
+    g_scCopyAsHex       =new QShortcut(QKeySequence(XShortcuts::COPYASHEX),     this,SLOT(_copyAsHex()));
+    g_scFind            =new QShortcut(QKeySequence(XShortcuts::FIND),          this,SLOT(_find()));
+    g_scFindNext        =new QShortcut(QKeySequence(XShortcuts::FINDNEXT),      this,SLOT(_findNext()));
+    g_scHexSignature    =new QShortcut(QKeySequence(XShortcuts::HEXSIGNATURE),  this,SLOT(_signature()));
+    g_scDisasmSignature =new QShortcut(QKeySequence(XShortcuts::DISASM),        this,SLOT(_disasmSignature()));
 
     addColumn(tr("Address"));
     addColumn(tr("Offset"));
@@ -48,15 +49,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
-#ifdef Q_OS_WIN
-    setTextFont(QFont("Courier",10));
-#endif
-#ifdef Q_OS_LINUX
-    setTextFont(QFont("Monospace",10));
-#endif
-#ifdef Q_OS_OSX
-    setTextFont(QFont("Courier",10)); // TODO Check "Menlo"
-#endif
+    setTextFont(getMonoFont(10));
 }
 
 XDisasmView::~XDisasmView()
@@ -463,9 +456,13 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionDumpToFile.setShortcut(QKeySequence(XShortcuts::DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFile()));
 
-    QAction actionSignature(tr("Signature"),this);
-    actionSignature.setShortcut(QKeySequence(XShortcuts::SIGNATURE));
-    connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signature()));
+    QAction actionHexSignature("Hex"+tr("Signature"),this);
+    actionHexSignature.setShortcut(QKeySequence(XShortcuts::HEXSIGNATURE));
+    connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_signature()));
+
+    QAction actionDisasmSignature("Disasm"+tr("Signature"),this);
+    actionDisasmSignature.setShortcut(QKeySequence(XShortcuts::DISASM));
+    connect(&actionDisasmSignature,SIGNAL(triggered()),this,SLOT(_disasmSignature()));
 
     QAction actionFind(tr("Find"),this);
     actionFind.setShortcut(QKeySequence(XShortcuts::FIND));
@@ -496,7 +493,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
     if(state.nSelectionSize)
     {
         contextMenu.addAction(&actionDumpToFile);
-        contextMenu.addAction(&actionSignature);
+        contextMenu.addAction(&actionHexSignature);
 
         menuCopy.addAction(&actionCopyAsHex);
         contextMenu.addMenu(&menuCopy);
@@ -647,9 +644,18 @@ void XDisasmView::_signature()
 {
     STATE state=getState();
 
-    DialogHexSignature dsh(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize);
+    DialogHexSignature dhs(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize);
 
-    dsh.exec();
+    dhs.exec();
+}
+
+void XDisasmView::_disasmSignature()
+{
+    STATE state=getState();
+
+    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,XBinary::offsetToAddress(&(g_options.memoryMap),state.nSelectionOffset));
+
+    dmds.exec();
 }
 
 void XDisasmView::_find()

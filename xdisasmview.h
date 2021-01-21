@@ -100,6 +100,7 @@ private slots:
     void _goToAddress();
     void _dumpToFile();
     void _signature();
+    void _disasmSignature();
     void _find();
     void _findNext();
     void _selectAll();
@@ -120,7 +121,8 @@ private:
     QShortcut *g_scCopyAsHex;
     QShortcut *g_scFind;
     QShortcut *g_scFindNext;
-    QShortcut *g_scSignature;
+    QShortcut *g_scHexSignature;
+    QShortcut *g_scDisasmSignature;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
 };
