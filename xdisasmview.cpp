@@ -19,6 +19,7 @@
 // SOFTWARE.
 //
 #include "xdisasmview.h"
+#include "xdisasmview.h"
 
 XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
 {
@@ -29,15 +30,14 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nBytesProLine=1;
     g_searchData={};
 
-    // TODO move to setData
-    g_scGoToAddress     =new QShortcut(QKeySequence(XShortcuts::GOTOADDRESS),   this,SLOT(_goToAddress()));
-    g_scDumpToFile      =new QShortcut(QKeySequence(XShortcuts::DUMPTOFILE),    this,SLOT(_dumpToFile()));
-    g_scSelectAll       =new QShortcut(QKeySequence(XShortcuts::SELECTALL),     this,SLOT(_selectAll()));
-    g_scCopyAsHex       =new QShortcut(QKeySequence(XShortcuts::COPYASHEX),     this,SLOT(_copyAsHex()));
-    g_scFind            =new QShortcut(QKeySequence(XShortcuts::FIND),          this,SLOT(_find()));
-    g_scFindNext        =new QShortcut(QKeySequence(XShortcuts::FINDNEXT),      this,SLOT(_findNext()));
-    g_scHexSignature    =new QShortcut(QKeySequence(XShortcuts::HEXSIGNATURE),  this,SLOT(_signature()));
-    g_scDisasmSignature =new QShortcut(QKeySequence(XShortcuts::DISASM),        this,SLOT(_disasmSignature()));
+    g_scGoToAddress=nullptr;
+    g_scDumpToFile=nullptr;
+    g_scSelectAll=nullptr;
+    g_scCopyAsHex=nullptr;
+    g_scFind=nullptr;
+    g_scFindNext=nullptr;
+    g_scHexSignature=nullptr;
+    g_scSignature=nullptr;
 
     addColumn(tr("Address"));
     addColumn(tr("Offset"));
@@ -431,35 +431,35 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 void XDisasmView::contextMenu(const QPoint &pos)
 {
     QAction actionGoToAddress(tr("Go to address"),this);
-    actionGoToAddress.setShortcut(QKeySequence(XShortcuts::GOTOADDRESS));
+    actionGoToAddress.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOADDRESS));
     connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddress()));
 
     QAction actionDumpToFile(tr("Dump to file"),this);
-    actionDumpToFile.setShortcut(QKeySequence(XShortcuts::DUMPTOFILE));
+    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFile()));
 
     QAction actionHexSignature("Hex"+tr("Signature"),this);
-    actionHexSignature.setShortcut(QKeySequence(XShortcuts::HEXSIGNATURE));
-    connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_signature()));
+    actionHexSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEXSIGNATURE));
+    connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_hexSignature()));
 
     QAction actionDisasmSignature("Disasm"+tr("Signature"),this);
-    actionDisasmSignature.setShortcut(QKeySequence(XShortcuts::DISASM));
+    actionDisasmSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE));
     connect(&actionDisasmSignature,SIGNAL(triggered()),this,SLOT(_disasmSignature()));
 
     QAction actionFind(tr("Find"),this);
-    actionFind.setShortcut(QKeySequence(XShortcuts::FIND));
+    actionFind.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FIND));
     connect(&actionFind,SIGNAL(triggered()),this,SLOT(_find()));
 
     QAction actionFindNext(tr("Find next"),this);
-    actionFindNext.setShortcut(QKeySequence(XShortcuts::FINDNEXT));
+    actionFindNext.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FINDNEXT));
     connect(&actionFindNext,SIGNAL(triggered()),this,SLOT(_findNext()));
 
     QAction actionSelectAll(tr("Select all"),this);
-    actionSelectAll.setShortcut(QKeySequence(XShortcuts::SELECTALL));
+    actionSelectAll.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SELECTALL));
     connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAll()));
 
     QAction actionCopyAsHex(tr("Copy as hex"),this);
-    actionCopyAsHex.setShortcut(QKeySequence(XShortcuts::COPYASHEX));
+    actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYASHEX));
     connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyAsHex()));
 
     QMenu contextMenu(this);
@@ -594,6 +594,32 @@ void XDisasmView::adjustColumns()
     setColumnWidth(COLUMN_COMMENT,40*getCharWidth());
 }
 
+void XDisasmView::registerShortcuts(bool bState)
+{
+    if(bState)
+    {
+        if(!g_scGoToAddress)  g_scGoToAddress   =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_GOTOADDRESS),     this,SLOT(_goToAddress()));
+        if(!g_scDumpToFile)   g_scDumpToFile    =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_DUMPTOFILE),      this,SLOT(_dumpToFile()));
+        if(!g_scSelectAll)    g_scSelectAll     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_SELECTALL),       this,SLOT(_selectAll()));
+        if(!g_scCopyAsHex)    g_scCopyAsHex     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_COPYASHEX),       this,SLOT(_copyAsHex()));
+        if(!g_scFind)         g_scFind          =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_FIND),            this,SLOT(_find()));
+        if(!g_scFindNext)     g_scFindNext      =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_FINDNEXT),        this,SLOT(_findNext()));
+        if(!g_scSignature)    g_scSignature     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),    this,SLOT(_hexSignature()));
+        if(!g_scHexSignature) g_scHexSignature  =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),    this,SLOT(_signature()));
+    }
+    else
+    {
+        if(g_scGoToAddress)     {delete g_scGoToAddress;    g_scGoToAddress=nullptr;}
+        if(g_scDumpToFile)      {delete g_scDumpToFile;     g_scDumpToFile=nullptr;}
+        if(g_scSelectAll)       {delete g_scSelectAll;      g_scSelectAll=nullptr;}
+        if(g_scCopyAsHex)       {delete g_scCopyAsHex;      g_scCopyAsHex=nullptr;}
+        if(g_scFind)            {delete g_scFind;           g_scFind=nullptr;}
+        if(g_scFindNext)        {delete g_scFindNext;       g_scFindNext=nullptr;}
+        if(g_scSignature)       {delete g_scSignature;      g_scSignature=nullptr;}
+        if(g_scHexSignature)    {delete g_scHexSignature;   g_scHexSignature=nullptr;}
+    }
+}
+
 void XDisasmView::_goToAddress()
 {
     DialogGoToAddress da(this,&(g_options.memoryMap),DialogGoToAddress::TYPE_ADDRESS);
@@ -622,7 +648,7 @@ void XDisasmView::_dumpToFile()
     }
 }
 
-void XDisasmView::_signature()
+void XDisasmView::_hexSignature()
 {
     STATE state=getState();
 
@@ -631,7 +657,7 @@ void XDisasmView::_signature()
     dhs.exec();
 }
 
-void XDisasmView::_disasmSignature()
+void XDisasmView::_signature()
 {
     STATE state=getState();
 

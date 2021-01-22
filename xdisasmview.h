@@ -92,12 +92,13 @@ protected:
     virtual qint64 getScrollValue();
     virtual void setScrollValue(qint64 nOffset);
     virtual void adjustColumns();
+    virtual void registerShortcuts(bool bState);
 
 private slots:
     void _goToAddress();
     void _dumpToFile();
+    void _hexSignature();
     void _signature();
-    void _disasmSignature();
     void _find();
     void _findNext();
     void _selectAll();
@@ -119,7 +120,7 @@ private:
     QShortcut *g_scFind;
     QShortcut *g_scFindNext;
     QShortcut *g_scHexSignature;
-    QShortcut *g_scDisasmSignature;
+    QShortcut *g_scSignature;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
 };
