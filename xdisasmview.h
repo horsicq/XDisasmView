@@ -85,10 +85,7 @@ protected:
     virtual bool isEnd(qint64 nOffset);
     virtual qint64 cursorPositionToOffset(CURSOR_POSITION cursorPosition);
     virtual void updateData();
-    virtual void startPainting();
-    virtual void paintColumn(qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
-    virtual void paintCell(qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
-    virtual void endPainting();
+    virtual void paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);

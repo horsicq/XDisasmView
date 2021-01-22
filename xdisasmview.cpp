@@ -29,6 +29,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nBytesProLine=1;
     g_searchData={};
 
+    // TODO move to setData
     g_scGoToAddress     =new QShortcut(QKeySequence(XShortcuts::GOTOADDRESS),   this,SLOT(_goToAddress()));
     g_scDumpToFile      =new QShortcut(QKeySequence(XShortcuts::DUMPTOFILE),    this,SLOT(_dumpToFile()));
     g_scSelectAll       =new QShortcut(QKeySequence(XShortcuts::SELECTALL),     this,SLOT(_selectAll()));
@@ -395,21 +396,7 @@ void XDisasmView::updateData()
     }
 }
 
-void XDisasmView::startPainting()
-{
-
-}
-
-void XDisasmView::paintColumn(qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
-{
-    Q_UNUSED(nColumn)
-    Q_UNUSED(nLeft)
-    Q_UNUSED(nTop)
-    Q_UNUSED(nWidth)
-    Q_UNUSED(nHeight)
-}
-
-void XDisasmView::paintCell(qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
 {
     qint32 nNumberOfRows=g_listRecords.count();
 
@@ -419,31 +406,26 @@ void XDisasmView::paintCell(qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nT
 
         if(isOffsetSelected(nOffset))
         {
-            getPainter()->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
+            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
         }
 
         if(nColumn==COLUMN_ADDRESS)
         {
-            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sAddress); // TODO Text Optional
+            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sAddress); // TODO Text Optional
         }
         else if(nColumn==COLUMN_OFFSET)
         {
-            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOffset); // TODO Text Optional
+            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOffset); // TODO Text Optional
         }
         else if(nColumn==COLUMN_BYTES)
         {
-            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sHEX); // TODO Text Optional
+            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sHEX); // TODO Text Optional
         }
         else if(nColumn==COLUMN_OPCODE)
         {
-            getPainter()->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOpcode); // TODO Text Optional
+            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOpcode); // TODO Text Optional
         }
     }
-}
-
-void XDisasmView::endPainting()
-{
-
 }
 
 void XDisasmView::contextMenu(const QPoint &pos)
