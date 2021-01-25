@@ -25,6 +25,7 @@
 #include <QClipboard>
 #include "xlineedithex.h"
 #include "xdisasmview.h"
+#include "xcapstone.h"
 
 namespace Ui {
 class DialogMultiDisasmSignature;
@@ -34,8 +35,20 @@ class DialogMultiDisasmSignature : public QDialog
 {
     Q_OBJECT
 
+    struct SIGNATURE_RECORD
+    {
+        qint64 nAddress;
+        QString sOpcode;
+        QByteArray baOpcode;
+        qint32 nDispOffset;
+        qint32 nDispSize;
+        qint32 nImmOffset;
+        qint32 nImmSize;
+        bool bIsConst;
+    };
+
 public:
-    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice,qint64 nOffset,qint64 nAddress);
+    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice,qint64 nOffset,qint64 nAddress,csh handle);
     ~DialogMultiDisasmSignature();
     void reload();
 
@@ -56,7 +69,8 @@ private:
     QIODevice *g_pDevice;
     qint64 g_nOffset;
     qint64 g_nAddress;
-//    QList<XDisasm::SIGNATURE_RECORD> g_listRecords;
+    csh g_handle;
+    QList<SIGNATURE_RECORD> g_listRecords;
 };
 
 #endif // DIALOGMULTIDISASMSIGNATURE_H

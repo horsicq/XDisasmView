@@ -438,13 +438,13 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFile()));
 
-    QAction actionHexSignature("Hex"+tr("Signature"),this);
+    QAction actionHexSignature(tr("Hex signature"),this);
     actionHexSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEXSIGNATURE));
     connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_hexSignature()));
 
-    QAction actionDisasmSignature("Disasm"+tr("Signature"),this);
-    actionDisasmSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE));
-    connect(&actionDisasmSignature,SIGNAL(triggered()),this,SLOT(_disasmSignature()));
+    QAction actionSignature(tr("Signature"),this);
+    actionSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE));
+    connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signature()));
 
     QAction actionFind(tr("Find"),this);
     actionFind.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FIND));
@@ -475,6 +475,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
     if(state.nSelectionSize)
     {
         contextMenu.addAction(&actionDumpToFile);
+        contextMenu.addAction(&actionSignature);
         contextMenu.addAction(&actionHexSignature);
 
         menuCopy.addAction(&actionCopyAsHex);
@@ -604,8 +605,8 @@ void XDisasmView::registerShortcuts(bool bState)
         if(!g_scCopyAsHex)    g_scCopyAsHex     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_COPYASHEX),       this,SLOT(_copyAsHex()));
         if(!g_scFind)         g_scFind          =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_FIND),            this,SLOT(_find()));
         if(!g_scFindNext)     g_scFindNext      =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_HEX_FINDNEXT),        this,SLOT(_findNext()));
-        if(!g_scSignature)    g_scSignature     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),    this,SLOT(_hexSignature()));
-        if(!g_scHexSignature) g_scHexSignature  =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),    this,SLOT(_signature()));
+        if(!g_scSignature)    g_scSignature     =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),    this,SLOT(_signature()));
+        if(!g_scHexSignature) g_scHexSignature  =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEXSIGNATURE), this,SLOT(_hexSignature()));
     }
     else
     {
@@ -661,7 +662,7 @@ void XDisasmView::_signature()
 {
     STATE state=getState();
 
-    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,XBinary::offsetToAddress(&(g_options.memoryMap),state.nSelectionOffset));
+    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,XBinary::offsetToAddress(&(g_options.memoryMap),state.nSelectionOffset),g_handle);
 
     dmds.exec();
 }
