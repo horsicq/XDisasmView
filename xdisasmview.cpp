@@ -82,7 +82,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     qint64 nTotalLineCount=g_nDataSize/g_nBytesProLine;
 
-    if(nTotalLineCount>1)
+    if(nTotalLineCount>1) // TODO Check
     {
         nTotalLineCount--;
     }
@@ -662,7 +662,7 @@ void XDisasmView::_signature()
 {
     STATE state=getState();
 
-    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,XBinary::offsetToAddress(&(g_options.memoryMap),state.nSelectionOffset),g_handle);
+    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle);
 
     dmds.exec();
 }

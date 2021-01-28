@@ -48,7 +48,7 @@ class DialogMultiDisasmSignature : public QDialog
     };
 
 public:
-    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice,qint64 nOffset,qint64 nAddress,csh handle);
+    explicit DialogMultiDisasmSignature(QWidget *pParent,QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap,csh handle);
     ~DialogMultiDisasmSignature();
     void reload();
 
@@ -68,7 +68,7 @@ private:
     Ui::DialogMultiDisasmSignature *ui;
     QIODevice *g_pDevice;
     qint64 g_nOffset;
-    qint64 g_nAddress;
+    XBinary::_MEMORY_MAP *g_pMemoryMap;
     csh g_handle;
     QList<SIGNATURE_RECORD> g_listRecords;
 };

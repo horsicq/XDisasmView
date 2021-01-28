@@ -21,7 +21,7 @@
 #include "dialogmultidisasmsignature.h"
 #include "ui_dialogmultidisasmsignature.h"
 
-DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevice *pDevice, qint64 nOffset, qint64 nAddress, csh handle) :
+DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle) :
     QDialog(pParent),
     ui(new Ui::DialogMultiDisasmSignature)
 {
@@ -29,17 +29,17 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevi
 
     this->g_pDevice=pDevice;
     this->g_nOffset=nOffset;
-    this->g_nAddress=nAddress;
+    this->g_pMemoryMap=pMemoryMap;
     this->g_handle=handle;
 
-    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
+//    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XAbstractTableView::getMonoFont(10));
 
     QSignalBlocker signalBlocker1(ui->spinBoxCount);
     QSignalBlocker signalBlocker2(ui->comboBoxMethod);
 
-    ui->comboBoxMethod->addItem("");
-    ui->comboBoxMethod->addItem(tr("Relative virtual address"));
+    ui->comboBoxMethod->addItem("",0);
+    ui->comboBoxMethod->addItem(tr("Relative virtual address"),1);
 
     reload();
 }
@@ -51,17 +51,90 @@ DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
 
 void DialogMultiDisasmSignature::reload()
 {
-    // TODO
-//    XDisasm::SIGNATURE_OPTIONS options={};
+    const int N_X64_OPCODE_SIZE=16;
 
-//    options.csarch=g_pModel->getStats()->csarch;
-//    options.csmode=g_pModel->getStats()->csmode;
-//    options.memoryMap=g_pModel->getStats()->memoryMap;
-//    options.pDevice=g_pDevice;
-//    options.nCount=ui->spinBoxCount->value();
-//    options.sm=(XDisasm::SM)(ui->comboBoxMethod->currentData().toInt());
+    g_listRecords.clear();
 
-//    g_listRecords=XDisasm::getSignature(&options,g_nAddress);
+    bool bStopBranch=false;
+    int nCount=ui->spinBoxCount->value();
+    qint64 nOffset=g_nOffset;
+    qint64 nAddress=XBinary::offsetToAddress(g_pMemoryMap,nOffset);
+    int nMethod=ui->comboBoxMethod->currentData().toInt();
+
+    for(int i=0;(i<nCount)&&(!bStopBranch);i++)
+    {
+        if(nOffset!=-1)
+        {
+            char opcode[N_X64_OPCODE_SIZE];
+
+            XBinary::_zeroMemory(opcode,N_X64_OPCODE_SIZE);
+
+            size_t nDataSize=XBinary::read_array(g_pDevice,nOffset,opcode,N_X64_OPCODE_SIZE);
+
+            uint8_t *pData=(uint8_t *)opcode;
+
+            cs_insn *pInsn=0;
+            size_t count=cs_disasm(g_handle,pData,nDataSize,nAddress,1,&pInsn);
+
+            if(count>0)
+            {
+                if(pInsn->size>1)
+                {
+                    bStopBranch=!XBinary::isOffsetValid(g_pMemoryMap,nOffset+pInsn->size-1);
+                }
+
+                if(!bStopBranch)
+                {
+                    SIGNATURE_RECORD record={};
+
+                    record.nAddress=nAddress;
+                    record.sOpcode=pInsn->mnemonic;
+                    QString sArgs=pInsn->op_str;
+
+                    if(sArgs!="")
+                    {
+                        record.sOpcode+=" "+sArgs;
+                    }
+
+                    record.baOpcode=QByteArray(opcode,pInsn->size);
+
+                    record.nDispOffset=pInsn->detail->x86.encoding.disp_offset;
+                    record.nDispSize=pInsn->detail->x86.encoding.disp_size;
+                    record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
+                    record.nImmSize=pInsn->detail->x86.encoding.imm_size;
+
+                    nAddress+=pInsn->size;
+
+                    if(nMethod==1)
+                    {
+                        for(int i=0; i<pInsn->detail->x86.op_count; i++)
+                        {
+                            if(pInsn->detail->x86.operands[i].type==X86_OP_IMM) // TODO another arch !!!
+                            {
+                                qint64 nImm=pInsn->detail->x86.operands[i].imm;
+
+                                if(XCapstone::isJmpOpcode(pInsn->id))
+                                {
+                                    nAddress=nImm;
+                                    record.bIsConst=true;
+                                }
+                            }
+                        }
+                    }
+
+                    g_listRecords.append(record);
+                }
+
+                cs_free(pInsn,count);
+            }
+            else
+            {
+                bStopBranch=true;
+            }
+        }
+
+        nOffset=XBinary::addressToOffset(g_pMemoryMap,nAddress);
+    }
 
     int nSymbolWidth=XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
 
