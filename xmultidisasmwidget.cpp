@@ -85,6 +85,11 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
     reloadFileType();
 }
 
+void XMultiDisasmWidget::setShortcuts(XShortcuts *pShortcuts)
+{
+    ui->scrollAreaDisasm->setShortcuts(pShortcuts);
+}
+
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 {
     ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);

@@ -37,6 +37,7 @@ public:
     ~DialogMultiDisasm();
 
     void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nStartAddress);
+    void setShortcuts(XShortcuts *pShortcuts);
 
 private slots:
     void on_pushButtonClose_clicked();

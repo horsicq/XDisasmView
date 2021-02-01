@@ -38,6 +38,7 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nStartAddress);
+    void setShortcuts(XShortcuts *pShortcuts);
 
 private:
     void addMode(XBinary::DM disasmMode);

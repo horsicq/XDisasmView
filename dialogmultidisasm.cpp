@@ -38,6 +38,11 @@ void DialogMultiDisasm::setData(QIODevice *pDevice, XBinary::FT fileType, qint64
     ui->widgetDisasm->setData(pDevice,fileType,nStartAddress);
 }
 
+void DialogMultiDisasm::setShortcuts(XShortcuts *pShortcuts)
+{
+     ui->widgetDisasm->setShortcuts(pShortcuts);
+}
+
 void DialogMultiDisasm::on_pushButtonClose_clicked()
 {
     this->close();
