@@ -52,7 +52,7 @@ private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *g_pDevice;
     XBinary::FT g_fileType;
-    qint64 g_nStartAddress;
+    qint64 g_nEntryPointAddress;
 };
 
 #endif // XMULTIDISASMWIDGET_H

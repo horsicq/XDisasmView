@@ -76,7 +76,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
 { 
     g_pDevice=pDevice;
     g_fileType=fileType;
-    g_nStartAddress=nStartAddress;
+    g_nEntryPointAddress=nStartAddress;
 
     QList<XBinary::FT> listFileTypes=XBinary::_getFileTypeListFromSet(XBinary::getFileTypes(pDevice,true));
 
@@ -102,7 +102,7 @@ void XMultiDisasmWidget::reloadFileType()
     XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
     XDisasmView::OPTIONS options={};
-    options.nStartAddress=g_nStartAddress;
+    options.nEntryPointAddress=g_nEntryPointAddress;
     options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
 
     ui->scrollAreaDisasm->setData(g_pDevice,options);

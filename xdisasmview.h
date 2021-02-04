@@ -39,9 +39,10 @@ public:
 
     struct OPTIONS
     {
-        qint64 nStartAddress;
+        qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
+        bool bMenu_Hex; // TODO !!!
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);
@@ -50,6 +51,7 @@ public:
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
     void goToAddress(qint64 nAddress);
+    void goToOffset(qint64 nOffset);
 
 private:
     enum COLUMN
@@ -95,14 +97,18 @@ protected:
     virtual void registerShortcuts(bool bState);
 
 private slots:
-    void _goToAddress();
-    void _dumpToFile();
-    void _hexSignature();
-    void _signature();
-    void _find();
-    void _findNext();
-    void _selectAll();
-    void _copyAsHex();
+    void _goToAddressSlot();
+    void _goToOffsetSlot();
+    void _dumpToFileSlot();
+    void _hexSignatureSlot();
+    void _signatureSlot();
+    void _findSlot();
+    void _findNextSlot();
+    void _selectAllSlot();
+    void _copyAsHexSlot();
+    void _copyCursorAddressSlot();
+    void _copyCursorOffsetSlot();
+    void _hexSlot();
 
 private:
     QIODevice *g_pDevice;
@@ -114,13 +120,17 @@ private:
     csh g_handle;
     SearchProcess::SEARCHDATA g_searchData;
     QShortcut *g_scGoToAddress;
+    QShortcut *g_scGoToOffset;
     QShortcut *g_scDumpToFile;
     QShortcut *g_scSelectAll;
     QShortcut *g_scCopyAsHex;
+    QShortcut *g_scCopyCursorOffset;
+    QShortcut *g_scCopyCursorAddress;
     QShortcut *g_scFind;
     QShortcut *g_scFindNext;
     QShortcut *g_scHexSignature;
     QShortcut *g_scSignature;
+    QShortcut *g_scHex;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
 };
