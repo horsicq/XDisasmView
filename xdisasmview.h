@@ -39,6 +39,7 @@ public:
 
     struct OPTIONS
     {
+        qint64 nInitAddress;
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
@@ -70,6 +71,7 @@ private:
         QString sHEX;
         QString sOpcode;
         qint64 nOffset;
+        qint64 nSize;
     };
 
     struct DISASM_RESULT
@@ -79,13 +81,21 @@ private:
         QString sOpcode;
     };
 
+    struct MENU_STATE
+    {
+        bool bOffset;
+        bool bSize;
+        bool bHex;
+    };
+
     DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress);
     qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
+    MENU_STATE getMenuState();
 
 protected:
     virtual bool isOffsetValid(qint64 nOffset);
     virtual bool isEnd(qint64 nOffset);
-    virtual qint64 cursorPositionToOffset(CURSOR_POSITION cursorPosition);
+    virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
     virtual void updateData();
     virtual void paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
     virtual void contextMenu(const QPoint &pos);
@@ -99,6 +109,7 @@ protected:
 private slots:
     void _goToAddressSlot();
     void _goToOffsetSlot();
+    void _goToEntryPointSlot();
     void _dumpToFileSlot();
     void _hexSignatureSlot();
     void _signatureSlot();
@@ -121,6 +132,7 @@ private:
     SearchProcess::SEARCHDATA g_searchData;
     QShortcut *g_scGoToAddress;
     QShortcut *g_scGoToOffset;
+    QShortcut *g_scGoToEntryPoint;
     QShortcut *g_scDumpToFile;
     QShortcut *g_scSelectAll;
     QShortcut *g_scCopyAsHex;

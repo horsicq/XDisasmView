@@ -37,7 +37,7 @@ public:
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nStartAddress);
+    void setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress);
     void setShortcuts(XShortcuts *pShortcuts);
 
 private:
@@ -52,7 +52,7 @@ private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *g_pDevice;
     XBinary::FT g_fileType;
-    qint64 g_nEntryPointAddress;
+    qint64 g_nInitAddress;
 };
 
 #endif // XMULTIDISASMWIDGET_H

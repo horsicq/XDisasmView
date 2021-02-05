@@ -32,6 +32,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
 
     g_scGoToAddress=nullptr;
     g_scGoToOffset=nullptr;
+    g_scGoToEntryPoint=nullptr;
     g_scDumpToFile=nullptr;
     g_scSelectAll=nullptr;
     g_scCopyAsHex=nullptr;
@@ -93,9 +94,9 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     setTotalLineCount(nTotalLineCount);
 
-    if(options.nEntryPointAddress)
+    if(options.nInitAddress)
     {
-        qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),options.nEntryPointAddress);
+        qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),options.nInitAddress);
 
         if(nOffset==-1)
         {
@@ -289,6 +290,30 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
     return nResult;
 }
 
+XDisasmView::MENU_STATE XDisasmView::getMenuState()
+{
+    MENU_STATE result={};
+
+    STATE state=getState();
+
+    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
+    {
+        result.bOffset=true;
+    }
+
+    if(state.nSelectionSize)
+    {
+        result.bSize=true;
+    }
+
+    if(g_options.bMenu_Hex)
+    {
+        result.bHex=true;
+    }
+
+    return result;
+}
+
 bool XDisasmView::isOffsetValid(qint64 nOffset)
 {
     bool bResult=false;
@@ -306,48 +331,56 @@ bool XDisasmView::isEnd(qint64 nOffset)
     return (nOffset==g_nDataSize);
 }
 
-qint64 XDisasmView::cursorPositionToOffset(XAbstractTableView::CURSOR_POSITION cursorPosition)
+XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
-    qint64 nOffset=-1;
+    OS osResult={};
+    osResult.nOffset=-1;
 
     if((cursorPosition.bIsValid)&&(cursorPosition.ptype==PT_CELL))
     {
         if(cursorPosition.nRow<g_listRecords.count())
         {
-            qint64 nBlockOffset=0;
-            nBlockOffset=g_listRecords.at(cursorPosition.nRow).nOffset;
+            qint64 nBlockOffset=g_listRecords.at(cursorPosition.nRow).nOffset;
+            qint64 nBlockSize=g_listRecords.at(cursorPosition.nRow).nSize;
+
             if(cursorPosition.nColumn==COLUMN_ADDRESS)
             {
-                nOffset=nBlockOffset;
+                osResult.nOffset=nBlockOffset;
+                osResult.nSize=nBlockSize;
             }
             else if(cursorPosition.nColumn==COLUMN_OFFSET)
             {
-                nOffset=nBlockOffset;
+                osResult.nOffset=nBlockOffset;
+                osResult.nSize=nBlockSize;
             }
             else if(cursorPosition.nColumn==COLUMN_BYTES)
             {
                 // TODO
-                nOffset=nBlockOffset;
+                osResult.nOffset=nBlockOffset;
+                osResult.nSize=nBlockSize;
             }
             else if(cursorPosition.nColumn==COLUMN_OPCODE)
             {
-                nOffset=nBlockOffset;
+                osResult.nOffset=nBlockOffset;
+                osResult.nSize=nBlockSize;
             }
             else if(cursorPosition.nColumn==COLUMN_COMMENT)
             {
-                nOffset=nBlockOffset;
+                osResult.nOffset=nBlockOffset;
+                osResult.nSize=nBlockSize;
             }
         }
         else
         {
-            if(!isOffsetValid(nOffset))
+            if(!isOffsetValid(osResult.nOffset))
             {
-                nOffset=g_nDataSize; // TODO Check
+                osResult.nOffset=g_nDataSize; // TODO Check
+                osResult.nSize=0;
             }
         }
     }
 
-    return nOffset;
+    return osResult;
 }
 
 void XDisasmView::updateData()
@@ -393,6 +426,7 @@ void XDisasmView::updateData()
                 DISASM_RESULT disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress);
 
                 record.sOpcode=disasmResult.sOpcode;
+                record.nSize=disasmResult.nSize;
                 nBufferSize=disasmResult.nSize;
 
                 baBuffer.resize(nBufferSize);
@@ -444,6 +478,14 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionGoToAddress.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOADDRESS));
     connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddressSlot()));
 
+    QAction actionGoToOffset(tr("Go to offset"),this);
+    actionGoToOffset.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOOFFSET));
+    connect(&actionGoToOffset,SIGNAL(triggered()),this,SLOT(_goToOffsetSlot()));
+
+    QAction actionGoToEntryPoint(tr("Go to entry point"),this);
+    actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOENTRYPOINT));
+    connect(&actionGoToEntryPoint,SIGNAL(triggered()),this,SLOT(_goToEntryPointSlot()));
+
     QAction actionDumpToFile(tr("Dump to file"),this);
     actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
@@ -484,40 +526,53 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEX));
     connect(&actionHex,SIGNAL(triggered()),this,SLOT(_hexSlot()));
 
-    STATE state=getState();
+    MENU_STATE menuState=getMenuState();
 
     QMenu contextMenu(this);
+    QMenu menuGoTo(tr("Go to"),this);
     QMenu menuSelect(tr("Select"),this);
     QMenu menuCopy(tr("Copy"),this);
 
-    contextMenu.addAction(&actionGoToAddress);
-    contextMenu.addAction(&actionFind);
-    contextMenu.addAction(&actionFindNext);
+    menuSelect.addAction(&actionSelectAll);
+
+    menuGoTo.addAction(&actionGoToAddress);
+
+    if(menuState.bOffset)
+    {
+        menuGoTo.addAction(&actionGoToOffset);
+    }
+
+    menuGoTo.addAction(&actionGoToEntryPoint);
 
     menuCopy.addAction(&actionCopyCursorAddress);
 
-    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
+    if(menuState.bOffset)
     {
         menuCopy.addAction(&actionCopyCursorOffset);
     }
 
-    if(state.nSelectionSize)
+    if(menuState.bSize)
+    {
+        menuCopy.addAction(&actionCopyAsHex);
+    }
+
+    contextMenu.addAction(&actionFind);
+    contextMenu.addAction(&actionFindNext);
+
+    if(menuState.bSize)
     {
         contextMenu.addAction(&actionDumpToFile);
         contextMenu.addAction(&actionSignature);
         contextMenu.addAction(&actionHexSignature);
-
-        menuCopy.addAction(&actionCopyAsHex);
     }
 
-    if(g_options.bMenu_Hex)
+    if(menuState.bHex)
     {
         contextMenu.addAction(&actionHex);
     }
 
+    contextMenu.addMenu(&menuGoTo);
     contextMenu.addMenu(&menuCopy);
-
-    menuSelect.addAction(&actionSelectAll);
     contextMenu.addMenu(&menuSelect);
 
     // TODO reset select
@@ -636,6 +691,7 @@ void XDisasmView::registerShortcuts(bool bState)
     {
         if(!g_scGoToAddress)        g_scGoToAddress         =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOADDRESS),          this,SLOT(_goToAddressSlot()));
         if(!g_scGoToOffset)         g_scGoToOffset          =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOOFFSET),           this,SLOT(_goToOffsetSlot()));
+        if(!g_scGoToEntryPoint)     g_scGoToEntryPoint      =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOENTRYPOINT),       this,SLOT(_goToEntryPointSlot()));
         if(!g_scDumpToFile)         g_scDumpToFile          =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE),           this,SLOT(_dumpToFileSlot()));
         if(!g_scSelectAll)          g_scSelectAll           =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SELECTALL),            this,SLOT(_selectAllSlot()));
         if(!g_scCopyAsHex)          g_scCopyAsHex           =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYASHEX),            this,SLOT(_copyAsHexSlot()));
@@ -651,6 +707,7 @@ void XDisasmView::registerShortcuts(bool bState)
     {
         if(g_scGoToAddress)         {delete g_scGoToAddress;        g_scGoToAddress=nullptr;}
         if(g_scGoToOffset)          {delete g_scGoToOffset;         g_scGoToOffset=nullptr;}
+        if(g_scGoToEntryPoint)      {delete g_scGoToEntryPoint;     g_scGoToEntryPoint=nullptr;}
         if(g_scDumpToFile)          {delete g_scDumpToFile;         g_scDumpToFile=nullptr;}
         if(g_scSelectAll)           {delete g_scSelectAll;          g_scSelectAll=nullptr;}
         if(g_scCopyAsHex)           {delete g_scCopyAsHex;          g_scCopyAsHex=nullptr;}
@@ -686,6 +743,13 @@ void XDisasmView::_goToOffsetSlot()
     }
 }
 
+void XDisasmView::_goToEntryPointSlot()
+{
+    goToAddress(g_options.nEntryPointAddress);
+    setFocus();
+    viewport()->update();
+}
+
 void XDisasmView::_dumpToFileSlot()
 {
     QString sFilter;
@@ -716,7 +780,9 @@ void XDisasmView::_signatureSlot()
 {
     STATE state=getState();
 
-    DialogMultiDisasmSignature dmds(this,g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle);
+    DialogMultiDisasmSignature dmds(this);
+
+    dmds.setData(g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle);
 
     dmds.exec();
 }

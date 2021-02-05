@@ -21,16 +21,11 @@
 #include "dialogmultidisasmsignature.h"
 #include "ui_dialogmultidisasmsignature.h"
 
-DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle) :
+DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
     QDialog(pParent),
     ui(new Ui::DialogMultiDisasmSignature)
 {
     ui->setupUi(this);
-
-    this->g_pDevice=pDevice;
-    this->g_nOffset=nOffset;
-    this->g_pMemoryMap=pMemoryMap;
-    this->g_handle=handle;
 
 //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XAbstractTableView::getMonoFont(10));
@@ -41,12 +36,22 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent, QIODevi
     ui->comboBoxMethod->addItem("",0);
     ui->comboBoxMethod->addItem(tr("Relative virtual address"),1);
 
-    reload();
+    g_nSymbolWidth=XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
 }
 
 DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
 {
     delete ui;
+}
+
+void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
+{
+    this->g_pDevice=pDevice;
+    this->g_nOffset=nOffset;
+    this->g_pMemoryMap=pMemoryMap;
+    this->g_handle=handle;
+
+    reload();
 }
 
 void DialogMultiDisasmSignature::reload()
@@ -136,8 +141,6 @@ void DialogMultiDisasmSignature::reload()
         nOffset=XBinary::addressToOffset(g_pMemoryMap,nAddress);
     }
 
-    int nSymbolWidth=XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
-
     int nNumberOfRecords=g_listRecords.count();
 
     ui->tableWidgetSignature->clear();
@@ -173,7 +176,7 @@ void DialogMultiDisasmSignature::reload()
                 QPushButton *pDispButton=new QPushButton(this);
                 pDispButton->setText(QString("d"));
                 pDispButton->setCheckable(true);
-                pDispButton->setMaximumWidth(nSymbolWidth*6);
+                pDispButton->setMaximumWidth(g_nSymbolWidth*6);
                 connect(pDispButton,SIGNAL(clicked()),this,SLOT(reloadSignature()));
 
                 ui->tableWidgetSignature->setCellWidget(i,3,pDispButton);
@@ -184,7 +187,7 @@ void DialogMultiDisasmSignature::reload()
                 QPushButton *pImmButton=new QPushButton(this);
                 pImmButton->setText(QString("i"));
                 pImmButton->setCheckable(true);
-                pImmButton->setMaximumWidth(nSymbolWidth*6);
+                pImmButton->setMaximumWidth(g_nSymbolWidth*6);
                 connect(pImmButton,SIGNAL(clicked()),this,SLOT(reloadSignature()));
 
                 ui->tableWidgetSignature->setCellWidget(i,4,pImmButton);
@@ -196,17 +199,17 @@ void DialogMultiDisasmSignature::reload()
         }
     }
 
-    ui->tableWidgetSignature->setColumnWidth(0,nSymbolWidth*12);
-    ui->tableWidgetSignature->setColumnWidth(1,nSymbolWidth*8);
-    ui->tableWidgetSignature->setColumnWidth(2,nSymbolWidth*20);
-    ui->tableWidgetSignature->setColumnWidth(3,nSymbolWidth*6);
-    ui->tableWidgetSignature->setColumnWidth(4,nSymbolWidth*6);
+    ui->tableWidgetSignature->setColumnWidth(0,g_nSymbolWidth*12);
+    ui->tableWidgetSignature->setColumnWidth(1,g_nSymbolWidth*28);
+    ui->tableWidgetSignature->setColumnWidth(2,g_nSymbolWidth*20);
+    ui->tableWidgetSignature->setColumnWidth(3,g_nSymbolWidth*6);
+    ui->tableWidgetSignature->setColumnWidth(4,g_nSymbolWidth*6);
 
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Interactive);
-    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Interactive);
+//    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Interactive);
 
     reloadSignature();
 }
