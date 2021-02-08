@@ -180,7 +180,8 @@ XBinary::DM XDisasmView::getMode()
 
 void XDisasmView::goToAddress(qint64 nAddress)
 {
-    _goToOffset(XBinary::addressToOffset(&(g_options.memoryMap),nAddress));
+    qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),nAddress);
+    _goToOffset(nOffset);
     // TODO reload
 }
 

@@ -38,6 +38,7 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress);
+    void goToAddress(qint64 nAddress);
     void setShortcuts(XShortcuts *pShortcuts);
 
 private:

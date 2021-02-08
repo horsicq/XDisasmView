@@ -85,6 +85,12 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
     reloadFileType();
 }
 
+void XMultiDisasmWidget::goToAddress(qint64 nAddress)
+{
+    ui->scrollAreaDisasm->goToAddress(nAddress);
+    ui->scrollAreaDisasm->reload(true);
+}
+
 void XMultiDisasmWidget::setShortcuts(XShortcuts *pShortcuts)
 {
     ui->scrollAreaDisasm->setShortcuts(pShortcuts);
