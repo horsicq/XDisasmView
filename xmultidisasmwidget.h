@@ -39,7 +39,11 @@ public:
 
     void setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress);
     void goToAddress(qint64 nAddress);
+    void goToOffset(qint64 nOffset);
     void setShortcuts(XShortcuts *pShortcuts);
+
+signals:
+    void errorMessage(QString sText);
 
 private:
     void addMode(XBinary::DM disasmMode);

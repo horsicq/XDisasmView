@@ -801,8 +801,13 @@ void XDisasmView::_findSlot()
     if(dialogSearch.exec()==QDialog::Accepted)
     {
         _goToOffset(g_searchData.nResultOffset);
+        setSelection(g_searchData.nResultOffset,g_searchData.nResultSize);
         setFocus();
         viewport()->update();
+    }
+    else
+    {
+        errorMessage(tr("Nothing found"));
     }
 }
 
@@ -818,8 +823,13 @@ void XDisasmView::_findNextSlot()
         if(dialogSearch.exec()==QDialog::Accepted)
         {
             _goToOffset(g_searchData.nResultOffset);
+            setSelection(g_searchData.nResultOffset,g_searchData.nResultSize);
             setFocus();
             viewport()->update();
+        }
+        else
+        {
+            errorMessage(tr("Nothing found"));
         }
     }
 }

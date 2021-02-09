@@ -65,6 +65,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_HCS08);
 //    addMode(XBinary::DM_EVM);
 //    addMode(XBinary::DM_MOS65XX);
+
+    connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -88,6 +90,12 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint6
 void XMultiDisasmWidget::goToAddress(qint64 nAddress)
 {
     ui->scrollAreaDisasm->goToAddress(nAddress);
+    ui->scrollAreaDisasm->reload(true);
+}
+
+void XMultiDisasmWidget::goToOffset(qint64 nOffset)
+{
+    ui->scrollAreaDisasm->goToOffset(nOffset);
     ui->scrollAreaDisasm->reload(true);
 }
 
