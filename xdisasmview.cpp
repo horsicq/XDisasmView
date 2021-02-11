@@ -416,7 +416,16 @@ void XDisasmView::updateData()
 
                 RECORD record={};
 
-                qint64 nCurrentAddress=XBinary::offsetToAddress(&(g_options.memoryMap),nCurrentOffset);
+                qint64 nCurrentAddress=0;
+
+                if(g_mode==MODE_ADDRESS)
+                {
+                    nCurrentAddress=XBinary::offsetToAddress(&(g_options.memoryMap),nCurrentOffset);
+                }
+                else if(g_mode==MODE_RELADDRESS)
+                {
+                    nCurrentAddress=XBinary::offsetToRelAddress(&(g_options.memoryMap),nCurrentOffset);
+                }
 
                 record.nOffset=nCurrentOffset;
                 record.sOffset=QString("%1").arg(nCurrentOffset,g_nAddressWidth,16,QChar('0'));
@@ -717,12 +726,33 @@ void XDisasmView::registerShortcuts(bool bState)
 
 void XDisasmView::_headerClicked(qint32 nNumber)
 {
-    // TODO
+    if(nNumber==COLUMN_ADDRESS)
+    {
+        if(g_mode==MODE_ADDRESS)
+        {
+            setColumnTitle(COLUMN_ADDRESS,tr("Address"));
+            g_mode=MODE_RELADDRESS;
+        }
+        else if(g_mode==MODE_RELADDRESS)
+        {
+            setColumnTitle(COLUMN_ADDRESS,tr("Relative address"));
+            g_mode=MODE_ADDRESS;
+        }
+
+        adjust(true);
+    }
 }
 
 void XDisasmView::_goToAddressSlot()
 {
-    DialogGoToAddress da(this,&(g_options.memoryMap),DialogGoToAddress::TYPE_ADDRESS);
+    DialogGoToAddress::TYPE type=DialogGoToAddress::TYPE_ADDRESS;
+
+    if(g_mode==MODE_RELADDRESS)
+    {
+        type=DialogGoToAddress::TYPE_RELADDRESS;
+    }
+
+    DialogGoToAddress da(this,&(g_options.memoryMap),type);
     if(da.exec()==QDialog::Accepted)
     {
         goToAddress(da.getValue());
@@ -852,7 +882,18 @@ void XDisasmView::_copyCursorAddressSlot()
 {
     STATE state=getState();
 
-    QApplication::clipboard()->setText(XBinary::valueToHex(XBinary::MODE_UNKNOWN,XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset)));
+    qint64 nAddress=0;
+
+    if(g_mode==MODE_ADDRESS)
+    {
+        nAddress=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset);
+    }
+    else if(g_mode==MODE_RELADDRESS)
+    {
+        nAddress=XBinary::offsetToRelAddress(&(g_options.memoryMap),state.nCursorOffset);
+    }
+
+    QApplication::clipboard()->setText(XBinary::valueToHex(XBinary::MODE_UNKNOWN,nAddress));
 }
 
 void XDisasmView::_copyCursorOffsetSlot()
