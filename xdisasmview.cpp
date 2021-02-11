@@ -44,7 +44,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_scSignature=nullptr;
     g_scHex=nullptr;
 
-    addColumn(tr("Address"));
+    addColumn(tr("Address"),0,true);
     addColumn(tr("Offset"));
     addColumn(tr("Bytes"));
     addColumn(tr("Opcode"));
@@ -56,6 +56,8 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nOpcodeSize=16;
 
     setTextFont(getMonoFont(10));
+
+    g_mode=MODE_ADDRESS;
 }
 
 XDisasmView::~XDisasmView()
@@ -297,10 +299,10 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
 
     STATE state=getState();
 
-    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
-    {
-        result.bOffset=true;
-    }
+//    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
+//    {
+//        result.bOffset=true;
+//    }
 
     if(state.nSelectionSize)
     {
@@ -537,20 +539,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
     menuSelect.addAction(&actionSelectAll);
 
     menuGoTo.addAction(&actionGoToAddress);
-
-    if(menuState.bOffset)
-    {
-        menuGoTo.addAction(&actionGoToOffset);
-    }
-
+    menuGoTo.addAction(&actionGoToOffset);
     menuGoTo.addAction(&actionGoToEntryPoint);
 
     menuCopy.addAction(&actionCopyCursorAddress);
-
-    if(menuState.bOffset)
-    {
-        menuCopy.addAction(&actionCopyCursorOffset);
-    }
+    menuCopy.addAction(&actionCopyCursorOffset);
 
     if(menuState.bSize)
     {
@@ -720,6 +713,11 @@ void XDisasmView::registerShortcuts(bool bState)
         if(g_scHexSignature)        {delete g_scHexSignature;       g_scHexSignature=nullptr;}
         if(g_scHex)                 {delete g_scHex;                g_scHex=nullptr;}
     }
+}
+
+void XDisasmView::_headerClicked(qint32 nNumber)
+{
+    // TODO
 }
 
 void XDisasmView::_goToAddressSlot()

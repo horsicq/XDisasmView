@@ -64,6 +64,12 @@ private:
         COLUMN_COMMENT
     };
 
+    enum MODE
+    {
+        MODE_ADDRESS,
+        MODE_RELADDRESS
+    };
+
     struct RECORD
     {
         QString sAddress;
@@ -83,7 +89,7 @@ private:
 
     struct MENU_STATE
     {
-        bool bOffset;
+//        bool bOffset;
         bool bSize;
         bool bHex;
     };
@@ -105,6 +111,7 @@ protected:
     virtual void setScrollValue(qint64 nOffset);
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
+    virtual void _headerClicked(qint32 nNumber);
 
 private slots:
     void _goToAddressSlot();
@@ -145,6 +152,7 @@ private:
     QShortcut *g_scHex;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
+    MODE g_mode;
 };
 
 #endif // XDISASMVIEW_H
