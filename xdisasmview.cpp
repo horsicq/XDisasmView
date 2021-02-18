@@ -663,7 +663,7 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
-    if(XBinary::getModeFromSize(g_nDataSize)==XBinary::MODE_64)
+    if(XBinary::getWidthModeFromSize(g_nDataSize)==XBinary::MODE_64)
     {
         g_nAddressWidth=16;
         setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
