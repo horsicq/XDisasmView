@@ -27,6 +27,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 {
     ui->setupUi(this);
 
+    g_options={};
+
     QSignalBlocker blocker(ui->comboBoxMode);
 
     addMode(XBinary::DM_X86_16);
@@ -74,17 +76,16 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress)
+void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options)
 { 
     g_pDevice=pDevice;
-    g_fileType=fileType;
-    g_nInitAddress=nInitAddress;
+    g_options=options;
 
     QSet<XBinary::FT> stFileType=XBinary::getFileTypes(pDevice,true);
     stFileType.insert(XBinary::FT_COM);
     QList<XBinary::FT> listFileTypes=XBinary::_getFileTypeListFromSet(stFileType);
 
-    XFormats::setFileTypeComboBox(ui->comboBoxType,&listFileTypes,fileType);
+    XFormats::setFileTypeComboBox(ui->comboBoxType,&listFileTypes,options.fileType);
 
     reloadFileType();
 }
@@ -118,9 +119,10 @@ void XMultiDisasmWidget::reloadFileType()
     XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
     XDisasmView::OPTIONS options={};
-    options.nInitAddress=g_nInitAddress;
+    options.nInitAddress=g_options.nInitAddress;
     options.nEntryPointAddress=XFormats::getEntryPointAddress(fileType,g_pDevice);
     options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
+    options.sSignaturesPath=g_options.sSignaturesPath;
 
     ui->scrollAreaDisasm->setData(g_pDevice,options);
 

@@ -44,12 +44,13 @@ DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
     delete ui;
 }
 
-void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
+void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle, QString sSignaturesPath)
 {
     this->g_pDevice=pDevice;
     this->g_nOffset=nOffset;
     this->g_pMemoryMap=pMemoryMap;
     this->g_handle=handle;
+    this->g_sSignaturesPath=sSignaturesPath;
 
     reload();
 }
@@ -371,4 +372,15 @@ void DialogMultiDisasmSignature::on_comboBoxMethod_currentIndexChanged(int nInde
     Q_UNUSED(nIndex)
 
     reload();
+}
+
+void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
+{
+    SearchSignaturesWidget::OPTIONS options={};
+    options.bMenu_Hex=false;
+    options.sSignaturesPath=g_sSignaturesPath;
+
+    DialogSearchSignatures dialogSearchSignatures(this,g_pDevice,g_pMemoryMap->fileType,options,true);
+
+    dialogSearchSignatures.exec();
 }

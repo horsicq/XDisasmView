@@ -34,10 +34,18 @@ class XMultiDisasmWidget : public QWidget
     Q_OBJECT
 
 public:
+
+    struct OPTIONS
+    {
+        XBinary::FT fileType;
+        qint64 nInitAddress;
+        QString sSignaturesPath;
+    };
+
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress);
+    void setData(QIODevice *pDevice,OPTIONS options);
     void goToAddress(qint64 nAddress);
     void goToOffset(qint64 nOffset);
     void setShortcuts(XShortcuts *pShortcuts);
@@ -56,8 +64,7 @@ private slots:
 private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *g_pDevice;
-    XBinary::FT g_fileType;
-    qint64 g_nInitAddress;
+    OPTIONS g_options;
 };
 
 #endif // XMULTIDISASMWIDGET_H

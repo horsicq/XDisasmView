@@ -800,7 +800,7 @@ void XDisasmView::_hexSignatureSlot()
 {
     STATE state=getState();
 
-    DialogHexSignature dhs(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize);
+    DialogHexSignature dhs(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize,g_options.sSignaturesPath);
 
     dhs.exec();
 }
@@ -811,7 +811,7 @@ void XDisasmView::_signatureSlot()
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle);
+    dmds.setData(g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle,g_options.sSignaturesPath);
 
     dmds.exec();
 }

@@ -48,6 +48,11 @@ FORMS += \
     include($$PWD/../FormatDialogs/dialogdump.pri)
 }
 
+!contains(XCONFIG, formatwidgets) {
+    XCONFIG += formatwidgets
+    include($$PWD/../FormatWidgets/formatwidgets.pri)
+}
+
 !contains(XCONFIG, dialoghexsignature) {
     XCONFIG += dialoghexsignature
     include($$PWD/../FormatDialogs/dialoghexsignature.pri)

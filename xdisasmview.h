@@ -44,6 +44,7 @@ public:
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
         bool bMenu_Hex; // TODO !!!
+        QString sSignaturesPath;
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);

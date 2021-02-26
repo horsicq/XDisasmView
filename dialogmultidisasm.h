@@ -36,7 +36,7 @@ public:
     explicit DialogMultiDisasm(QWidget *pParent=nullptr);
     ~DialogMultiDisasm();
 
-    void setData(QIODevice *pDevice,XBinary::FT fileType,qint64 nInitAddress);
+    void setData(QIODevice *pDevice,XMultiDisasmWidget::OPTIONS options);
     void setShortcuts(XShortcuts *pShortcuts);
 
 private slots:

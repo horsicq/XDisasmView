@@ -50,7 +50,7 @@ class DialogMultiDisasmSignature : public QDialog
 public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
-    void setData(QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap,csh handle);
+    void setData(QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap,csh handle,QString sSignaturesPath);
     void reload();
 
 private slots:
@@ -64,6 +64,7 @@ private slots:
     void on_spinBoxCount_valueChanged(int nValue);
 
     void on_comboBoxMethod_currentIndexChanged(int nIndex);
+    void on_pushButtonScan_clicked();
 
 private:
     Ui::DialogMultiDisasmSignature *ui;
@@ -73,6 +74,7 @@ private:
     csh g_handle;
     QList<SIGNATURE_RECORD> g_listRecords;
     qint32 g_nSymbolWidth;
+    QString g_sSignaturesPath;
 };
 
 #endif // DIALOGMULTIDISASMSIGNATURE_H

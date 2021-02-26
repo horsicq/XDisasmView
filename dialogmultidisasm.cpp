@@ -33,9 +33,9 @@ DialogMultiDisasm::~DialogMultiDisasm()
     delete ui;
 }
 
-void DialogMultiDisasm::setData(QIODevice *pDevice, XBinary::FT fileType, qint64 nInitAddress)
+void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options)
 {
-    ui->widgetDisasm->setData(pDevice,fileType,nInitAddress);
+    ui->widgetDisasm->setData(pDevice,options);
 }
 
 void DialogMultiDisasm::setShortcuts(XShortcuts *pShortcuts)
