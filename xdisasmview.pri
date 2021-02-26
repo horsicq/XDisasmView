@@ -48,9 +48,9 @@ FORMS += \
     include($$PWD/../FormatDialogs/dialogdump.pri)
 }
 
-!contains(XCONFIG, formatwidgets) {
-    XCONFIG += formatwidgets
-    include($$PWD/../FormatWidgets/formatwidgets.pri)
+!contains(XCONFIG, searchsignatureswidget) {
+    XCONFIG += searchsignatureswidget
+    include($$PWD/../FormatWidgets/SearchSignatures/searchsignatureswidget.pri)
 }
 
 !contains(XCONFIG, dialoghexsignature) {
