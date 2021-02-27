@@ -22,7 +22,7 @@
 #include "ui_dialogmultidisasmsignature.h"
 
 DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
-    QDialog(pParent),
+    XShortcutsDialog(pParent),
     ui(new Ui::DialogMultiDisasmSignature)
 {
     ui->setupUi(this);
@@ -379,8 +379,11 @@ void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
     SearchSignaturesWidget::OPTIONS options={};
     options.bMenu_Hex=false;
     options.sSignaturesPath=g_sSignaturesPath;
+    options.sUserSignature=ui->textEditSignature->toPlainText();
 
     DialogSearchSignatures dialogSearchSignatures(this,g_pDevice,g_pMemoryMap->fileType,options,true);
+
+    dialogSearchSignatures.setShortcuts(getShortcuts());
 
     dialogSearchSignatures.exec();
 }

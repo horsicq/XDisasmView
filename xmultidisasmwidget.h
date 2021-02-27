@@ -50,9 +50,6 @@ public:
     void goToOffset(qint64 nOffset);
     void setShortcuts(XShortcuts *pShortcuts);
 
-signals:
-    void errorMessage(QString sText);
-
 private:
     void addMode(XBinary::DM disasmMode);
     void reloadFileType();
@@ -60,6 +57,7 @@ private:
 private slots:
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_comboBoxMode_currentIndexChanged(int nIndex);
+    void errorMessageSlot(QString sErrorMessage);
 
 private:
     Ui::XMultiDisasmWidget *ui;

@@ -28,7 +28,7 @@ namespace Ui {
 class DialogMultiDisasm;
 }
 
-class DialogMultiDisasm : public QDialog
+class DialogMultiDisasm : public XShortcutsDialog
 {
     Q_OBJECT
 

@@ -22,7 +22,7 @@
 #include "ui_dialogmultidisasm.h"
 
 DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) :
-    QDialog(pParent),
+    XShortcutsDialog(pParent),
     ui(new Ui::DialogMultiDisasm)
 {
     ui->setupUi(this);
@@ -41,6 +41,7 @@ void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS 
 void DialogMultiDisasm::setShortcuts(XShortcuts *pShortcuts)
 {
      ui->widgetDisasm->setShortcuts(pShortcuts);
+     XShortcutsDialog::setShortcuts(pShortcuts);
 }
 
 void DialogMultiDisasm::on_pushButtonClose_clicked()

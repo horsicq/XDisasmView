@@ -68,7 +68,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 //    addMode(XBinary::DM_EVM);
 //    addMode(XBinary::DM_MOS65XX);
 
-    connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SIGNAL(errorMessage(QString)));
+    connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -156,4 +156,9 @@ void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
 
     ui->scrollAreaDisasm->setMode(disasmMode);
     ui->scrollAreaDisasm->reload(true);
+}
+
+void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
+{
+    QMessageBox::critical(this,tr("Error"),sErrorMessage);
 }

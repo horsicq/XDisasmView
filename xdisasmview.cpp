@@ -802,6 +802,8 @@ void XDisasmView::_hexSignatureSlot()
 
     DialogHexSignature dhs(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize,g_options.sSignaturesPath);
 
+    dhs.setShortcuts(getShortcuts());
+
     dhs.exec();
 }
 
@@ -812,6 +814,8 @@ void XDisasmView::_signatureSlot()
     DialogMultiDisasmSignature dmds(this);
 
     dmds.setData(g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle,g_options.sSignaturesPath);
+
+    dmds.setShortcuts(getShortcuts());
 
     dmds.exec();
 }
@@ -835,7 +839,7 @@ void XDisasmView::_findSlot()
     }
     else
     {
-        errorMessage(tr("Nothing found"));
+        emit errorMessage(tr("Nothing found"));
     }
 }
 
@@ -857,7 +861,7 @@ void XDisasmView::_findNextSlot()
         }
         else
         {
-            errorMessage(tr("Nothing found"));
+            emit errorMessage(tr("Nothing found"));
         }
     }
 }

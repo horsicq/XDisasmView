@@ -31,7 +31,7 @@ namespace Ui {
 class DialogMultiDisasmSignature;
 }
 
-class DialogMultiDisasmSignature : public QDialog
+class DialogMultiDisasmSignature : public XShortcutsDialog
 {
     Q_OBJECT
 
