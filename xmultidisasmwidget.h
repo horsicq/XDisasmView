@@ -29,7 +29,7 @@ namespace Ui {
 class XMultiDisasmWidget;
 }
 
-class XMultiDisasmWidget : public QWidget
+class XMultiDisasmWidget : public QWidget // TODO XShortcutsWidget
 {
     Q_OBJECT
 
