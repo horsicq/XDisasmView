@@ -22,7 +22,7 @@
 #include "ui_xmultidisasmwidget.h"
 
 XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
-    QWidget(pParent),
+    XShortcutsWidget(pParent),
     ui(new Ui::XMultiDisasmWidget)
 {
     ui->setupUi(this);
@@ -105,6 +105,7 @@ void XMultiDisasmWidget::goToOffset(qint64 nOffset)
 void XMultiDisasmWidget::setShortcuts(XShortcuts *pShortcuts)
 {
     ui->scrollAreaDisasm->setShortcuts(pShortcuts);
+    XShortcutsWidget::setShortcuts(pShortcuts);
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
@@ -161,4 +162,9 @@ void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
 void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
 {
     QMessageBox::critical(this,tr("Error"),sErrorMessage);
+}
+
+void XMultiDisasmWidget::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
 }

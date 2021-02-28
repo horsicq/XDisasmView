@@ -29,7 +29,7 @@ namespace Ui {
 class XMultiDisasmWidget;
 }
 
-class XMultiDisasmWidget : public QWidget // TODO XShortcutsWidget
+class XMultiDisasmWidget : public XShortcutsWidget
 {
     Q_OBJECT
 
@@ -58,6 +58,9 @@ private slots:
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void errorMessageSlot(QString sErrorMessage);
+
+protected:
+    virtual void registerShortcuts(bool bState);
 
 private:
     Ui::XMultiDisasmWidget *ui;
