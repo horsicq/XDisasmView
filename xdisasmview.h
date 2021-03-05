@@ -43,8 +43,9 @@ public:
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
-        bool bMenu_Hex; // TODO !!!
+        bool bMenu_Hex;  // TODO remove TODO list of custom items
         QString sSignaturesPath;
+        // TODO save backup
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);
