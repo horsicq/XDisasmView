@@ -36,14 +36,13 @@ class XDisasmView : public XAbstractTableView
     Q_OBJECT
 
 public:
-
     struct OPTIONS
     {
         qint64 nInitAddress;
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
-        bool bMenu_Hex;  // TODO remove TODO list of custom items
+        bool bMenu_Hex;
         QString sSignaturesPath;
         // TODO save backup
     };
