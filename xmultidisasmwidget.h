@@ -21,8 +21,8 @@
 #ifndef XMULTIDISASMWIDGET_H
 #define XMULTIDISASMWIDGET_H
 
-#include "xformats.h"
 #include <QComboBox>
+#include "xformats.h"
 #include "xdisasmview.h"
 
 namespace Ui {
