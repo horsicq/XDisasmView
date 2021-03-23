@@ -55,7 +55,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
-    setTextFont(getMonoFont(10));
+    setTextFont(getMonoFont());
 
     g_mode=MODE_ADDRESS;
 }

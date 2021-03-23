@@ -28,7 +28,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
     ui->setupUi(this);
 
 //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
-    ui->textEditSignature->setFont(XAbstractTableView::getMonoFont(10));
+    ui->textEditSignature->setFont(XAbstractTableView::getMonoFont());
 
     QSignalBlocker signalBlocker1(ui->spinBoxCount);
     QSignalBlocker signalBlocker2(ui->comboBoxMethod);
