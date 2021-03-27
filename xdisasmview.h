@@ -96,7 +96,7 @@ private:
     };
 
     DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress);
-    qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
+    qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
     MENU_STATE getMenuState();
 
 protected:
