@@ -837,7 +837,7 @@ void XDisasmView::_findSlot()
         setFocus();
         viewport()->update();
     }
-    else
+    else if(g_searchData.type!=SearchProcess::TYPE_UNKNOWN)
     {
         emit errorMessage(tr("Nothing found"));
     }
@@ -859,7 +859,7 @@ void XDisasmView::_findNextSlot()
             setFocus();
             viewport()->update();
         }
-        else
+        else if(g_searchData.type!=SearchProcess::TYPE_UNKNOWN)
         {
             emit errorMessage(tr("Nothing found"));
         }
