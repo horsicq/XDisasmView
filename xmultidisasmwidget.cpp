@@ -96,6 +96,13 @@ void XMultiDisasmWidget::goToAddress(qint64 nAddress)
     ui->scrollAreaDisasm->reload(true);
 }
 
+void XMultiDisasmWidget::setCurrentIPAddress(qint64 nAddress)
+{
+    ui->scrollAreaDisasm->setCurrentIPAddress(nAddress);
+    ui->scrollAreaDisasm->goToAddress(nAddress);
+    ui->scrollAreaDisasm->reload(true);
+}
+
 void XMultiDisasmWidget::goToOffset(qint64 nOffset)
 {
     ui->scrollAreaDisasm->goToOffset(nOffset);

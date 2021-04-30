@@ -58,6 +58,8 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
     setTextFont(getMonoFont());
 
     g_mode=MODE_ADDRESS;
+
+    g_nCurrentIPAddress=-1;
 }
 
 XDisasmView::~XDisasmView()
@@ -95,6 +97,8 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
     }
 
     setTotalLineCount(nTotalLineCount);
+
+    setCurrentIPAddress(options.nCurrentIPAddress);
 
     if(options.nInitAddress)
     {
@@ -191,6 +195,11 @@ void XDisasmView::goToOffset(qint64 nOffset)
 {
     _goToOffset(nOffset);
     // TODO reload
+}
+
+void XDisasmView::setCurrentIPAddress(qint64 nAddress)
+{
+    g_nCurrentIPAddress=nAddress;
 }
 
 XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
@@ -432,6 +441,7 @@ void XDisasmView::updateData()
 
                 if(nCurrentAddress!=-1)
                 {
+                    record.nAddress=nCurrentAddress;
                     record.sAddress=QString("%1").arg(nCurrentAddress,g_nAddressWidth,16,QChar('0'));
                 }
 
@@ -459,15 +469,37 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
     if(nRow<nNumberOfRows)
     {
         qint64 nOffset=g_listRecords.at(nRow).nOffset;
+        qint64 nAddress=g_listRecords.at(nRow).nAddress;
+
+        bool bCurrentIPAddress=((nAddress==g_nCurrentIPAddress)&&(nColumn==COLUMN_ADDRESS));
 
         if(isOffsetSelected(nOffset))
         {
-            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
+            if(!bCurrentIPAddress)
+            {
+                pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
+            }
+        }
+
+        if(bCurrentIPAddress)
+        {
+            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
         }
 
         if(nColumn==COLUMN_ADDRESS)
         {
+            if(bCurrentIPAddress)
+            {
+                pPainter->save();
+                pPainter->setPen(viewport()->palette().color(QPalette::Base));
+            }
+
             pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sAddress); // TODO Text Optional
+
+            if(bCurrentIPAddress)
+            {
+                pPainter->restore();
+            }
         }
         else if(nColumn==COLUMN_OFFSET)
         {

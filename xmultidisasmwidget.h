@@ -47,6 +47,7 @@ public:
 
     void setData(QIODevice *pDevice,OPTIONS options);
     void goToAddress(qint64 nAddress);
+    void setCurrentIPAddress(qint64 nAddress);
     void goToOffset(qint64 nOffset);
     void setShortcuts(XShortcuts *pShortcuts);
 

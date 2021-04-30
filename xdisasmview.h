@@ -39,6 +39,7 @@ public:
     struct OPTIONS
     {
         qint64 nInitAddress;
+        qint64 nCurrentIPAddress; // For Debugger
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
@@ -54,6 +55,8 @@ public:
     XBinary::DM getMode();
     void goToAddress(qint64 nAddress);
     void goToOffset(qint64 nOffset);
+
+    void setCurrentIPAddress(qint64 nAddress); // For Debugger
 
 private:
     enum COLUMN
@@ -78,6 +81,7 @@ private:
         QString sHEX;
         QString sOpcode;
         qint64 nOffset;
+        qint64 nAddress;
         qint64 nSize;
     };
 
@@ -154,6 +158,9 @@ private:
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
     MODE g_mode;
+
+    // Debugger
+    qint64 g_nCurrentIPAddress;
 };
 
 #endif // XDISASMVIEW_H
