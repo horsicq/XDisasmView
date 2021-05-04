@@ -57,6 +57,7 @@ public:
     void goToOffset(qint64 nOffset);
 
     void setCurrentIPAddress(qint64 nAddress); // For Debugger
+    qint64 getSelectionInitAddress();
 
 private:
     enum COLUMN

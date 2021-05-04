@@ -202,6 +202,20 @@ void XDisasmView::setCurrentIPAddress(qint64 nAddress)
     g_nCurrentIPAddress=nAddress;
 }
 
+qint64 XDisasmView::getSelectionInitAddress()
+{
+    qint64 nResult=-1;
+
+    qint64 nOffset=getSelectionInitOffset();
+
+    if(nOffset!=-1)
+    {
+        nResult=XBinary::offsetToAddress(&(g_options.memoryMap),nOffset);
+    }
+
+    return nResult;
+}
+
 XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
 {
     DISASM_RESULT result={};
