@@ -59,6 +59,8 @@ public:
     void setCurrentIPAddress(qint64 nAddress); // For Debugger
     qint64 getSelectionInitAddress();
 
+    void setMemoryReplaces(QList<XBinary::MEMORY_REPLACE> listReplaces);
+
 private:
     enum COLUMN
     {
@@ -162,6 +164,7 @@ private:
 
     // Debugger
     qint64 g_nCurrentIPAddress;
+    QList<XBinary::MEMORY_REPLACE> g_listReplaces;
 };
 
 #endif // XDISASMVIEW_H

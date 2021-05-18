@@ -216,6 +216,11 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
+void XDisasmView::setMemoryReplaces(QList<XBinary::MEMORY_REPLACE> listReplaces)
+{
+    g_listReplaces=listReplaces;
+}
+
 XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
 {
     DISASM_RESULT result={};
@@ -432,6 +437,9 @@ void XDisasmView::updateData()
 
                 nBufferSize=XBinary::read_array(g_pDevice,nCurrentOffset,baBuffer.data(),nBufferSize);
 
+                // TODO replace bytes in Memory !!! from ListMemoryReplaces
+                // If present setFlag !!!
+
                 if(nBufferSize==0)
                 {
                     break;
@@ -499,6 +507,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         {
             pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
         }
+
+        // TODO set if Breakpoint
 
         if(nColumn==COLUMN_ADDRESS)
         {
