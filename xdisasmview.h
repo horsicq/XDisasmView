@@ -22,16 +22,10 @@
 #define XDISASMVIEW_H
 
 #include "xcapstone.h"
-#include "xformats.h"
-#include "xabstracttableview.h"
-#include "dialoggotoaddress.h"
-#include "dialogsearch.h"
-#include "dialogdumpprocess.h"
-#include "dialogsearchprocess.h"
-#include "dialoghexsignature.h"
+#include "xdevicetableview.h"
 #include "dialogmultidisasmsignature.h"
 
-class XDisasmView : public XAbstractTableView
+class XDisasmView : public XDeviceTableView
 {
     Q_OBJECT
 
@@ -53,13 +47,9 @@ public:
     void setData(QIODevice *pDevice,OPTIONS options);
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
-    void goToAddress(qint64 nAddress);
-    void goToOffset(qint64 nOffset);
 
     void setCurrentIPAddress(qint64 nAddress); // For Debugger
     qint64 getSelectionInitAddress();
-
-    void setMemoryReplaces(QList<XBinary::MEMORY_REPLACE> listReplaces);
 
 private:
     enum COLUMN
@@ -71,12 +61,6 @@ private:
         COLUMN_COMMENT
     };
 
-    enum MODE
-    {
-        MODE_ADDRESS,
-        MODE_RELADDRESS
-    };
-
     struct RECORD
     {
         QString sAddress;
@@ -86,6 +70,7 @@ private:
         qint64 nOffset;
         qint64 nAddress;
         qint64 nSize;
+        bool bIsReplaced;
     };
 
     struct DISASM_RESULT
@@ -122,29 +107,17 @@ protected:
     virtual void _headerClicked(qint32 nNumber);
 
 private slots:
-    void _goToAddressSlot();
-    void _goToOffsetSlot();
     void _goToEntryPointSlot();
-    void _dumpToFileSlot();
-    void _hexSignatureSlot();
     void _signatureSlot();
-    void _findSlot();
-    void _findNextSlot();
-    void _selectAllSlot();
-    void _copyAsHexSlot();
-    void _copyCursorAddressSlot();
-    void _copyCursorOffsetSlot();
     void _hexSlot();
 
 private:
-    QIODevice *g_pDevice;
     OPTIONS g_options;
     qint64 g_nDataSize;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
     XBinary::DM g_disasmMode;
     csh g_handle;
-    SearchProcess::SEARCHDATA g_searchData;
     QShortcut *g_scGoToAddress;
     QShortcut *g_scGoToOffset;
     QShortcut *g_scGoToEntryPoint;
@@ -160,11 +133,9 @@ private:
     QShortcut *g_scHex;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    MODE g_mode;
 
     // Debugger
-    qint64 g_nCurrentIPAddress;
-    QList<XBinary::MEMORY_REPLACE> g_listReplaces;
+    qint64 g_nCurrentIP;
 };
 
 #endif // XDISASMVIEW_H

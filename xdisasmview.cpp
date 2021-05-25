@@ -21,14 +21,12 @@
 #include "xdisasmview.h"
 #include "xdisasmview.h"
 
-XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
+XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
 {
-    g_pDevice=nullptr;
     g_handle=0;
 
     g_nDataSize=0;
     g_nBytesProLine=1;
-    g_searchData={};
 
     g_scGoToAddress=nullptr;
     g_scGoToOffset=nullptr;
@@ -57,9 +55,9 @@ XDisasmView::XDisasmView(QWidget *pParent) : XAbstractTableView(pParent)
 
     setTextFont(getMonoFont());
 
-    g_mode=MODE_ADDRESS;
+    setAddressMode(MODE_ADDRESS);
 
-    g_nCurrentIPAddress=-1;
+    g_nCurrentIP=-1;
 }
 
 XDisasmView::~XDisasmView()
@@ -72,16 +70,13 @@ XDisasmView::~XDisasmView()
 
 void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 {
-    g_pDevice=pDevice;
     g_options=options;
 
-    if(g_options.memoryMap.fileType==XBinary::FT_UNKNOWN)
-    {
-        XBinary binary(g_pDevice);
-        g_options.memoryMap=binary.getMemoryMap();
-    }
+    setDevice(pDevice);
+    setMemoryMap(g_options.memoryMap);
+    setSignaturesPath(g_options.sSignaturesPath);
 
-    XBinary::DM disasmMode=XBinary::getDisasmMode(&(options.memoryMap));
+    XBinary::DM disasmMode=XBinary::getDisasmMode(getMemoryMap());
 
     setMode(disasmMode);
 
@@ -102,7 +97,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     if(options.nInitAddress)
     {
-        qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),options.nInitAddress);
+        qint64 nOffset=XBinary::addressToOffset(getMemoryMap(),options.nInitAddress);
 
         if(nOffset==-1)
         {
@@ -184,22 +179,9 @@ XBinary::DM XDisasmView::getMode()
     return g_disasmMode;
 }
 
-void XDisasmView::goToAddress(qint64 nAddress)
-{
-    qint64 nOffset=XBinary::addressToOffset(&(g_options.memoryMap),nAddress);
-    _goToOffset(nOffset);
-    // TODO reload
-}
-
-void XDisasmView::goToOffset(qint64 nOffset)
-{
-    _goToOffset(nOffset);
-    // TODO reload
-}
-
 void XDisasmView::setCurrentIPAddress(qint64 nAddress)
 {
-    g_nCurrentIPAddress=nAddress;
+    g_nCurrentIP=nAddress;
 }
 
 qint64 XDisasmView::getSelectionInitAddress()
@@ -210,15 +192,10 @@ qint64 XDisasmView::getSelectionInitAddress()
 
     if(nOffset!=-1)
     {
-        nResult=XBinary::offsetToAddress(&(g_options.memoryMap),nOffset);
+        nResult=XBinary::offsetToAddress(getMemoryMap(),nOffset);
     }
 
     return nResult;
-}
-
-void XDisasmView::setMemoryReplaces(QList<XBinary::MEMORY_REPLACE> listReplaces)
-{
-    g_listReplaces=listReplaces;
 }
 
 XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
@@ -279,7 +256,7 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
 
         qint32 nSize=nEndOffset-nStartOffset;
 
-        QByteArray baData=XBinary::read_array(g_pDevice,nStartOffset,nSize);
+        QByteArray baData=read_array(nStartOffset,nSize);
 
         nSize=baData.size();
 
@@ -416,7 +393,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
 
 void XDisasmView::updateData()
 {
-    if(g_pDevice)
+    if(getDevice())
     {
         qint64 nBlockOffset=getViewStart()*g_nBytesProLine;
 
@@ -426,19 +403,15 @@ void XDisasmView::updateData()
 
         qint64 nCurrentOffset=nBlockOffset;
 
-        QByteArray baBuffer;
-        baBuffer.resize(g_nOpcodeSize); // TODO Check
-
         for(int i=0;i<nNumberLinesProPage;i++)
         {
             if(nCurrentOffset<g_nDataSize)
             {
                 qint32 nBufferSize=qMin(g_nOpcodeSize,qint32(g_nDataSize-nCurrentOffset));
 
-                nBufferSize=XBinary::read_array(g_pDevice,nCurrentOffset,baBuffer.data(),nBufferSize);
+                QByteArray baBuffer=read_array(nCurrentOffset,nBufferSize);
 
-                // TODO replace bytes in Memory !!! from ListMemoryReplaces
-                // If present setFlag !!!
+                nBufferSize=baBuffer.size();
 
                 if(nBufferSize==0)
                 {
@@ -449,13 +422,13 @@ void XDisasmView::updateData()
 
                 qint64 nCurrentAddress=0;
 
-                if(g_mode==MODE_ADDRESS)
+                if(getAddressMode()==MODE_ADDRESS)
                 {
-                    nCurrentAddress=XBinary::offsetToAddress(&(g_options.memoryMap),nCurrentOffset);
+                    nCurrentAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
                 }
-                else if(g_mode==MODE_RELADDRESS)
+                else if(getAddressMode()==MODE_RELADDRESS)
                 {
-                    nCurrentAddress=XBinary::offsetToRelAddress(&(g_options.memoryMap),nCurrentOffset);
+                    nCurrentAddress=XBinary::offsetToRelAddress(getMemoryMap(),nCurrentOffset);
                 }
 
                 record.nOffset=nCurrentOffset;
@@ -476,6 +449,8 @@ void XDisasmView::updateData()
                 baBuffer.resize(nBufferSize);
                 record.sHEX=baBuffer.toHex().data();
 
+                record.bIsReplaced=isReplaced(record.nOffset,record.nSize);
+
                 g_listRecords.append(record);
 
                 nCurrentOffset+=nBufferSize;
@@ -493,17 +468,22 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         qint64 nOffset=g_listRecords.at(nRow).nOffset;
         qint64 nAddress=g_listRecords.at(nRow).nAddress;
 
-        bool bCurrentIPAddress=((nAddress==g_nCurrentIPAddress)&&(nColumn==COLUMN_ADDRESS));
+        bool bCurrentIP=((nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
+        bool bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
 
         if(isOffsetSelected(nOffset))
         {
-            if(!bCurrentIPAddress)
+            if(!bCurrentIP)
             {
                 pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
             }
         }
 
-        if(bCurrentIPAddress)
+        if(bIsReplaced)
+        {
+            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,QColor(Qt::red));
+        }
+        else if(bCurrentIP)
         {
             pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
         }
@@ -512,7 +492,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         if(nColumn==COLUMN_ADDRESS)
         {
-            if(bCurrentIPAddress)
+            if(bCurrentIP)
             {
                 pPainter->save();
                 pPainter->setPen(viewport()->palette().color(QPalette::Base));
@@ -520,7 +500,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
             pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sAddress); // TODO Text Optional
 
-            if(bCurrentIPAddress)
+            if(bCurrentIP)
             {
                 pPainter->restore();
             }
@@ -784,47 +764,18 @@ void XDisasmView::_headerClicked(qint32 nNumber)
 {
     if(nNumber==COLUMN_ADDRESS)
     {
-        if(g_mode==MODE_ADDRESS)
+        if(getAddressMode()==MODE_ADDRESS)
         {
             setColumnTitle(COLUMN_ADDRESS,tr("Address"));
-            g_mode=MODE_RELADDRESS;
+            setAddressMode(MODE_RELADDRESS);
         }
-        else if(g_mode==MODE_RELADDRESS)
+        else if(getAddressMode()==MODE_RELADDRESS)
         {
             setColumnTitle(COLUMN_ADDRESS,tr("Relative address"));
-            g_mode=MODE_ADDRESS;
+            setAddressMode(MODE_ADDRESS);
         }
 
         adjust(true);
-    }
-}
-
-void XDisasmView::_goToAddressSlot()
-{
-    DialogGoToAddress::TYPE type=DialogGoToAddress::TYPE_ADDRESS;
-
-    if(g_mode==MODE_RELADDRESS)
-    {
-        type=DialogGoToAddress::TYPE_RELADDRESS;
-    }
-
-    DialogGoToAddress da(this,&(g_options.memoryMap),type);
-    if(da.exec()==QDialog::Accepted)
-    {
-        goToAddress(da.getValue());
-        setFocus();
-        viewport()->update();
-    }
-}
-
-void XDisasmView::_goToOffsetSlot()
-{
-    DialogGoToAddress da(this,&(g_options.memoryMap),DialogGoToAddress::TYPE_OFFSET);
-    if(da.exec()==QDialog::Accepted)
-    {
-        goToOffset(da.getValue());
-        setFocus();
-        viewport()->update();
     }
 }
 
@@ -835,132 +786,17 @@ void XDisasmView::_goToEntryPointSlot()
     viewport()->update();
 }
 
-void XDisasmView::_dumpToFileSlot()
-{
-    QString sFilter;
-    sFilter+=QString("%1 (*.bin)").arg(tr("Raw data"));
-    QString sSaveFileName="dump.bin"; // TODO a function
-    QString sFileName=QFileDialog::getSaveFileName(this,tr("Save dump"),sSaveFileName,sFilter);
-
-    if(!sFileName.isEmpty())
-    {
-        STATE state=getState();
-
-        DialogDumpProcess dd(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize,sFileName,DumpProcess::DT_OFFSET);
-
-        dd.exec();
-    }
-}
-
-void XDisasmView::_hexSignatureSlot()
-{
-    STATE state=getState();
-
-    DialogHexSignature dhs(this,g_pDevice,state.nSelectionOffset,state.nSelectionSize,g_options.sSignaturesPath);
-
-    dhs.setShortcuts(getShortcuts());
-
-    dhs.exec();
-}
-
 void XDisasmView::_signatureSlot()
 {
     STATE state=getState();
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(g_pDevice,state.nSelectionOffset,&(g_options.memoryMap),g_handle,g_options.sSignaturesPath);
+    dmds.setData(getDevice(),state.nSelectionOffset,getMemoryMap(),g_handle,g_options.sSignaturesPath);
 
     dmds.setShortcuts(getShortcuts());
 
     dmds.exec();
-}
-
-void XDisasmView::_findSlot()
-{
-    STATE state=getState();
-
-    g_searchData={};
-    g_searchData.nResultOffset=-1;
-    g_searchData.nCurrentOffset=state.nCursorOffset;
-
-    DialogSearch dialogSearch(this,g_pDevice,&g_searchData);
-
-    if(dialogSearch.exec()==QDialog::Accepted)
-    {
-        _goToOffset(g_searchData.nResultOffset);
-        setSelection(g_searchData.nResultOffset,g_searchData.nResultSize);
-        setFocus();
-        viewport()->update();
-    }
-    else if(g_searchData.type!=SearchProcess::TYPE_UNKNOWN)
-    {
-        emit errorMessage(tr("Nothing found"));
-    }
-}
-
-void XDisasmView::_findNextSlot()
-{
-    if(g_searchData.bInit)
-    {
-        g_searchData.nCurrentOffset=g_searchData.nResultOffset+1;
-        g_searchData.startFrom=SearchProcess::SF_CURRENTOFFSET;
-
-        DialogSearchProcess dialogSearch(this,g_pDevice,&g_searchData);
-
-        if(dialogSearch.exec()==QDialog::Accepted)
-        {
-            _goToOffset(g_searchData.nResultOffset);
-            setSelection(g_searchData.nResultOffset,g_searchData.nResultSize);
-            setFocus();
-            viewport()->update();
-        }
-        else if(g_searchData.type!=SearchProcess::TYPE_UNKNOWN)
-        {
-            emit errorMessage(tr("Nothing found"));
-        }
-    }
-}
-
-void XDisasmView::_selectAllSlot()
-{
-    setSelection(0,g_nDataSize);
-}
-
-void XDisasmView::_copyAsHexSlot()
-{
-    STATE state=getState();
-
-    qint64 nSize=qMin(state.nSelectionSize,(qint64)0x10000);
-
-    QByteArray baData=XBinary::read_array(g_pDevice,state.nSelectionOffset,nSize);
-
-    QApplication::clipboard()->setText(baData.toHex());
-}
-
-void XDisasmView::_copyCursorAddressSlot()
-{
-    STATE state=getState();
-
-    qint64 nAddress=0;
-
-    if(g_mode==MODE_ADDRESS)
-    {
-        nAddress=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset);
-    }
-    else if(g_mode==MODE_RELADDRESS)
-    {
-        nAddress=XBinary::offsetToRelAddress(&(g_options.memoryMap),state.nCursorOffset);
-    }
-
-    QApplication::clipboard()->setText(XBinary::valueToHex(XBinary::MODE_UNKNOWN,nAddress));
-}
-
-void XDisasmView::_copyCursorOffsetSlot()
-{
-    STATE state=getState();
-
-    QApplication::clipboard()->setText(XBinary::valueToHex(XBinary::MODE_UNKNOWN,state.nCursorOffset));
 }
 
 void XDisasmView::_hexSlot()
