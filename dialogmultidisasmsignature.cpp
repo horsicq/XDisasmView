@@ -30,13 +30,23 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
 //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XAbstractTableView::getMonoFont());
 
-    QSignalBlocker signalBlocker1(ui->spinBoxCount);
-    QSignalBlocker signalBlocker2(ui->comboBoxMethod);
+#if QT_VERSION >= 0x050300
+    const QSignalBlocker signalBlocker1(ui->spinBoxCount);
+    const QSignalBlocker signalBlocker2(ui->comboBoxMethod);
+#else
+    const bool bBlocked1=ui->spinBoxCount->blockSignals(true);
+    const bool bBlocked2=ui->comboBoxMethod->blockSignals(true);
+#endif
 
     ui->comboBoxMethod->addItem("",0);
     ui->comboBoxMethod->addItem(tr("Relative virtual address"),1);
 
     g_nSymbolWidth=XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
+
+#if QT_VERSION < 0x050300
+    ui->spinBoxCount->blockSignals(bBlocked1);
+    ui->comboBoxMethod->blockSignals(bBlocked2);
+#endif
 }
 
 DialogMultiDisasmSignature::~DialogMultiDisasmSignature()

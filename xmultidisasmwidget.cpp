@@ -29,7 +29,11 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 
     g_options={};
 
-    QSignalBlocker blocker(ui->comboBoxMode);
+#if QT_VERSION >= 0x050300
+    const QSignalBlocker blocker(ui->comboBoxMode);
+#else
+    const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
+#endif
 
     addMode(XBinary::DM_X86_16);
     addMode(XBinary::DM_X86_32);
@@ -69,6 +73,10 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 //    addMode(XBinary::DM_MOS65XX);
 
     connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
+
+#if QT_VERSION < 0x050300
+    ui->comboBoxMode->blockSignals(bBlocked1);
+#endif
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -122,7 +130,11 @@ void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-    QSignalBlocker blocker1(ui->comboBoxMode);
+#if QT_VERSION >= 0x050300
+    const QSignalBlocker blocker1(ui->comboBoxMode);
+#else
+    const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
+#endif
 
     XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
@@ -147,6 +159,10 @@ void XMultiDisasmWidget::reloadFileType()
             break;
         }
     }
+
+#if QT_VERSION < 0x050300
+    ui->comboBoxMode->blockSignals(bBlocked1);
+#endif
 }
 
 void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
