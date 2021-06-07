@@ -92,8 +92,6 @@ private:
     MENU_STATE getMenuState();
 
 protected:
-    virtual bool isOffsetValid(qint64 nOffset);
-    virtual bool isEnd(qint64 nOffset);
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
     virtual void updateData();
     virtual void paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
@@ -113,7 +111,6 @@ private slots:
 
 private:
     OPTIONS g_options;
-    qint64 g_nDataSize;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
     XBinary::DM g_disasmMode;
