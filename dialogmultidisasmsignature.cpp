@@ -339,16 +339,22 @@ void DialogMultiDisasmSignature::on_pushButtonOK_clicked()
 
 void DialogMultiDisasmSignature::on_checkBoxSpaces_toggled(bool bChecked)
 {
+    Q_UNUSED(bChecked)
+
     reloadSignature();
 }
 
 void DialogMultiDisasmSignature::on_checkBoxUpper_toggled(bool bChecked)
 {
+    Q_UNUSED(bChecked)
+
     reloadSignature();
 }
 
 void DialogMultiDisasmSignature::on_lineEditWildcard_textChanged(const QString &sText)
 {
+    Q_UNUSED(sText)
+
     reloadSignature();
 }
 
