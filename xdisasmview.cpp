@@ -115,60 +115,8 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 {
     g_disasmMode=disasmMode;
 
-    if(g_handle)
-    {
-        cs_close(&g_handle);
-        g_handle=0;
-    }
-
-    cs_err error=CS_ERR_HANDLE;
-
-    if      (disasmMode==XBinary::DM_X86_16)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_16),&g_handle);
-    else if (disasmMode==XBinary::DM_X86_32)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_32),&g_handle);
-    else if (disasmMode==XBinary::DM_X86_64)        error=cs_open(CS_ARCH_X86,cs_mode(CS_MODE_64),&g_handle);
-    else if (disasmMode==XBinary::DM_ARM_LE)        error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_ARM_BE)        error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_ARM64_LE)      error=cs_open(CS_ARCH_ARM64,cs_mode(CS_MODE_ARM|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_ARM64_BE)      error=cs_open(CS_ARCH_ARM64,cs_mode(CS_MODE_ARM|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_CORTEXM)       error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_MCLASS),&g_handle);
-    else if (disasmMode==XBinary::DM_THUMB_LE)      error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_THUMB_BE)      error=cs_open(CS_ARCH_ARM,cs_mode(CS_MODE_ARM|CS_MODE_THUMB|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_MIPS_LE)       error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS32|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_MIPS_BE)       error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS32|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_MIPS64_LE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_MIPS64_BE)     error=cs_open(CS_ARCH_MIPS,cs_mode(CS_MODE_MIPS64|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_PPC_LE)        error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_32|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_PPC_BE)        error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_32|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_PPC64_LE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_LITTLE_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_PPC64_BE)      error=cs_open(CS_ARCH_PPC,cs_mode(CS_MODE_64|CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_SPARC)         error=cs_open(CS_ARCH_SPARC,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_S390X)         error=cs_open(CS_ARCH_SYSZ,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_XCORE)         error=cs_open(CS_ARCH_XCORE,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_M68K)          error=cs_open(CS_ARCH_M68K,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_M68K40)        error=cs_open(CS_ARCH_M68K,cs_mode(CS_MODE_M68K_040),&g_handle);
-    else if (disasmMode==XBinary::DM_TMS320C64X)    error=cs_open(CS_ARCH_TMS320C64X,cs_mode(CS_MODE_BIG_ENDIAN),&g_handle);
-    else if (disasmMode==XBinary::DM_M6800)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6800),&g_handle);
-    else if (disasmMode==XBinary::DM_M6801)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6801),&g_handle);
-    else if (disasmMode==XBinary::DM_M6805)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6805),&g_handle);
-    else if (disasmMode==XBinary::DM_M6808)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6808),&g_handle);
-    else if (disasmMode==XBinary::DM_M6809)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6809),&g_handle);
-    else if (disasmMode==XBinary::DM_M6811)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6811),&g_handle);
-    else if (disasmMode==XBinary::DM_CPU12)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_CPU12),&g_handle);
-    else if (disasmMode==XBinary::DM_HD6301)        error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6301),&g_handle);
-    else if (disasmMode==XBinary::DM_HD6309)        error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_6309),&g_handle);
-    else if (disasmMode==XBinary::DM_HCS08)         error=cs_open(CS_ARCH_M680X,cs_mode(CS_MODE_M680X_HCS08),&g_handle);
-//    else if (disasmMode==XBinary::DM_EVM)           error=cs_open(CS_ARCH_M680X,cs_mode(CS_ARCH_EVM),&g_handle);
-//    else if (disasmMode==XBinary::DM_MOS65XX)       error=cs_open(CS_ARCH_M680X,cs_mode(CS_ARCH_MOS65XX),&g_handle);
-
-    if(error==CS_ERR_OK)
-    {
-        cs_option(g_handle,CS_OPT_DETAIL,CS_OPT_ON);
-        // TODO Syntax
-    }
-    else
-    {
-        g_handle=0;
-    }
+    XCapstone::closeHandle(&g_handle);
+    XCapstone::openHandle(disasmMode,&g_handle,true);
 }
 
 XBinary::DM XDisasmView::getMode()
