@@ -25,6 +25,9 @@
 #include "xdevicetableview.h"
 #include "dialogmultidisasmsignature.h"
 
+// TODO AbstractQuery
+// Load symbols Save db
+// TODO Click on Comment Header All -> User Comments -> System Comments
 class XDisasmView : public XDeviceTableView
 {
     Q_OBJECT
