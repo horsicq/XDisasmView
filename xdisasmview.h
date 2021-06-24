@@ -24,6 +24,7 @@
 #include "xcapstone.h"
 #include "xdevicetableview.h"
 #include "dialogmultidisasmsignature.h"
+#include <QTextDocument>
 
 // TODO AbstractQuery
 // Load symbols Save db
@@ -90,9 +91,19 @@ private:
         bool bHex;
     };
 
-    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress);
+    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress); // TODO move to XDisasm
     qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
     MENU_STATE getMenuState();
+
+    struct TEXT_OPTION
+    {
+        bool bSelected;
+        bool bCurrentIP;
+        bool bIsReplaced;
+        bool bHighlight;
+    };
+
+    void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -133,6 +144,7 @@ private:
     QShortcut *g_scHex;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
+    QTextDocument g_textDocument;
 
     // Debugger
     qint64 g_nCurrentIP;

@@ -267,6 +267,58 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
     return result;
 }
 
+void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption)
+{
+    QRect rectText;
+
+    rectText.setLeft(nLeft+getCharWidth());
+    rectText.setTop(nTop+getLineDelta());
+    rectText.setWidth(nWidth);
+    rectText.setHeight(nHeight-getLineDelta());
+
+    bool bSave=false;
+
+    if((pTextOption->bCurrentIP)||(pTextOption->bHighlight))
+    {
+        bSave=true;
+    }
+
+    if(bSave)
+    {
+        pPainter->save();
+    }
+
+    if((pTextOption->bSelected)&&(!pTextOption->bCurrentIP))
+    {
+        pPainter->fillRect(nLeft,nTop,nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
+    }
+
+    if(pTextOption->bIsReplaced)
+    {
+        pPainter->fillRect(nLeft,nTop,nWidth,nHeight,QColor(Qt::red));
+    }
+    else if(pTextOption->bCurrentIP)
+    {
+        pPainter->fillRect(nLeft,nTop,nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
+        pPainter->setPen(viewport()->palette().color(QPalette::Base));
+    }
+
+    if(pTextOption->bHighlight)
+    {
+        g_textDocument.setPlainText(sText);
+        g_textDocument.drawContents(pPainter,rectText);
+    }
+    else
+    {
+        pPainter->drawText(rectText,sText);
+    }
+
+    if(bSave)
+    {
+        pPainter->restore();
+    }
+}
+
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
     OS osResult={};
@@ -396,54 +448,27 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         qint64 nOffset=g_listRecords.at(nRow).nOffset;
         qint64 nAddress=g_listRecords.at(nRow).nAddress;
 
-        bool bCurrentIP=((nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
-        bool bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
-
-        if(isOffsetSelected(nOffset))
-        {
-            if(!bCurrentIP)
-            {
-                pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
-            }
-        }
-
-        if(bIsReplaced)
-        {
-            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,QColor(Qt::red));
-        }
-        else if(bCurrentIP)
-        {
-            pPainter->fillRect(nLeft,nTop+getLineDelta(),nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
-        }
-
-        // TODO set if Breakpoint
+        TEXT_OPTION textOption={};
+        textOption.bSelected=isOffsetSelected(nOffset);
+        textOption.bCurrentIP=((nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
+        textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
+        textOption.bHighlight=(nColumn==COLUMN_ADDRESS);
 
         if(nColumn==COLUMN_ADDRESS)
         {
-            if(bCurrentIP)
-            {
-                pPainter->save();
-                pPainter->setPen(viewport()->palette().color(QPalette::Base));
-            }
-
-            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sAddress); // TODO Text Optional
-
-            if(bCurrentIP)
-            {
-                pPainter->restore();
-            }
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sAddress,&textOption);
         }
         else if(nColumn==COLUMN_OFFSET)
         {
-            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOffset); // TODO Text Optional
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOffset,&textOption);
         }
         else if(nColumn==COLUMN_BYTES)
         {
-            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sHEX); // TODO Text Optional
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sHEX,&textOption);
         }
         else if(nColumn==COLUMN_OPCODE)
         {
-            pPainter->drawText(nLeft+getCharWidth(),nTop+nHeight,g_listRecords.at(nRow).sOpcode); // TODO Text Optional
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOpcode,&textOption);
         }
     }
 }
