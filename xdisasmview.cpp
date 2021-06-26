@@ -414,9 +414,10 @@ void XDisasmView::updateData()
                 record.nOffset=nCurrentOffset;
                 record.sOffset=QString("%1").arg(nCurrentOffset,g_nAddressWidth,16,QChar('0'));
 
+                record.nAddress=nCurrentAddress;
+
                 if(nCurrentAddress!=-1)
                 {
-                    record.nAddress=nCurrentAddress;
                     record.sAddress=QString("%1").arg(nCurrentAddress,g_nAddressWidth,16,QChar('0'));
                 }
 
@@ -450,9 +451,9 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         TEXT_OPTION textOption={};
         textOption.bSelected=isOffsetSelected(nOffset);
-        textOption.bCurrentIP=((nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
+        textOption.bCurrentIP=((g_nCurrentIP!=-1)&&(nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
         textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
-        textOption.bHighlight=(nColumn==COLUMN_ADDRESS);
+//        textOption.bHighlight=(nColumn==COLUMN_ADDRESS);
 
         if(nColumn==COLUMN_ADDRESS)
         {

@@ -397,8 +397,9 @@ void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
     options.sSignaturesPath=g_sSignaturesPath;
     options.sUserSignature=ui->textEditSignature->toPlainText();
 
-    DialogSearchSignatures dialogSearchSignatures(this,g_pDevice,g_pMemoryMap->fileType,options,true);
+    DialogSearchSignatures dialogSearchSignatures(this);
 
+    dialogSearchSignatures.setData(g_pDevice,g_pMemoryMap->fileType,options,true);
     dialogSearchSignatures.setShortcuts(getShortcuts());
 
     dialogSearchSignatures.exec();
