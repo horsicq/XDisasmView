@@ -278,7 +278,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
     bool bSave=false;
 
-    if((pTextOption->bCurrentIP)||(pTextOption->bHighlight))
+    if((pTextOption->bCurrentIP))
     {
         bSave=true;
     }
@@ -305,8 +305,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
     if(pTextOption->bHighlight)
     {
-        g_textDocument.setPlainText(sText);
-        g_textDocument.drawContents(pPainter,rectText);
+        drawDisasmText(pPainter,rectText,sText);
     }
     else
     {
@@ -317,6 +316,12 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     {
         pPainter->restore();
     }
+}
+
+void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
+{
+    // TODO
+    pPainter->drawText(rect,sText);
 }
 
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
@@ -453,7 +458,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         textOption.bSelected=isOffsetSelected(nOffset);
         textOption.bCurrentIP=((g_nCurrentIP!=-1)&&(nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
         textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
-//        textOption.bHighlight=(nColumn==COLUMN_ADDRESS);
+        textOption.bHighlight=(nColumn==COLUMN_OPCODE);
 
         if(nColumn==COLUMN_ADDRESS)
         {
@@ -470,6 +475,10 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         else if(nColumn==COLUMN_OPCODE)
         {
             drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOpcode,&textOption);
+        }
+        else if(nColumn==COLUMN_COMMENT)
+        {
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sCommemt,&textOption);
         }
     }
 }

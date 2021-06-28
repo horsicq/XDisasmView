@@ -71,6 +71,7 @@ private:
         QString sOffset;
         QString sHEX;
         QString sOpcode;
+        QString sCommemt;
         qint64 nOffset;
         qint64 nAddress;
         qint64 nSize;
@@ -104,6 +105,7 @@ private:
     };
 
     void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
+    void drawDisasmText(QPainter *pPainter,QRect rect,QString sText);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -144,7 +146,6 @@ private:
     QShortcut *g_scHex;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QTextDocument g_textDocument;
 
     // Debugger
     qint64 g_nCurrentIP;
