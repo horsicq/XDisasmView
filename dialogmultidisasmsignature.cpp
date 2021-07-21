@@ -114,6 +114,7 @@ void DialogMultiDisasmSignature::reload()
 
                     record.baOpcode=QByteArray(opcode,pInsn->size);
 
+                    // TODO Another archs
                     record.nDispOffset=pInsn->detail->x86.encoding.disp_offset;
                     record.nDispSize=pInsn->detail->x86.encoding.disp_size;
                     record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
@@ -125,7 +126,7 @@ void DialogMultiDisasmSignature::reload()
                     {
                         for(int i=0; i<pInsn->detail->x86.op_count; i++)
                         {
-                            if(pInsn->detail->x86.operands[i].type==X86_OP_IMM) // TODO another arch !!!
+                            if(pInsn->detail->x86.operands[i].type==X86_OP_IMM) // TODO another archs !!!
                             {
                                 qint64 nImm=pInsn->detail->x86.operands[i].imm;
 
@@ -276,17 +277,17 @@ void DialogMultiDisasmSignature::reloadSignature()
 
             if(!bDisp)
             {
-                sRecord=replaceWild(sRecord,g_listRecords.at(i).nDispOffset,g_listRecords.at(i).nDispSize,cWild);
+                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nDispOffset,g_listRecords.at(i).nDispSize,cWild);
             }
 
             if(!bImm)
             {
-                sRecord=replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,cWild);
+                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,cWild);
             }
 
             if(g_listRecords.at(i).bIsConst)
             {
-                sRecord=replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,QChar('$'));
+                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,QChar('$'));
             }
         }
         else
@@ -362,18 +363,6 @@ void DialogMultiDisasmSignature::on_pushButtonCopy_clicked()
 {
     QClipboard *clipboard=QApplication::clipboard();
     clipboard->setText(ui->textEditSignature->toPlainText());
-}
-
-QString DialogMultiDisasmSignature::replaceWild(QString sString, qint32 nOffset, qint32 nSize, QChar cWild)
-{
-    QString sResult=sString;
-    QString sWild;
-
-    sWild=sWild.fill(cWild,nSize*2);
-
-    sResult=sResult.replace(nOffset*2,nSize*2,sWild);
-
-    return sResult;
 }
 
 void DialogMultiDisasmSignature::on_spinBoxCount_valueChanged(int nValue)
