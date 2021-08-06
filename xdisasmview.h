@@ -149,6 +149,8 @@ private:
 
     // Debugger
     qint64 g_nCurrentIP;
+
+    QMap<QString,QColor> g_mapOpcodes;
 };
 
 #endif // XDISASMVIEW_H

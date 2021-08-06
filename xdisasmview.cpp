@@ -115,6 +115,20 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 {
     g_disasmMode=disasmMode;
 
+    if((disasmMode==XBinary::DM_X86_16)||(disasmMode==XBinary::DM_X86_32)||(disasmMode==XBinary::DM_X86_64))
+    {
+        // TODO Function
+        g_mapOpcodes.insert("call",Qt::red);
+        g_mapOpcodes.insert("ret",Qt::red);
+        g_mapOpcodes.insert("push",Qt::blue);
+        g_mapOpcodes.insert("pop",Qt::blue);
+        g_mapOpcodes.insert("je",Qt::green);
+        g_mapOpcodes.insert("jne",Qt::green);
+        g_mapOpcodes.insert("jz",Qt::green);
+        g_mapOpcodes.insert("jnz",Qt::green);
+        g_mapOpcodes.insert("ja",Qt::green);
+    }
+
     XCapstone::closeHandle(&g_handle);
     XCapstone::openHandle(disasmMode,&g_handle,true);
 }
@@ -320,8 +334,31 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
 void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
 {
-    // TODO
-    pPainter->drawText(rect,sText);
+    QString sOpcode=sText.section(" ",0,0);
+
+    if(g_mapOpcodes.contains(sOpcode))
+    {
+        pPainter->save();
+
+        pPainter->setPen(g_mapOpcodes.value(sOpcode));
+        pPainter->drawText(rect,sOpcode);
+
+        pPainter->restore();
+
+        QString sOperands=sText.section(" ",1,-1);
+
+        if(sOperands!="")
+        {
+            QRect _rect=rect;
+            _rect.setX(rect.x()+QFontMetrics(pPainter->font()).size(Qt::TextSingleLine,sOpcode+" ").width());
+            pPainter->drawText(_rect,sOperands);
+        }
+    }
+    else
+    {
+        // TODO
+        pPainter->drawText(rect,sText);
+    }
 }
 
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
