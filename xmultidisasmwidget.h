@@ -34,7 +34,6 @@ class XMultiDisasmWidget : public XShortcutsWidget
     Q_OBJECT
 
 public:
-
     struct OPTIONS
     {
         XBinary::FT fileType;
