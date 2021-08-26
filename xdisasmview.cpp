@@ -115,19 +115,7 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 {
     g_disasmMode=disasmMode;
 
-    if((disasmMode==XBinary::DM_X86_16)||(disasmMode==XBinary::DM_X86_32)||(disasmMode==XBinary::DM_X86_64))
-    {
-        // TODO Function
-        g_mapOpcodes.insert("call",Qt::red);
-        g_mapOpcodes.insert("ret",Qt::red);
-        g_mapOpcodes.insert("push",Qt::blue);
-        g_mapOpcodes.insert("pop",Qt::blue);
-        g_mapOpcodes.insert("je",Qt::green);
-        g_mapOpcodes.insert("jne",Qt::green);
-        g_mapOpcodes.insert("jz",Qt::green);
-        g_mapOpcodes.insert("jnz",Qt::green);
-        g_mapOpcodes.insert("ja",Qt::green);
-    }
+    g_mapOpcodes=XCapstone::getOpcodeColorMap(disasmMode);
 
     XCapstone::closeHandle(&g_handle);
     XCapstone::openHandle(disasmMode,&g_handle,true);
