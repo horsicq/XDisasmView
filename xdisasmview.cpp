@@ -322,6 +322,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
 void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
 {
+    // TODO registers
     QString sOpcode=sText.section(" ",0,0);
 
     if(g_mapOpcodes.contains(sOpcode))
