@@ -404,11 +404,11 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
 
 void XDisasmView::updateData()
 {
+    g_listRecords.clear();
+
     if(getDevice())
     {
         qint64 nBlockOffset=getViewStart()*g_nBytesProLine;
-
-        g_listRecords.clear();
 
         qint32 nNumberLinesProPage=getLinesProPage();
 
