@@ -408,7 +408,7 @@ void XDisasmView::updateData()
 
     if(getDevice())
     {
-        qint64 nBlockOffset=getViewStart()*g_nBytesProLine;
+        qint64 nBlockOffset=getViewStart()*g_nBytesProLine; // mb TODO remove BytesProLine!
 
         qint32 nNumberLinesProPage=getLinesProPage();
 
@@ -468,6 +468,8 @@ void XDisasmView::updateData()
                 nCurrentOffset+=nBufferSize;
             }
         }
+
+        setCurrentBlock(nBlockOffset,(nCurrentOffset-nBlockOffset));
     }
 }
 
@@ -641,7 +643,6 @@ qint64 XDisasmView::getScrollValue()
     {
         nResult=(qint64)nValue*g_nBytesProLine;
     }
-
 
     qint64 _nResult=getDisasmOffset(nResult,getViewStart());
 
