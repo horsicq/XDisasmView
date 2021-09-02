@@ -70,10 +70,11 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_HD6309);
     addMode(XBinary::DM_HCS08);
     addMode(XBinary::DM_EVM);
-//    addMode(XBinary::DM_MOS65XX);
+    addMode(XBinary::DM_MOS65XX);
     addMode(XBinary::DM_RISKV32);
     addMode(XBinary::DM_RISKV64);
     addMode(XBinary::DM_RISKVC);
+    addMode(XBinary::DM_MOS65XX);
     // TODO WASM
     // TODO BPF
     // TODO MOS65XX
