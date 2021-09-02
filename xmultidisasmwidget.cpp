@@ -74,6 +74,9 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_RISKV32);
     addMode(XBinary::DM_RISKV64);
     addMode(XBinary::DM_RISKVC);
+    // TODO WASM
+    // TODO BPF
+    // TODO MOS65XX
 
     connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
 
