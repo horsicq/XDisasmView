@@ -485,8 +485,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         TEXT_OPTION textOption={};
         textOption.bSelected=isOffsetSelected(nOffset);
         textOption.bCurrentIP=((g_nCurrentIP!=-1)&&(nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
-        textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
-        textOption.bHighlight=(nColumn==COLUMN_OPCODE);
+        textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS)); 
 
         if(nColumn==COLUMN_ADDRESS)
         {
@@ -502,6 +501,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         }
         else if(nColumn==COLUMN_OPCODE)
         {
+            textOption.bHighlight=true;
             drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOpcode,&textOption);
         }
         else if(nColumn==COLUMN_COMMENT)
