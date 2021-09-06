@@ -77,6 +77,8 @@ void DialogMultiDisasmSignature::reload()
     qint64 nAddress=XBinary::offsetToAddress(g_pMemoryMap,nOffset);
     int nMethod=ui->comboBoxMethod->currentData().toInt();
 
+    XBinary::DMFAMILY dmFamily=XBinary::getDisasmFamily(g_pMemoryMap);
+
     for(int i=0;(i<nCount)&&(!bStopBranch);i++)
     {
         if(nOffset!=-1)
@@ -115,25 +117,32 @@ void DialogMultiDisasmSignature::reload()
                     record.baOpcode=QByteArray(opcode,pInsn->size);
 
                     // TODO Another archs
-                    record.nDispOffset=pInsn->detail->x86.encoding.disp_offset;
-                    record.nDispSize=pInsn->detail->x86.encoding.disp_size;
-                    record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
-                    record.nImmSize=pInsn->detail->x86.encoding.imm_size;
+                    if(dmFamily==XBinary::DMFAMILY_X86)
+                    {
+                        record.nDispOffset=pInsn->detail->x86.encoding.disp_offset;
+                        record.nDispSize=pInsn->detail->x86.encoding.disp_size;
+                        record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
+                        record.nImmSize=pInsn->detail->x86.encoding.imm_size;
+                    }
 
                     nAddress+=pInsn->size;
 
                     if(nMethod==1)
                     {
-                        for(int i=0; i<pInsn->detail->x86.op_count; i++)
+                        // TODO another archs !!!
+                        if(dmFamily==XBinary::DMFAMILY_X86)
                         {
-                            if(pInsn->detail->x86.operands[i].type==X86_OP_IMM) // TODO another archs !!!
+                            for(int i=0; i<pInsn->detail->x86.op_count; i++)
                             {
-                                qint64 nImm=pInsn->detail->x86.operands[i].imm;
-
-                                if(XCapstone::isJmpOpcode(pInsn->id))
+                                if(pInsn->detail->x86.operands[i].type==X86_OP_IMM)
                                 {
-                                    nAddress=nImm;
-                                    record.bIsConst=true;
+                                    qint64 nImm=pInsn->detail->x86.operands[i].imm;
+
+                                    if(XCapstone::isJmpOpcode(pInsn->id)||XCapstone::isCallOpcode(pInsn->id))
+                                    {
+                                        nAddress=nImm;
+                                        record.bIsConst=true;
+                                    }
                                 }
                             }
                         }
