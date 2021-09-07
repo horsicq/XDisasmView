@@ -53,12 +53,16 @@ public:
 
 private:
     void addMode(XBinary::DM disasmMode);
+    void addSyntax(XBinary::SYNTAX syntax);
     void reloadFileType();
+    void adjustMode();
+    void adjustSyntax();
 
 private slots:
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void errorMessageSlot(QString sErrorMessage);
+    void on_comboBoxSyntax_currentIndexChanged(int nIndex);
 
 protected:
     virtual void registerShortcuts(bool bState);

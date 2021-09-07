@@ -41,6 +41,12 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_scSignature=nullptr;
     g_scHex=nullptr;
 
+    g_options=OPTIONS();
+
+    g_nCurrentIP=-1;
+    g_nAddressWidth=8;
+    g_nOpcodeSize=16;
+
     addColumn(tr("Address"),0,true);
     addColumn(tr("Offset"));
     addColumn(tr("Bytes"));
@@ -49,14 +55,9 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
 
     setLastColumnScretch(true);
 
-    g_nAddressWidth=8;
-    g_nOpcodeSize=16;
-
     setTextFont(getMonoFont());
 
     setAddressMode(MODE_ADDRESS);
-
-    g_nCurrentIP=-1;
 }
 
 XDisasmView::~XDisasmView()
@@ -111,14 +112,14 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
     reload(true);
 }
 
-void XDisasmView::setMode(XBinary::DM disasmMode)
+void XDisasmView::setMode(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
 {
     g_disasmMode=disasmMode;
 
-    g_mapOpcodes=XCapstone::getOpcodeColorMap(disasmMode);
+    g_mapOpcodes=XCapstone::getOpcodeColorMap(disasmMode,syntax);
 
     XCapstone::closeHandle(&g_handle);
-    XCapstone::openHandle(disasmMode,&g_handle,true);
+    XCapstone::openHandle(disasmMode,&g_handle,true,syntax);
 }
 
 XBinary::DM XDisasmView::getMode()
@@ -689,7 +690,7 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
-    if(XBinary::getWidthModeFromSize(getDataSize())==XBinary::MODE_64)
+    if(XBinary::getWidthModeFromSize(g_options.nInitAddress+getDataSize())==XBinary::MODE_64)
     {
         g_nAddressWidth=16;
         setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
