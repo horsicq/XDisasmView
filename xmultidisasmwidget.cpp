@@ -29,7 +29,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 
     g_options={};
 
-#if QT_VERSION >= 0x050300
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker blocker1(ui->comboBoxMode);
     const QSignalBlocker blocker2(ui->comboBoxSyntax);
 #else
@@ -82,7 +82,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 
     connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
 
-#if QT_VERSION < 0x050300
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
     ui->comboBoxSyntax->blockSignals(bBlocked2);
 #endif
@@ -144,7 +144,7 @@ void XMultiDisasmWidget::addSyntax(XBinary::SYNTAX syntax)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-#if QT_VERSION >= 0x050300
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker blocker1(ui->comboBoxMode);
     const QSignalBlocker blocker2(ui->comboBoxSyntax);
 #else
@@ -178,7 +178,7 @@ void XMultiDisasmWidget::reloadFileType()
 
     adjustMode();
 
-#if QT_VERSION < 0x050300
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
     ui->comboBoxSyntax->blockSignals(bBlocked2);
 #endif
@@ -186,7 +186,7 @@ void XMultiDisasmWidget::reloadFileType()
 
 void XMultiDisasmWidget::adjustMode()
 {
-#if QT_VERSION >= 0x050300
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker blocker1(ui->comboBoxSyntax);
 #else
     const bool bBlocked1=ui->comboBoxSyntax->blockSignals(true);
@@ -207,7 +207,7 @@ void XMultiDisasmWidget::adjustMode()
 
     adjustSyntax();
 
-#if QT_VERSION < 0x050300
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxSyntax->blockSignals(bBlocked1);
 #endif
 }

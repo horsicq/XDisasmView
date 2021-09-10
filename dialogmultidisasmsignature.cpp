@@ -30,7 +30,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
 //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XAbstractTableView::getMonoFont());
 
-#if QT_VERSION >= 0x050300
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker signalBlocker1(ui->spinBoxCount);
     const QSignalBlocker signalBlocker2(ui->comboBoxMethod);
 #else
@@ -43,7 +43,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
 
     g_nSymbolWidth=XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
 
-#if QT_VERSION < 0x050300
+#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->spinBoxCount->blockSignals(bBlocked1);
     ui->comboBoxMethod->blockSignals(bBlocked2);
 #endif
