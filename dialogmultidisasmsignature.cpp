@@ -124,7 +124,6 @@ void DialogMultiDisasmSignature::reload()
                         record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
                         record.nImmSize=pInsn->detail->x86.encoding.imm_size;
                     }
-                    // TODO ARM
 
                     nAddress+=pInsn->size;
 
