@@ -120,7 +120,7 @@ protected:
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nNumber);
 
-private slots:
+protected slots:
     void _goToEntryPointSlot();
     void _signatureSlot();
     void _hexSlot();
