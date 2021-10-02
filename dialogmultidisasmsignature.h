@@ -22,7 +22,6 @@
 #define DIALOGMULTIDISASMSIGNATURE_H
 
 #include <QDialog>
-#include <QClipboard>
 #include "xlineedithex.h"
 #include "xdisasmview.h"
 #include "xcapstone.h"
