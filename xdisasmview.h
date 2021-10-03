@@ -43,7 +43,7 @@ public:
         bool bHideOffset;
         bool bMenu_Hex;
         QString sSignaturesPath;
-        // TODO save backup
+        bool bIsSaveBackup; // TODO
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);

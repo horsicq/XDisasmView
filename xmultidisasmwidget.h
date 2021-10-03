@@ -36,10 +36,10 @@ class XMultiDisasmWidget : public XShortcutsWidget
 public:
     struct OPTIONS
     {
-        // mb TODO bIsSaveBackup
         XBinary::FT fileType;
         qint64 nInitAddress;
         QString sSignaturesPath;
+        bool bIsSaveBackup;
     };
 
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
