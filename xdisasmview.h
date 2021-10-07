@@ -21,10 +21,11 @@
 #ifndef XDISASMVIEW_H
 #define XDISASMVIEW_H
 
+#include <QTextDocument>
+
 #include "xcapstone.h"
 #include "xdevicetableview.h"
 #include "dialogmultidisasmsignature.h"
-#include <QTextDocument>
 
 // TODO AbstractQuery
 // Load symbols Save db
