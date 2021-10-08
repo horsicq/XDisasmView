@@ -98,11 +98,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options)
     g_pDevice=pDevice;
     g_options=options;
 
-    QSet<XBinary::FT> stFileType=XBinary::getFileTypes(pDevice,true);
-    stFileType.insert(XBinary::FT_COM);
-    QList<XBinary::FT> listFileTypes=XBinary::_getFileTypeListFromSet(stFileType);
-
-    XFormats::setFileTypeComboBox(ui->comboBoxType,&listFileTypes,options.fileType);
+    XFormats::setFileTypeComboBox(options.fileType,g_pDevice,ui->comboBoxType);
 
     reloadFileType();
 }
