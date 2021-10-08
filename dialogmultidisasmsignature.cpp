@@ -91,7 +91,7 @@ void DialogMultiDisasmSignature::reload()
 
             uint8_t *pData=(uint8_t *)opcode;
 
-            cs_insn *pInsn=0;
+            cs_insn *pInsn=nullptr;
             size_t count=cs_disasm(g_handle,pData,nDataSize,nAddress,1,&pInsn);
 
             if(count>0)
