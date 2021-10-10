@@ -233,7 +233,7 @@ void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
 
 void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
 {
-    QMessageBox::critical(this,tr("Error"),sErrorMessage);
+    QMessageBox::critical(XOptions::getMainWidget(this),tr("Error"),sErrorMessage);
 }
 
 void XMultiDisasmWidget::registerShortcuts(bool bState)
