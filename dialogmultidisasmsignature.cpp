@@ -132,7 +132,7 @@ void DialogMultiDisasmSignature::reload()
                         // TODO another archs !!!
                         if(dmFamily==XBinary::DMFAMILY_X86)
                         {
-                            for(int i=0; i<pInsn->detail->x86.op_count; i++)
+                            for(int i=0;i<pInsn->detail->x86.op_count;i++)
                             {
                                 if(pInsn->detail->x86.operands[i].type==X86_OP_IMM)
                                 {
