@@ -155,6 +155,12 @@ void XMultiDisasmWidget::reloadFileType()
     options.nEntryPointAddress=XFormats::getEntryPointAddress(fileType,g_pDevice);
     options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
     options.sSignaturesPath=g_options.sSignaturesPath;
+    options.bIsSaveBackup=g_options.bIsSaveBackup;
+
+    if(g_options.sArch!="")
+    {
+        options.memoryMap.sArch=g_options.sArch;
+    }
 
     ui->scrollAreaDisasm->setData(g_pDevice,options);
 

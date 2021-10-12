@@ -36,6 +36,8 @@ DialogMultiDisasm::~DialogMultiDisasm()
 void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options)
 {
     ui->widgetDisasm->setData(pDevice,options);
+
+    setWindowTitle(options.sTitle);
 }
 
 void DialogMultiDisasm::setShortcuts(XShortcuts *pShortcuts)

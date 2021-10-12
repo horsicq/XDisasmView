@@ -39,6 +39,8 @@ public:
         XBinary::FT fileType;
         qint64 nInitAddress;
         QString sSignaturesPath;
+        QString sTitle;
+        QString sArch;
         bool bIsSaveBackup;
     };
 
