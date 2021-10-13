@@ -153,7 +153,16 @@ void XMultiDisasmWidget::reloadFileType()
     XDisasmView::OPTIONS options={};
     options.nInitAddress=g_options.nInitAddress;
     options.nEntryPointAddress=XFormats::getEntryPointAddress(fileType,g_pDevice);
-    options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
+
+    if(fileType==XBinary::FT_REGION)
+    {
+        options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice,true,g_options.nStartAddress);
+    }
+    else
+    {
+        options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
+    }
+
     options.sSignaturesPath=g_options.sSignaturesPath;
     options.bIsSaveBackup=g_options.bIsSaveBackup;
 
