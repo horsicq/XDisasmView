@@ -57,3 +57,7 @@ FORMS += \
     XCONFIG += dialoghexsignature
     include($$PWD/../FormatDialogs/dialoghexsignature.pri)
 }
+
+DISTFILES += \
+    $$PWD/LICENSE \
+    $$PWD/README.md
