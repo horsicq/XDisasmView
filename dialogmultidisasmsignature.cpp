@@ -79,7 +79,7 @@ void DialogMultiDisasmSignature::reload()
 
     XBinary::DMFAMILY dmFamily=XBinary::getDisasmFamily(g_pMemoryMap);
 
-    for(int i=0;(i<nCount)&&(!bStopBranch);i++)
+    for(qint32 i=0;(i<nCount)&&(!bStopBranch);i++)
     {
         if(nOffset!=-1)
         {
