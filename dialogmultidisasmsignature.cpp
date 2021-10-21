@@ -179,7 +179,7 @@ void DialogMultiDisasmSignature::reload()
 
     ui->tableWidgetSignature->setHorizontalHeaderLabels(listHeaders);
 
-    for(int i=0;i<nNumberOfRecords;i++)
+    for(qint32 i=0;i<nNumberOfRecords;i++)
     {
         ui->tableWidgetSignature->setItem(i,0,new QTableWidgetItem(XBinary::valueToHex(g_listRecords.at(i).nAddress)));
         ui->tableWidgetSignature->setItem(i,1,new QTableWidgetItem(g_listRecords.at(i).baOpcode.toHex().data()));
