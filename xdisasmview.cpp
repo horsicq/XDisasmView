@@ -415,7 +415,7 @@ void XDisasmView::updateData()
 
         qint64 nCurrentOffset=nBlockOffset;
 
-        for(int i=0;i<nNumberLinesProPage;i++)
+        for(qint32 i=0;i<nNumberLinesProPage;i++)
         {
             if(nCurrentOffset<getDataSize())
             {
