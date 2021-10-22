@@ -325,9 +325,9 @@ void DialogMultiDisasmSignature::reloadSignature()
     {
         QString _sText;
 
-        int nSize=sText.size();
+        qint32 nSize=sText.size();
 
-        for(int i=0;i<nSize;i++)
+        for(qint32 i=0;i<nSize;i++)
         {
             _sText+=sText.at(i);
 
