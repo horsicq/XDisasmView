@@ -248,9 +248,9 @@ void DialogMultiDisasmSignature::reloadSignature()
         cWild=_sWild.at(0);
     }
 
-    int nNumberOfRecords=g_listRecords.count();
+    qint32 nNumberOfRecords=g_listRecords.count();
 
-    for(int i=0;i<nNumberOfRecords;i++)
+    for(qint32 i=0;i<nNumberOfRecords;i++)
     {
         bool bUse=true;
         bool bDisp=true;
