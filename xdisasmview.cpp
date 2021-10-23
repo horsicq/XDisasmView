@@ -705,7 +705,7 @@ void XDisasmView::adjustColumns()
 
     QString sBytes;
 
-    for(int i=0;i<g_nOpcodeSize;i++)
+    for(qint32 i=0;i<g_nOpcodeSize;i++)
     {
         sBytes+="00";
     }
