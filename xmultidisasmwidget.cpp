@@ -175,9 +175,9 @@ void XMultiDisasmWidget::reloadFileType()
 
     XBinary::DM disasmMode=ui->scrollAreaDisasm->getMode();
 
-    int nCount=ui->comboBoxMode->count();
+    qint32 nCount=ui->comboBoxMode->count();
 
-    for(int i=0;i<nCount;i++)
+    for(qint32 i=0;i<nCount;i++)
     {
         if(ui->comboBoxMode->itemData(i).toInt()==(int)disasmMode)
         {
