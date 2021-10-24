@@ -67,7 +67,7 @@ void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBi
 
 void DialogMultiDisasmSignature::reload()
 {
-    const int N_X64_OPCODE_SIZE=16;
+    const qint32 N_X64_OPCODE_SIZE=16;
 
     g_listRecords.clear();
 
