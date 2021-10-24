@@ -211,7 +211,7 @@ void XMultiDisasmWidget::adjustMode()
 
     qint32 nNumberOfRecords=listSyntax.count();
 
-    for(int i=0;i<nNumberOfRecords;i++)
+    for(qint32 i=0;i<nNumberOfRecords;i++)
     {
         addSyntax(listSyntax.at(i));
     }
