@@ -154,7 +154,8 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, q
     {
         cs_insn *pInsn=nullptr;
 
-        int nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)pData,nDataSize,nAddress,1,&pInsn);
+        qint32 nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)pData,nDataSize,nAddress,1,&pInsn);
+
         if(nNumberOfOpcodes>0)
         {
             QString sMnemonic=pInsn->mnemonic;
