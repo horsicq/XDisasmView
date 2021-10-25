@@ -163,7 +163,7 @@ void DialogMultiDisasmSignature::reload()
         nOffset=XBinary::addressToOffset(g_pMemoryMap,nAddress);
     }
 
-    int nNumberOfRecords=g_listRecords.count();
+    qint32 nNumberOfRecords=g_listRecords.count();
 
     ui->tableWidgetSignature->clear();
 
