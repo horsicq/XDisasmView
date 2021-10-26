@@ -277,7 +277,7 @@ void DialogMultiDisasmSignature::reloadSignature()
             bImm=!(pImmButton->isChecked());
         }
 
-        int nSize=g_listRecords.at(i).baOpcode.size();
+        qint32 nSize=g_listRecords.at(i).baOpcode.size();
 
         QString sRecord;
 
@@ -302,7 +302,7 @@ void DialogMultiDisasmSignature::reloadSignature()
         }
         else
         {
-            for(int j=0;j<nSize;j++)
+            for(qint32 j=0;j<nSize;j++)
             {
                 sRecord+=cWild;
                 sRecord+=cWild;
