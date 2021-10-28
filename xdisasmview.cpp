@@ -154,7 +154,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, q
     {
         cs_insn *pInsn=nullptr;
 
-        qint32 nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)pData,nDataSize,nAddress,1,&pInsn);
+        quint64 nNumberOfOpcodes=cs_disasm(g_handle,(uint8_t *)pData,nDataSize,nAddress,1,&pInsn);
 
         if(nNumberOfOpcodes>0)
         {
@@ -410,6 +410,8 @@ void XDisasmView::updateData()
 
     if(getDevice())
     {
+        XBinary::MODE mode=XBinary::getWidthModeFromByteSize(g_nAddressWidth);
+
         qint64 nBlockOffset=getViewStart()*g_nBytesProLine; // mb TODO remove BytesProLine!
 
         qint32 nNumberLinesProPage=getLinesProPage();
@@ -445,13 +447,13 @@ void XDisasmView::updateData()
                 }
 
                 record.nOffset=nCurrentOffset;
-                record.sOffset=QString("%1").arg(nCurrentOffset,g_nAddressWidth,16,QChar('0'));
+                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
 
                 record.nAddress=nCurrentAddress;
 
                 if(nCurrentAddress!=-1)
                 {
-                    record.sAddress=QString("%1").arg(nCurrentAddress,g_nAddressWidth,16,QChar('0'));
+                    record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
                 }
 
                 DISASM_RESULT disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress);
@@ -694,8 +696,8 @@ void XDisasmView::adjustColumns()
     if(XBinary::getWidthModeFromSize(g_options.nInitAddress+getDataSize())==XBinary::MODE_64)
     {
         g_nAddressWidth=16;
-        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
-        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000000000000000").width());
+        setColumnWidth(COLUMN_ADDRESS,2*getCharWidth()+fm.boundingRect("00000000:00000000").width());
+        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000:00000000").width());
     }
     else
     {
