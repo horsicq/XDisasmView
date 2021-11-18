@@ -122,10 +122,10 @@ void XMultiDisasmWidget::goToOffset(qint64 nOffset)
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::setShortcuts(XShortcuts *pShortcuts)
+void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions)
 {
-    ui->scrollAreaDisasm->setShortcuts(pShortcuts);
-    XShortcutsWidget::setShortcuts(pShortcuts);
+    ui->scrollAreaDisasm->setGlobal(pShortcuts,pXOptions);
+    XShortcutsWidget::setGlobal(pShortcuts,pXOptions);
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
@@ -162,9 +162,6 @@ void XMultiDisasmWidget::reloadFileType()
     {
         options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
     }
-
-    options.sSignaturesPath=g_options.sSignaturesPath;
-    options.bIsSaveBackup=g_options.bIsSaveBackup;
 
     if(g_options.sArch!="")
     {

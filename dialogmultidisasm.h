@@ -37,7 +37,7 @@ public:
     ~DialogMultiDisasm();
 
     void setData(QIODevice *pDevice,XMultiDisasmWidget::OPTIONS options);
-    void setShortcuts(XShortcuts *pShortcuts);
+    void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
 
 private slots:
     void on_pushButtonClose_clicked();

@@ -39,10 +39,8 @@ public:
         XBinary::FT fileType;
         qint64 nStartAddress; // For FT_REGION
         qint64 nInitAddress;
-        QString sSignaturesPath;
         QString sTitle;
         QString sArch;
-        bool bIsSaveBackup;
     };
 
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
@@ -52,7 +50,7 @@ public:
     void goToAddress(qint64 nAddress);
     void setCurrentIPAddress(qint64 nAddress);
     void goToOffset(qint64 nOffset);
-    void setShortcuts(XShortcuts *pShortcuts);
+    void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
 
 private:
     void addMode(XBinary::DM disasmMode);

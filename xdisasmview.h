@@ -42,8 +42,6 @@ public:
         XBinary::_MEMORY_MAP memoryMap;
         bool bHideOffset;
         bool bMenu_Hex;
-        QString sSignaturesPath;
-        bool bIsSaveBackup; // TODO
     };
 
     explicit XDisasmView(QWidget *pParent=nullptr);
@@ -58,7 +56,8 @@ public:
 private:
     enum COLUMN
     {
-        COLUMN_ADDRESS=0,
+//        COLUMN_ARROWS=0,
+        COLUMN_ADDRESS,
         COLUMN_OFFSET,
         COLUMN_BYTES,
         COLUMN_OPCODE,

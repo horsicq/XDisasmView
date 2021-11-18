@@ -40,10 +40,10 @@ void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS 
     setWindowTitle(options.sTitle);
 }
 
-void DialogMultiDisasm::setShortcuts(XShortcuts *pShortcuts)
+void DialogMultiDisasm::setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions)
 {
-     ui->widgetDisasm->setShortcuts(pShortcuts);
-     XShortcutsDialog::setShortcuts(pShortcuts);
+     ui->widgetDisasm->setGlobal(pShortcuts,pXOptions);
+     XShortcutsDialog::setGlobal(pShortcuts,pXOptions);
 }
 
 void DialogMultiDisasm::on_pushButtonClose_clicked()

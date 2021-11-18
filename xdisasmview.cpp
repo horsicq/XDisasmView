@@ -47,6 +47,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
+//    addColumn("FFF",0,true); // Arrows
     addColumn(tr("Address"),0,true);
     addColumn(tr("Offset"));
     addColumn(tr("Bytes"));
@@ -74,7 +75,6 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     setDevice(pDevice);
     setMemoryMap(g_options.memoryMap);
-    setSignaturesPath(g_options.sSignaturesPath);
 
     XBinary::DM disasmMode=XBinary::getDisasmMode(getMemoryMap());
 
@@ -786,9 +786,9 @@ void XDisasmView::_signatureSlot()
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(getDevice(),state.nSelectionOffset,getMemoryMap(),g_handle,g_options.sSignaturesPath);
+    dmds.setData(getDevice(),state.nSelectionOffset,getMemoryMap(),g_handle);
 
-    dmds.setShortcuts(getShortcuts());
+    dmds.setGlobal(getShortcuts(),getGlobalOptions());
 
     dmds.exec();
 }
