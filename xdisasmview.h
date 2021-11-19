@@ -33,6 +33,24 @@ class XDisasmView : public XDeviceTableView
 {
     Q_OBJECT
 
+    enum SHORTCUT
+    {
+        SHORTCUT_GOTOADDRESS,
+        SHORTCUT_GOTOOFFSET,
+        SHORTCUT_GOTOENTRYPOINT,
+        SHORTCUT_DUMPTOFILE,
+        SHORTCUT_SELECTALL,
+        SHORTCUT_COPYASHEX,
+        SHORTCUT_COPYCURSOROFFSET,
+        SHORTCUT_COPYCURSORADDRESS,
+        SHORTCUT_FIND,
+        SHORTCUT_FINDNEXT,
+        SHORTCUT_HEXSIGNATURE,
+        SHORTCUT_SIGNATURE,
+        SHORTCUT_HEX,
+        SHORTCUT__SIZE,
+    };
+
 public:
     struct OPTIONS
     {
@@ -56,7 +74,7 @@ public:
 private:
     enum COLUMN
     {
-//        COLUMN_ARROWS=0,
+        COLUMN_ARROWS=0,
         COLUMN_ADDRESS,
         COLUMN_OFFSET,
         COLUMN_BYTES,
@@ -130,19 +148,9 @@ private:
     QList<RECORD> g_listRecords;
     XBinary::DM g_disasmMode;
     csh g_handle;
-    QShortcut *g_scGoToAddress;
-    QShortcut *g_scGoToOffset;
-    QShortcut *g_scGoToEntryPoint;
-    QShortcut *g_scDumpToFile;
-    QShortcut *g_scSelectAll;
-    QShortcut *g_scCopyAsHex;
-    QShortcut *g_scCopyCursorOffset;
-    QShortcut *g_scCopyCursorAddress;
-    QShortcut *g_scFind;
-    QShortcut *g_scFindNext;
-    QShortcut *g_scHexSignature;
-    QShortcut *g_scSignature;
-    QShortcut *g_scHex;
+
+    QShortcut *shortCuts[SHORTCUT__SIZE];
+
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
 
