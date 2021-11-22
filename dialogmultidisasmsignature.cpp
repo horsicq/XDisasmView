@@ -137,6 +137,7 @@ void DialogMultiDisasmSignature::reload()
                                 {
                                     qint64 nImm=pInsn->detail->x86.operands[i].imm;
 
+                                    // mb TODO CS_GRP_BRANCH_RELATIVE
                                     if(XCapstone::isJmpOpcode(pInsn->id)||XCapstone::isCallOpcode(pInsn->id))
                                     {
                                         nAddress=nImm;

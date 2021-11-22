@@ -58,7 +58,7 @@ public:
         qint64 nCurrentIPAddress; // For Debugger
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
-        bool bHideOffset;
+        bool bHideOffset; // TODO remove
         bool bMenu_Hex;
     };
 
@@ -76,30 +76,30 @@ private:
     {
         COLUMN_ARROWS=0,
         COLUMN_ADDRESS,
-        COLUMN_OFFSET,
+//        COLUMN_OFFSET,
         COLUMN_BYTES,
         COLUMN_OPCODE,
         COLUMN_COMMENT
     };
 
-    struct RECORD
-    {
-        QString sAddress;
-        QString sOffset;
-        QString sHEX;
-        QString sOpcode;
-        QString sCommemt;
-        qint64 nOffset;
-        qint64 nAddress;
-        qint64 nSize;
-        bool bIsReplaced;
-    };
-
     struct DISASM_RESULT
     {
         bool bIsValid;
+        qint64 nAddress;
         qint32 nSize;
         QString sOpcode;
+        qint64 nXrefTo;
+    };
+
+    struct RECORD
+    {
+        QString sAddress;
+//        QString sOffset;
+        QString sHEX;
+        QString sCommemt;
+        qint64 nOffset;
+        DISASM_RESULT disasmResult;
+        bool bIsReplaced;
     };
 
     struct MENU_STATE
@@ -157,7 +157,7 @@ private:
     // Debugger
     qint64 g_nCurrentIP;
 
-    QMap<QString,QColor> g_mapOpcodes;
+    QMap<QString,XCapstone::OPCODECOLOR> g_mapOpcodes;
 };
 
 #endif // XDISASMVIEW_H
