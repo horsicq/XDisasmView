@@ -58,7 +58,6 @@ public:
         qint64 nCurrentIPAddress; // For Debugger
         qint64 nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
-        bool bHideOffset; // TODO remove
         bool bMenu_Hex;
     };
 
@@ -100,6 +99,13 @@ private:
         qint64 nOffset;
         DISASM_RESULT disasmResult;
         bool bIsReplaced;
+    };
+
+    struct ARROW
+    {
+        qint64 nFrom;
+        qint64 nTo;
+        qint32 nLevel;
     };
 
     struct MENU_STATE
@@ -146,6 +152,7 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
+    QList<ARROW> g_listArrows;
     XBinary::DM g_disasmMode;
     csh g_handle;
 

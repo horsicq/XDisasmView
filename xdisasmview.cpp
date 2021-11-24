@@ -435,6 +435,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
 void XDisasmView::updateData()
 {
     g_listRecords.clear();
+    g_listArrows.clear();
 
     if(getDevice())
     {
@@ -498,6 +499,30 @@ void XDisasmView::updateData()
                 g_listRecords.append(record);
 
                 nCurrentOffset+=nBufferSize;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        qint32 nNumberOfRecords=g_listRecords.count();
+
+        if(nNumberOfRecords)
+        {
+//            qint64 nMinAddress=g_listRecords.first().disasmResult.nAddress;
+//            qint64 nMaxAddress=g_listRecords.last().disasmResult.nAddress+g_listRecords.last().disasmResult.nSize;
+
+            for(qint32 i=0;i<nNumberOfRecords;i++)
+            {
+                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
+                {
+                    ARROW arrow={};
+                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
+                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+
+                    g_listArrows.append(arrow);
+                }
             }
         }
 
