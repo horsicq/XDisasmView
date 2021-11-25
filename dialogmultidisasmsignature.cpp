@@ -222,10 +222,12 @@ void DialogMultiDisasmSignature::reload()
     }
 
     ui->tableWidgetSignature->setColumnWidth(0,g_nSymbolWidth*12);
-    ui->tableWidgetSignature->setColumnWidth(1,g_nSymbolWidth*28);
+    ui->tableWidgetSignature->setColumnWidth(1,g_nSymbolWidth*20);
     ui->tableWidgetSignature->setColumnWidth(2,g_nSymbolWidth*20);
     ui->tableWidgetSignature->setColumnWidth(3,g_nSymbolWidth*6);
     ui->tableWidgetSignature->setColumnWidth(4,g_nSymbolWidth*6);
+
+    ui->tableWidgetSignature->horizontalHeader()->setVisible(true);
 
 //    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
 //    ui->tableWidgetSignature->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
