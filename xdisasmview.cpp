@@ -44,7 +44,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     addColumn(tr("Opcode"));
     addColumn(tr("Comment"));
 
-    setLastColumnScretch(true);
+    setLastColumnStretch(true);
 
     setTextFont(getMonoFont());
 
