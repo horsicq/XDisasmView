@@ -83,7 +83,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 
     setCurrentIPAddress(options.nCurrentIPAddress);
 
-    if(options.nInitAddress)
+    if(options.nInitAddress!=-1)
     {
         qint64 nOffset=XBinary::addressToOffset(getMemoryMap(),options.nInitAddress);
 
