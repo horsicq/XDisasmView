@@ -453,9 +453,13 @@ void XDisasmView::updateData()
             {
                 qint32 nBufferSize=qMin(g_nOpcodeSize,qint32(getDataSize()-nCurrentOffset));
 
+//                qDebug("DELTA: %d BS: %d",qint32(getDataSize()-nCurrentOffset),nBufferSize);
+
                 QByteArray baBuffer=read_array(nCurrentOffset,nBufferSize);
 
                 nBufferSize=baBuffer.size();
+
+//                qDebug("BS: %d",nBufferSize);
 
                 if(nBufferSize==0)
                 {
@@ -484,6 +488,12 @@ void XDisasmView::updateData()
 
                 if(nCurrentAddress!=-1)
                 {
+                    // TODO !!!
+                    record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                }
+                else
+                {
+                    nCurrentAddress=nCurrentOffset;
                     record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
                 }
 
