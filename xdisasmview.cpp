@@ -166,7 +166,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, q
 
             qint32 nNumberOfGroups=pInsn->detail->groups_count;
 
-            for(int i=0;i<nNumberOfGroups;i++)
+            for(qint32 i=0;i<nNumberOfGroups;i++)
             {
                 if(pInsn->detail->groups[i]==CS_GRP_BRANCH_RELATIVE)
                 {
