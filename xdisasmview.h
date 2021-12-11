@@ -64,6 +64,7 @@ public:
 
     explicit XDisasmView(QWidget *pParent=nullptr);
     ~XDisasmView();
+
     void setData(QIODevice *pDevice,OPTIONS options);
     void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     XBinary::DM getMode();
