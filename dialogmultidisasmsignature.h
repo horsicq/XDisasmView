@@ -49,6 +49,7 @@ class DialogMultiDisasmSignature : public XShortcutsDialog
 public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
+
     void setData(QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap,csh handle);
     void reload();
 
