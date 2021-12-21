@@ -540,6 +540,14 @@ void XDisasmView::updateData()
     }
 }
 
+void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+{
+    if(nColumn==COLUMN_ARROWS)
+    {
+        // TODO
+    }
+}
+
 void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
 {
     qint32 nNumberOfRows=g_listRecords.count();
@@ -554,7 +562,11 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         textOption.bCurrentIP=((g_nCurrentIP!=-1)&&(nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
         textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS)); 
 
-        if(nColumn==COLUMN_ADDRESS)
+        if(nColumn==COLUMN_ARROWS)
+        {
+            // TODO
+        }
+        else if(nColumn==COLUMN_ADDRESS)
         {
             drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sAddress,&textOption);
         }
