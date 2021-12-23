@@ -435,7 +435,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
 void XDisasmView::updateData()
 {
     g_listRecords.clear();
-    g_listArrows.clear();
+//    g_listArrows.clear();
 
     if(getDevice())
     {
@@ -516,6 +516,34 @@ void XDisasmView::updateData()
             }
         }
 
+//        qint32 nNumberOfRecords=g_listRecords.count();
+
+//        if(nNumberOfRecords)
+//        {
+////            qint64 nMinAddress=g_listRecords.first().disasmResult.nAddress;
+////            qint64 nMaxAddress=g_listRecords.last().disasmResult.nAddress+g_listRecords.last().disasmResult.nSize;
+
+//            for(qint32 i=0;i<nNumberOfRecords;i++)
+//            {
+//                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
+//                {
+//                    ARROW arrow={};
+//                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
+//                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+
+//                    g_listArrows.append(arrow);
+//                }
+//            }
+//        }
+
+        setCurrentBlock(nBlockOffset,(nCurrentOffset-nBlockOffset));
+    }
+}
+
+void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+{
+    if(nColumn==COLUMN_ARROWS)
+    {
         qint32 nNumberOfRecords=g_listRecords.count();
 
         if(nNumberOfRecords)
@@ -527,23 +555,18 @@ void XDisasmView::updateData()
             {
                 if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
                 {
-                    ARROW arrow={};
-                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
-                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+                    pPainter->fillRect(nLeft,nTop+(i*getLineHeight()),nWidth,getLineHeight(),viewport()->palette().color(QPalette::Highlight));
 
-                    g_listArrows.append(arrow);
+                    // TODO
+
+//                    ARROW arrow={};
+//                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
+//                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+
+//                    g_listArrows.append(arrow);
                 }
             }
         }
-
-        setCurrentBlock(nBlockOffset,(nCurrentOffset-nBlockOffset));
-    }
-}
-
-void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
-{
-    if(nColumn==COLUMN_ARROWS)
-    {
         // TODO
     }
 }

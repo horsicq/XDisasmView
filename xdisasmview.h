@@ -102,12 +102,12 @@ private:
         bool bIsReplaced;
     };
 
-    struct ARROW
-    {
-        qint64 nFrom;
-        qint64 nTo;
-        qint32 nLevel;
-    };
+//    struct ARROW
+//    {
+//        qint64 nFrom;
+//        qint64 nTo;
+//        qint32 nLevel;
+//    };
 
     struct MENU_STATE
     {
@@ -154,7 +154,8 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-    QList<ARROW> g_listArrows;
+
+//    QList<ARROW> g_listArrows;
     XBinary::DM g_disasmMode;
     csh g_handle;
 
