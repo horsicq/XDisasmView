@@ -106,7 +106,7 @@ void XDisasmView::setMode(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
 {
     g_disasmMode=disasmMode;
 
-    g_mapOpcodes=XCapstone::getOpcodeColorMap(disasmMode,syntax);
+    g_mapOpcodes=getOpcodeColorMap(disasmMode,syntax);
 
     XCapstone::closeHandle(&g_handle);
     XCapstone::openHandle(disasmMode,&g_handle,true,syntax);
@@ -345,7 +345,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
 
     if(g_mapOpcodes.contains(sOpcode))
     {
-        XCapstone::OPCODECOLOR opcodeColor=g_mapOpcodes.value(sOpcode);
+        OPCODECOLOR opcodeColor=g_mapOpcodes.value(sOpcode);
 
         pPainter->save();
 
@@ -378,6 +378,74 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         // TODO
         pPainter->drawText(rect,sText);
     }
+}
+
+QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
+{
+    // TODO set color sheme
+    QMap<QString, OPCODECOLOR> mapResult;
+
+    if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_X86)
+    {
+        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
+        {
+            OPCODECOLOR opcodeColor={};
+            opcodeColor.colText=Qt::red;
+
+            mapResult.insert("call",opcodeColor);
+            mapResult.insert("ret",opcodeColor);
+        }
+        else if(syntax==XBinary::SYNTAX_ATT)
+        {
+            // TODO
+        }
+
+        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
+        {
+            OPCODECOLOR opcodeColor={};
+            opcodeColor.colText=Qt::blue;
+
+            mapResult.insert("push",opcodeColor);
+            mapResult.insert("pop",opcodeColor);
+        }
+        else if(syntax==XBinary::SYNTAX_ATT)
+        {
+            // TODO
+        }
+
+        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
+        {
+            OPCODECOLOR opcodeColor={};
+            opcodeColor.colText=Qt::green;
+
+            mapResult.insert("je",opcodeColor);
+            mapResult.insert("jne",opcodeColor);
+            mapResult.insert("jz",opcodeColor);
+            mapResult.insert("jnz",opcodeColor);
+            mapResult.insert("ja",opcodeColor);
+            // TODO more
+        }
+        else if(syntax==XBinary::SYNTAX_ATT)
+        {
+            // TODO
+        }
+
+        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
+        {
+            OPCODECOLOR opcodeColor={};
+            opcodeColor.colText=Qt::gray;
+
+            mapResult.insert("nop",opcodeColor);
+        }
+        else if(syntax==XBinary::SYNTAX_ATT)
+        {
+            // TODO
+        }
+
+        // TODO jmp
+    }
+
+    return mapResult;
 }
 
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)

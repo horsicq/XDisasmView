@@ -52,6 +52,12 @@ class XDisasmView : public XDeviceTableView
         SHORTCUT__SIZE,
     };
 
+    struct OPCODECOLOR
+    {
+        QColor colText;
+        QColor colBackground;
+    };
+
 public:
     struct OPTIONS
     {
@@ -130,6 +136,7 @@ private:
 
     void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
     void drawDisasmText(QPainter *pPainter,QRect rect,QString sText);
+    static QMap<QString,OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -167,7 +174,7 @@ private:
     // Debugger
     qint64 g_nCurrentIP;
 
-    QMap<QString,XCapstone::OPCODECOLOR> g_mapOpcodes;
+    QMap<QString,OPCODECOLOR> g_mapOpcodes;
 };
 
 #endif // XDISASMVIEW_H
