@@ -25,4 +25,6 @@ set(XDISASMVIEW_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmview.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.ui
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.ui
 )

@@ -59,6 +59,17 @@ XDisasmView::~XDisasmView()
     }
 }
 
+void XDisasmView::adjustView()
+{
+    QFont _font;
+    QString sFont=getGlobalOptions()->getValue(XOptions::ID_DISASM_FONT).toString();
+    if(_font.fromString(sFont))
+    {
+        setTextFont(_font);
+    }
+    // mb TODO errorString
+}
+
 void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
 {
     g_options=options;
