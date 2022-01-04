@@ -36,6 +36,8 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
+    g_nThisBase=0;
+
     addColumn(""); // Arrows
 //    addColumn(tr("Address"),0,true);
     addColumn(tr("Address"),0,true);
@@ -546,34 +548,45 @@ void XDisasmView::updateData()
                 }
 
                 RECORD record={};
+                record.nOffset=nCurrentOffset;
 
                 qint64 nCurrentAddress=0;
 
-                if(getAddressMode()==MODE_ADDRESS)
+                if(getAddressMode()==MODE_THIS)
                 {
                     nCurrentAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
-                }
-                else if(getAddressMode()==MODE_OFFSET)
-                {
-                    nCurrentAddress=nCurrentOffset;
-                }
-                else if(getAddressMode()==MODE_RELADDRESS)
-                {
-                    nCurrentAddress=XBinary::offsetToRelAddress(getMemoryMap(),nCurrentOffset);
-                }
 
-                record.nOffset=nCurrentOffset;
-//                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
+                    qint64 nDelta=nCurrentAddress-g_nThisBase;
 
-                if(nCurrentAddress!=-1)
-                {
-                    // TODO !!!
-                    record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                    record.sAddress=XBinary::thisToString(nDelta);
                 }
                 else
                 {
-                    nCurrentAddress=nCurrentOffset;
-                    record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                    if(getAddressMode()==MODE_ADDRESS)
+                    {
+                        nCurrentAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
+                    }
+                    else if(getAddressMode()==MODE_OFFSET)
+                    {
+                        nCurrentAddress=nCurrentOffset;
+                    }
+                    else if(getAddressMode()==MODE_RELADDRESS)
+                    {
+                        nCurrentAddress=XBinary::offsetToRelAddress(getMemoryMap(),nCurrentOffset);
+                    }
+
+    //                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
+
+                    if(nCurrentAddress!=-1)
+                    {
+                        // TODO !!!
+                        record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                    }
+                    else
+                    {
+                        nCurrentAddress=nCurrentOffset;
+                        record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                    }
                 }
 
                 record.disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress);
@@ -930,9 +943,9 @@ void XDisasmView::registerShortcuts(bool bState)
     }
 }
 
-void XDisasmView::_headerClicked(qint32 nNumber)
+void XDisasmView::_headerClicked(qint32 nColumn)
 {
-    if(nNumber==COLUMN_ADDRESS)
+    if(nColumn==COLUMN_ADDRESS)
     {
         if(getAddressMode()==MODE_ADDRESS)
         {
@@ -944,10 +957,26 @@ void XDisasmView::_headerClicked(qint32 nNumber)
             setColumnTitle(COLUMN_ADDRESS,tr("Relative address"));
             setAddressMode(MODE_RELADDRESS);
         }
-        else if(getAddressMode()==MODE_RELADDRESS)
+        else if((getAddressMode()==MODE_RELADDRESS)||(getAddressMode()==MODE_THIS))
         {
             setColumnTitle(COLUMN_ADDRESS,tr("Address"));
             setAddressMode(MODE_ADDRESS);
+        }
+
+        adjust(true);
+    }
+}
+
+void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
+{
+    if(nColumn==COLUMN_ADDRESS)
+    {
+        setColumnTitle(COLUMN_ADDRESS,"");
+        setAddressMode(MODE_THIS);
+
+        if(nRow<g_listRecords.count())
+        {
+            g_nThisBase=g_listRecords.at(nRow).disasmResult.nAddress;
         }
 
         adjust(true);
