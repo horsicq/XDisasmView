@@ -65,7 +65,8 @@ void XDisasmView::adjustView()
 {
     QFont _font;
     QString sFont=getGlobalOptions()->getValue(XOptions::ID_DISASM_FONT).toString();
-    if(_font.fromString(sFont))
+
+    if((sFont!="")&&_font.fromString(sFont))
     {
         setTextFont(_font);
     }
