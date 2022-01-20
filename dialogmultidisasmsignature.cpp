@@ -115,7 +115,7 @@ void DialogMultiDisasmSignature::reload()
 
                     record.baOpcode=QByteArray(opcode,pInsn->size);
 
-                    // TODO Another archs
+                    // TODO Another archs !!!
                     if(dmFamily==XBinary::DMFAMILY_X86)
                     {
                         record.nDispOffset=pInsn->detail->x86.encoding.disp_offset;
