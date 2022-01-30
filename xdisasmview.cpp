@@ -441,7 +441,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
         }
         else if(syntax==XBinary::SYNTAX_ATT)
         {
-            // TODO
+            // TODO !!!
         }
 
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
