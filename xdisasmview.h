@@ -72,7 +72,6 @@ public:
     ~XDisasmView();
 
     void adjustView();
-
     void setData(QIODevice *pDevice,OPTIONS options);
     void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     XBinary::DM getMode();
