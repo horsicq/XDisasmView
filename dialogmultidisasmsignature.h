@@ -61,7 +61,6 @@ private slots:
     void on_lineEditWildcard_textChanged(const QString &sText);
     void on_pushButtonCopy_clicked();
     void on_spinBoxCount_valueChanged(int nValue);
-
     void on_comboBoxMethod_currentIndexChanged(int nIndex);
     void on_pushButtonScan_clicked();
 
