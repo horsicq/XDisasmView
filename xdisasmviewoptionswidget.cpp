@@ -58,6 +58,13 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
 #ifdef Q_OS_OSX
     pOptions->addID(XOptions::ID_DISASM_FONT,"Menlo,10,-1,5,50,0,0,0,0,0"); // TODO Check
 #endif
+
+    pOptions->addID(XOptions::ID_DISASM_SYNTAX,""); // TODO
+
+    // Colors
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,QColor(Qt::red).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND,"");
+    // TODO more
 }
 
 void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()

@@ -71,6 +71,7 @@ void XDisasmView::adjustView()
         setTextFont(_font);
     }
     // mb TODO errorString
+    // TODO disasm colors
 }
 
 void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
@@ -165,15 +166,14 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, q
 
         if(nNumberOfOpcodes>0)
         {
-            QString sMnemonic=pInsn->mnemonic;
-            QString sStr=pInsn->op_str;
+            result.sMnemonic=pInsn->mnemonic;
+            result.sString=pInsn->op_str;
 
-            result.sOpcode+=sMnemonic;
-
-            if(sStr!="")
-            {
-                result.sOpcode+=QString(" %1").arg(sStr);
-            }
+//            result.sOpcode+=sMnemonic;
+//            if(sStr!="")
+//            {
+//                result.sOpcode+=QString("|%1").arg(sStr);
+//            }
 
             result.nSize=pInsn->size;
             result.bIsValid=true;
@@ -204,7 +204,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, q
         }
         else
         {
-            result.sOpcode=tr("Invalid opcode");
+            result.sMnemonic=tr("Invalid opcode");
             result.nSize=1;
         }
     }
@@ -354,18 +354,19 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
 void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
 {
+    QString sMnemonic=sText.section("|",0,0);
+    QString sString=sText.section("|",1,1);
     // TODO registers !!!
-    QString sOpcode=sText.section(" ",0,0);
-
-    if(g_mapOpcodes.contains(sOpcode))
+    // TODO upper case
+    if(g_mapOpcodes.contains(sMnemonic))
     {
-        OPCODECOLOR opcodeColor=g_mapOpcodes.value(sOpcode);
+        OPCODECOLOR opcodeColor=g_mapOpcodes.value(sMnemonic);
 
         pPainter->save();
 
         QRect _rect=rect;
 
-        _rect.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine,sOpcode).width());
+        _rect.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine,sMnemonic).width());
 
         if(opcodeColor.colBackground.isValid())
         {
@@ -373,24 +374,28 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         }
 
         pPainter->setPen(opcodeColor.colText);
-        pPainter->drawText(_rect,sOpcode);
+        pPainter->drawText(_rect,sMnemonic);
 
         pPainter->restore();
 
-        QString sOperands=sText.section(" ",1,-1);
-
-        if(sOperands!="")
+        if(sString!="")
         {
             QRect _rect=rect;
-            _rect.setX(rect.x()+QFontMetrics(pPainter->font()).size(Qt::TextSingleLine,sOpcode+" ").width());
+            _rect.setX(rect.x()+QFontMetrics(pPainter->font()).size(Qt::TextSingleLine,sMnemonic+" ").width());
 
-            pPainter->drawText(_rect,sOperands);
+            pPainter->drawText(_rect,sString);
         }
     }
     else
     {
+        QString sOpcode=sMnemonic;
+
+        if(sString!="")
+        {
+            sOpcode+=QString(" %1").arg(sString);
+        }
         // TODO
-        pPainter->drawText(rect,sText);
+        pPainter->drawText(rect,sOpcode);
     }
 }
 
@@ -403,10 +408,11 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
     {
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
         {
+            mapResult.insert("call",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND));
+
             OPCODECOLOR opcodeColor={};
             opcodeColor.colText=Qt::red;
 
-            mapResult.insert("call",opcodeColor);
             mapResult.insert("ret",opcodeColor);
         }
         else if(syntax==XBinary::SYNTAX_ATT)
@@ -460,6 +466,26 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
     }
 
     return mapResult;
+}
+
+XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID idText, XOptions::ID idBackground)
+{
+    OPCODECOLOR result={};
+
+    QString sTextCode=getGlobalOptions()->getValue(idText).toString();
+    QString sBackgroundCode=getGlobalOptions()->getValue(idBackground).toString();
+
+    if(sTextCode!="")
+    {
+        result.colText.setNamedColor(sTextCode);
+    }
+
+    if(sBackgroundCode!="")
+    {
+        result.colBackground.setNamedColor(sBackgroundCode);
+    }
+
+    return result;
 }
 
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
@@ -696,8 +722,10 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         }
         else if(nColumn==COLUMN_OPCODE)
         {
+            QString sOpcode=QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic,g_listRecords.at(nRow).disasmResult.sString);
+
             textOption.bHighlight=true;
-            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).disasmResult.sOpcode,&textOption);
+            drawText(pPainter,nLeft,nTop,nWidth,nHeight,sOpcode,&textOption);
         }
         else if(nColumn==COLUMN_COMMENT)
         {
