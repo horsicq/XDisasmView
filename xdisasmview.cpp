@@ -406,39 +406,44 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
 
     if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_X86)
     {
-        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
-        {
-            mapResult.insert("call",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND));
-            mapResult.insert("ret",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND));
-            mapResult.insert("push",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND));
-            mapResult.insert("pop",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND));
-            mapResult.insert("nop",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND));
-            mapResult.insert("nop",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND));
-            // TODO jcc
-        }
-        else if(syntax==XBinary::SYNTAX_ATT)
-        {
-            // TODO
-        }
+        OPCODECOLOR colorCALL=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND);
+        OPCODECOLOR colorJCC=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JCC_TEXT,XOptions::ID_DISASM_COLOR_X86_JCC_BACKGROUND);
+        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND);
+        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND);
+        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND);
+        OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND);
+        OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP_TEXT,XOptions::ID_DISASM_COLOR_X86_JMP_BACKGROUND);
 
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
         {
-            OPCODECOLOR opcodeColor={};
-            opcodeColor.colText=Qt::green;
-
-            mapResult.insert("je",opcodeColor);
-            mapResult.insert("jne",opcodeColor);
-            mapResult.insert("jz",opcodeColor);
-            mapResult.insert("jnz",opcodeColor);
-            mapResult.insert("ja",opcodeColor);
+            mapResult.insert("call",colorCALL);
+            mapResult.insert("ret",colorRET);
+            mapResult.insert("push",colorPUSH);
+            mapResult.insert("pop",colorPOP);
+            mapResult.insert("nop",colorNOP);
+            mapResult.insert("jmp",colorJMP);
+            mapResult.insert("je",colorJCC);
+            mapResult.insert("jne",colorJCC);
+            mapResult.insert("jz",colorJCC);
+            mapResult.insert("jnz",colorJCC);
+            mapResult.insert("ja",colorJCC);
             // TODO more
         }
         else if(syntax==XBinary::SYNTAX_ATT)
         {
-            // TODO !!!
+            mapResult.insert("callq",colorCALL);
+            mapResult.insert("retq",colorRET);
+            mapResult.insert("pushq",colorPUSH);
+            mapResult.insert("popq",colorPOP);
+            mapResult.insert("nop",colorNOP);
+            mapResult.insert("jmpq",colorJMP);
+            mapResult.insert("je",colorJCC);
+            mapResult.insert("jne",colorJCC);
+            mapResult.insert("jz",colorJCC);
+            mapResult.insert("jnz",colorJCC);
+            mapResult.insert("ja",colorJCC);
+            // TODO
         }
-
-        // TODO jmp
     }
 
     return mapResult;

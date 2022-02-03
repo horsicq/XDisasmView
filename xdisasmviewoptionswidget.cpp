@@ -66,6 +66,14 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND,"");
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,QColor(Qt::red).name());
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,QColor(Qt::gray).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,QColor(Qt::blue).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,QColor(Qt::blue).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC_TEXT,QColor(Qt::green).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC_BACKGROUND,"");
     // TODO more
 }
 
