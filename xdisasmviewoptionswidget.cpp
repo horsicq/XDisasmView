@@ -64,6 +64,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     // Colors
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,QColor(Qt::red).name());
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,QColor(Qt::red).name());
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND,"");
     // TODO more
 }
 
