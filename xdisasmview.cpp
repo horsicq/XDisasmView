@@ -410,20 +410,9 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
         {
             mapResult.insert("call",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND));
             mapResult.insert("ret",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND));
+            mapResult.insert("push",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND));
+            mapResult.insert("pop",getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND));
             // TODO jcc
-        }
-        else if(syntax==XBinary::SYNTAX_ATT)
-        {
-            // TODO
-        }
-
-        if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
-        {
-            OPCODECOLOR opcodeColor={};
-            opcodeColor.colText=Qt::blue;
-
-            mapResult.insert("push",opcodeColor);
-            mapResult.insert("pop",opcodeColor);
         }
         else if(syntax==XBinary::SYNTAX_ATT)
         {
