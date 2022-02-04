@@ -406,13 +406,13 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
 
     if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_X86)
     {
-        OPCODECOLOR colorCALL=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND);
-        OPCODECOLOR colorJCC=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JCC_TEXT,XOptions::ID_DISASM_COLOR_X86_JCC_BACKGROUND);
-        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND);
-        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND);
-        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND);
-        OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND);
-        OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP_TEXT,XOptions::ID_DISASM_COLOR_X86_JMP_BACKGROUND);
+        OPCODECOLOR colorCALL=getOpcodeColor(XOptions::ID_DISASM_COLOR_CALL);
+        OPCODECOLOR colorJCC=getOpcodeColor(XOptions::ID_DISASM_COLOR_JCC);
+        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_RET);
+        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_PUSH);
+        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_POP);
+        OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_NOP);
+        OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_JMP);
 
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
         {
@@ -449,12 +449,13 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
     return mapResult;
 }
 
-XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID idText, XOptions::ID idBackground)
+XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id)
 {
     OPCODECOLOR result={};
 
-    QString sTextCode=getGlobalOptions()->getValue(idText).toString();
-    QString sBackgroundCode=getGlobalOptions()->getValue(idBackground).toString();
+    QString sCode=getGlobalOptions()->getValue(id).toString();
+    QString sTextCode=sCode.section("|",0,0);
+    QString sBackgroundCode=sCode.section("|",1,1);
 
     if(sTextCode!="")
     {

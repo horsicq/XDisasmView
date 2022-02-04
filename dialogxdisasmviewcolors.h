@@ -18,37 +18,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef XDISASMVIEWOPTIONSWIDGET_H
-#define XDISASMVIEWOPTIONSWIDGET_H
+#ifndef DIALOGXDISASMVIEWCOLORS_H
+#define DIALOGXDISASMVIEWCOLORS_H
 
-#include <QFontDialog>
-#include "dialogxdisasmviewcolors.h"
+#include <QColorDialog>
+#include <QDialog>
+#include <QLineEdit>
+#include <QToolButton>
 #include "xoptions.h"
 
 namespace Ui {
-class XDisasmViewOptionsWidget;
+class DialogXDisasmViewColors;
 }
 
-class XDisasmViewOptionsWidget : public QWidget
+class DialogXDisasmViewColors : public QDialog
 {
     Q_OBJECT
 
+    enum COLUMN
+    {
+        COLUMN_TEXT_COLOR,
+        COLUMN_TEXT_COLOR_REMOVE,
+        COLUMN_BACKGROUND_COLOR,
+        COLUMN_BACKGROUND_COLOR_REMOVE,
+        COLUMN_STRING
+    };
+
 public:
-    explicit XDisasmViewOptionsWidget(QWidget *pParent=nullptr);
-    ~XDisasmViewOptionsWidget();
+    explicit DialogXDisasmViewColors(QWidget *pParent=nullptr);
+    ~DialogXDisasmViewColors();
 
     void setOptions(XOptions *pOptions);
     void save();
 
-    static void setDefaultValues(XOptions *pOptions);
-
 private slots:
-    void on_toolButtonDisasmFont_clicked();
-    void on_pushButtonColors_clicked();
+    void on_pushButtonCancel_clicked();
+    void addRecord(qint32 nRow,QString sText,XOptions::ID id);
+    void updateRecord(qint32 nRow);
+    void on_pushButtonOK_clicked();
 
 private:
-    Ui::XDisasmViewOptionsWidget *ui;
+    Ui::DialogXDisasmViewColors *ui;
     XOptions *g_pOptions;
 };
 
-#endif // XDISASMVIEWOPTIONSWIDGET_H
+#endif // DIALOGXDISASMVIEWCOLORS_H

@@ -62,18 +62,13 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_SYNTAX,""); // TODO
 
     // Colors
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_TEXT,QColor(Qt::red).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL_BACKGROUND,"");
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_TEXT,QColor(Qt::red).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET_BACKGROUND,"");
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP_TEXT,QColor(Qt::gray).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP_BACKGROUND,"");
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH_TEXT,QColor(Qt::blue).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH_BACKGROUND,"");
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP_TEXT,QColor(Qt::blue).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP_BACKGROUND,"");
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC_TEXT,QColor(Qt::green).name());
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC_BACKGROUND,"");
+    pOptions->addID(XOptions::ID_DISASM_COLOR_CALL,QString("%1|%2").arg(QColor(Qt::red).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_RET,QString("%1|%2").arg(QColor(Qt::red).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_NOP,QString("%1|%2").arg(QColor(Qt::gray).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_PUSH,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_POP,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_JCC,QString("%1|%2").arg(QColor(Qt::green).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_JMP,QString("%1|%2").arg(QColor(Qt::darkBlue).name(),""));
     // TODO more
 }
 
@@ -91,3 +86,11 @@ void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
     }
 }
 
+void XDisasmViewOptionsWidget::on_pushButtonColors_clicked()
+{
+    DialogXDisasmViewColors dialogColors(this);
+
+    dialogColors.setOptions(g_pOptions);
+
+    dialogColors.exec();
+}
