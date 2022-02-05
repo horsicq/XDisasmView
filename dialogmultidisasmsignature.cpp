@@ -54,7 +54,7 @@ DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
     delete ui;
 }
 
-void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
+void DialogMultiDisasmSignature::setData(QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
 {
     this->g_pDevice=pDevice;
     this->g_nOffset=nOffset;

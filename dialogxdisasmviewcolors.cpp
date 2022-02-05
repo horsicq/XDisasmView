@@ -65,7 +65,7 @@ void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
     this->close();
 }
 
-void DialogXDisasmViewColors::addRecord(qint32 nRow, QString sText, XOptions::ID id)
+void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID id)
 {
     QToolButton *pButtonTextColor=new QToolButton;
     pButtonTextColor->setText(tr("Text"));
