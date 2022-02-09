@@ -117,7 +117,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
     reload(true);
 }
 
-void XDisasmView::setMode(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
+void XDisasmView::setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
 {
     g_disasmMode=disasmMode;
 
