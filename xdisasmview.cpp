@@ -74,7 +74,7 @@ void XDisasmView::adjustView()
     // TODO disasm colors
 }
 
-void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options)
+void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
 {
     g_options=options;
 
