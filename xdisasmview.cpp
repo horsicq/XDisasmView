@@ -352,7 +352,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
+void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
 {
     QString sMnemonic=sText.section("|",0,0);
     QString sString=sText.section("|",1,1);
