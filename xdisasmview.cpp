@@ -151,7 +151,7 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
-XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, qint64 nAddress)
+XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, quint64 nAddress)
 {
     DISASM_RESULT result={};
 

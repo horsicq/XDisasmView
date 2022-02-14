@@ -124,7 +124,7 @@ private:
         bool bHex;
     };
 
-    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,qint64 nAddress); // TODO move to XDisasm
+    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,quint64 nAddress); // TODO move to XDisasm
     qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
     MENU_STATE getMenuState();
 
