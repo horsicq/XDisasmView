@@ -60,6 +60,7 @@ private slots:
 private:
     Ui::DialogXDisasmViewColors *ui;
     XOptions *g_pOptions;
+    QMap<XOptions::ID,QString> g_mapColors;
 };
 
 #endif // DIALOGXDISASMVIEWCOLORS_H

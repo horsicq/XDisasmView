@@ -75,6 +75,30 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID i
 
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR,pButtonTextColor);
 
+    QToolButton *pButtonTextColorRemove=new QToolButton;
+    pButtonTextColorRemove->setText(QString("X"));
+    pButtonTextColorRemove->setProperty("ROW",nRow);
+    pButtonTextColorRemove->setProperty("COLUMN",COLUMN_TEXT_COLOR_REMOVE);
+    pButtonTextColorRemove->setProperty("ID",id);
+
+    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR_REMOVE,pButtonTextColorRemove);
+
+    QToolButton *pButtonBackgroundColor=new QToolButton;
+    pButtonBackgroundColor->setText(tr("Background"));
+    pButtonBackgroundColor->setProperty("ROW",nRow);
+    pButtonBackgroundColor->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR);
+    pButtonBackgroundColor->setProperty("ID",id);
+
+    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR,pButtonBackgroundColor);
+
+    QToolButton *pButtonBackgroundColorRemove=new QToolButton;
+    pButtonBackgroundColorRemove->setText(QString("X"));
+    pButtonBackgroundColorRemove->setProperty("ROW",nRow);
+    pButtonBackgroundColorRemove->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR_REMOVE);
+    pButtonBackgroundColorRemove->setProperty("ID",id);
+
+    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE,pButtonBackgroundColorRemove);
+
     QLineEdit *pLineEdit=new QLineEdit;
     pLineEdit->setText(sText);
     pLineEdit->setProperty("ROW",nRow);
@@ -83,11 +107,25 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID i
     pLineEdit->setReadOnly(true);
 
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_STRING,pLineEdit);
+
+    g_mapColors.insert(id,g_pOptions->getValue(id).toString());
+
+    updateRecord(nRow);
 }
 
 void DialogXDisasmViewColors::updateRecord(qint32 nRow)
 {
-    // TODO
+    XOptions::ID id=(XOptions::ID)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_TEXT_COLOR)->property("ID").toUInt());
+
+    QString sColor=g_mapColors.value(id);
+    QString sTextColor=sColor.section("|",0,0);
+    QString sBackgroundColor=sColor.section("|",1,1);
+
+    QLineEdit *pLineEdit=(QLineEdit *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_STRING));
+
+    pLineEdit->setStyleSheet(QString("color: %1;  background-color: %2").arg(sTextColor,sBackgroundColor));
+
+    // TODO if no color disable button
 }
 
 void DialogXDisasmViewColors::on_pushButtonOK_clicked()
