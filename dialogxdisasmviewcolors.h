@@ -25,6 +25,7 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QToolButton>
+#include <QColorDialog>
 #include "xoptions.h"
 
 namespace Ui {
@@ -54,8 +55,9 @@ public:
 private slots:
     void on_pushButtonCancel_clicked();
     void addRecord(qint32 nRow,QString sText,XOptions::ID id);
-    void updateRecord(qint32 nRow);
+    void updateRow(qint32 nRow);
     void on_pushButtonOK_clicked();
+    void pushButtonSlot();
 
 private:
     Ui::DialogXDisasmViewColors *ui;

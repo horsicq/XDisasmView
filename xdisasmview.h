@@ -36,20 +36,20 @@ class XDisasmView : public XDeviceTableView
 
     enum SHORTCUT
     {
-        SHORTCUT_GOTOADDRESS,
-        SHORTCUT_GOTOOFFSET,
-        SHORTCUT_GOTOENTRYPOINT,
-        SHORTCUT_DUMPTOFILE,
-        SHORTCUT_SELECTALL,
-        SHORTCUT_COPYASHEX,
-        SHORTCUT_COPYCURSOROFFSET,
-        SHORTCUT_COPYCURSORADDRESS,
-        SHORTCUT_FIND,
-        SHORTCUT_FINDNEXT,
-        SHORTCUT_HEXSIGNATURE,
-        SHORTCUT_SIGNATURE,
-        SHORTCUT_HEX,
-        SHORTCUT__SIZE,
+        SC_GOTOADDRESS,
+        SC_GOTOOFFSET,
+        SC_GOTOENTRYPOINT,
+        SC_DUMPTOFILE,
+        SC_SELECTALL,
+        SC_COPYASHEX,
+        SC_COPYCURSOROFFSET,
+        SC_COPYCURSORADDRESS,
+        SC_FIND,
+        SC_FINDNEXT,
+        SC_HEXSIGNATURE,
+        SC_SIGNATURE,
+        SC_HEX,
+        __SC_SIZE,
     };
 
     struct OPCODECOLOR
@@ -170,7 +170,7 @@ private:
     XBinary::DM g_disasmMode;
     csh g_handle;
 
-    QShortcut *shortCuts[SHORTCUT__SIZE];
+    QShortcut *shortCuts[__SC_SIZE];
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;

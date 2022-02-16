@@ -56,8 +56,18 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 }
 
 void DialogXDisasmViewColors::save()
-{
-    // TODO
+{  
+    QMapIterator<XOptions::ID,QString> iter(g_mapColors);
+
+    while(iter.hasNext())
+    {
+        iter.next();
+
+        XOptions::ID id=iter.key();
+        QString sValue=iter.value();
+
+        g_pOptions->setValue(id,sValue);
+    }
 }
 
 void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
@@ -67,35 +77,43 @@ void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
 
 void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID id)
 {
-    QToolButton *pButtonTextColor=new QToolButton;
+    QPushButton *pButtonTextColor=new QPushButton;
     pButtonTextColor->setText(tr("Text"));
     pButtonTextColor->setProperty("ROW",nRow);
     pButtonTextColor->setProperty("COLUMN",COLUMN_TEXT_COLOR);
     pButtonTextColor->setProperty("ID",id);
 
+    connect(pButtonTextColor,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR,pButtonTextColor);
 
-    QToolButton *pButtonTextColorRemove=new QToolButton;
+    QPushButton *pButtonTextColorRemove=new QPushButton;
     pButtonTextColorRemove->setText(QString("X"));
     pButtonTextColorRemove->setProperty("ROW",nRow);
     pButtonTextColorRemove->setProperty("COLUMN",COLUMN_TEXT_COLOR_REMOVE);
     pButtonTextColorRemove->setProperty("ID",id);
 
+    connect(pButtonTextColorRemove,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR_REMOVE,pButtonTextColorRemove);
 
-    QToolButton *pButtonBackgroundColor=new QToolButton;
+    QPushButton *pButtonBackgroundColor=new QPushButton;
     pButtonBackgroundColor->setText(tr("Background"));
     pButtonBackgroundColor->setProperty("ROW",nRow);
     pButtonBackgroundColor->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR);
     pButtonBackgroundColor->setProperty("ID",id);
 
+    connect(pButtonBackgroundColor,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR,pButtonBackgroundColor);
 
-    QToolButton *pButtonBackgroundColorRemove=new QToolButton;
+    QPushButton *pButtonBackgroundColorRemove=new QPushButton;
     pButtonBackgroundColorRemove->setText(QString("X"));
     pButtonBackgroundColorRemove->setProperty("ROW",nRow);
     pButtonBackgroundColorRemove->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR_REMOVE);
     pButtonBackgroundColorRemove->setProperty("ID",id);
+
+    connect(pButtonBackgroundColorRemove,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
 
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE,pButtonBackgroundColorRemove);
 
@@ -110,10 +128,10 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID i
 
     g_mapColors.insert(id,g_pOptions->getValue(id).toString());
 
-    updateRecord(nRow);
+    updateRow(nRow);
 }
 
-void DialogXDisasmViewColors::updateRecord(qint32 nRow)
+void DialogXDisasmViewColors::updateRow(qint32 nRow)
 {
     XOptions::ID id=(XOptions::ID)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_TEXT_COLOR)->property("ID").toUInt());
 
@@ -125,7 +143,8 @@ void DialogXDisasmViewColors::updateRecord(qint32 nRow)
 
     pLineEdit->setStyleSheet(QString("color: %1;  background-color: %2").arg(sTextColor,sBackgroundColor));
 
-    // TODO if no color disable button
+    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_TEXT_COLOR_REMOVE)))->setEnabled(sTextColor!="");
+    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE)))->setEnabled(sBackgroundColor!="");
 }
 
 void DialogXDisasmViewColors::on_pushButtonOK_clicked()
@@ -133,4 +152,60 @@ void DialogXDisasmViewColors::on_pushButtonOK_clicked()
     save();
 
     this->close();
+}
+
+void DialogXDisasmViewColors::pushButtonSlot()
+{
+    QPushButton *pPushButton=qobject_cast<QPushButton*>(sender());
+
+    if(pPushButton)
+    {
+        qint32 nRow=pPushButton->property("ROW").toInt();
+        qint32 nColumn=pPushButton->property("COLUMN").toInt();
+        XOptions::ID id=(XOptions::ID)(pPushButton->property("ID").toUInt());
+
+        QString sColor=g_mapColors.value(id);
+        QString sTextColor=sColor.section("|",0,0);
+        QString sBackgroundColor=sColor.section("|",1,1);
+
+        if(nColumn==COLUMN_TEXT_COLOR)
+        {
+            QColor color;
+            color.setNamedColor(sTextColor);
+
+            color=QColorDialog::getColor(color,this,tr("Text"));
+
+            sTextColor=color.name();
+        }
+        else if(nColumn==COLUMN_BACKGROUND_COLOR)
+        {
+            QColor color;
+            color.setNamedColor(sBackgroundColor);
+
+            color=QColorDialog::getColor(color,this,tr("Background"));
+
+            sBackgroundColor=color.name();
+        }
+        else if(nColumn==COLUMN_TEXT_COLOR_REMOVE)
+        {
+            sTextColor="";
+        }
+        else if(nColumn==COLUMN_BACKGROUND_COLOR_REMOVE)
+        {
+            sBackgroundColor="";
+        }
+
+        if((sTextColor!="")||(sBackgroundColor!=""))
+        {
+            sColor=QString("%1|%2").arg(sTextColor,sBackgroundColor);
+        }
+        else
+        {
+            sColor="";
+        }
+
+        g_mapColors.insert(id,sColor);
+
+        updateRow(nRow);
+    }
 }
