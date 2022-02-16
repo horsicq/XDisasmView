@@ -49,9 +49,9 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     addRecord(5,"NOP",XOptions::ID_DISASM_COLOR_NOP);
     addRecord(6,"JMP",XOptions::ID_DISASM_COLOR_JMP);
 
-    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
+//    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE,20);
-    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR,80);
+//    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR_REMOVE,20);
 }
 
