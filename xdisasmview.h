@@ -179,6 +179,7 @@ private:
     qint64 g_nCurrentIP;
 
     QMap<QString,OPCODECOLOR> g_mapOpcodes;
+    XBinary::SYNTAX g_syntax;
 
     qint64 g_nThisBase;
 };

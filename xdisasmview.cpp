@@ -71,7 +71,10 @@ void XDisasmView::adjustView()
         setTextFont(_font);
     }
     // mb TODO errorString
-    // TODO disasm colors
+
+    g_mapOpcodes=getOpcodeColorMap(g_disasmMode,g_syntax);
+
+    reload(true);
 }
 
 void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
@@ -120,6 +123,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
 void XDisasmView::setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
 {
     g_disasmMode=disasmMode;
+    g_syntax=syntax;
 
     g_mapOpcodes=getOpcodeColorMap(disasmMode,syntax);
 
@@ -301,7 +305,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
     return result;
 }
 
-void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption)
+void XDisasmView::drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption)
 {
     QRect rectText;
 
