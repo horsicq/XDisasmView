@@ -141,6 +141,15 @@ void DialogMultiDisasmSignature::reload()
                                     if(XCapstone::isJmpOpcode(pInsn->id)||XCapstone::isCallOpcode(pInsn->id))
                                     {
                                         nAddress=nImm;
+
+                                        if((g_pMemoryMap->fileType==XBinary::FT_COM)&&(pInsn->detail->x86.encoding.imm_size==2))
+                                        {
+                                            if(nAddress>0xFFFF)
+                                            {
+                                                nAddress&=0xFFFF;
+                                            }
+                                        }
+
                                         record.bIsConst=true;
                                     }
                                 }
