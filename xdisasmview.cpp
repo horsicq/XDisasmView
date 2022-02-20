@@ -645,7 +645,7 @@ void XDisasmView::updateData()
     }
 }
 
-void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+void XDisasmView::paintColumn(QPainter *pPainter,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight)
 {
     Q_UNUSED(nHeight)
 
