@@ -403,7 +403,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
     }
 }
 
-QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
+QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
 {
     // TODO set color sheme
     QMap<QString, OPCODECOLOR> mapResult;
