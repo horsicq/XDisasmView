@@ -678,7 +678,7 @@ void XDisasmView::paintColumn(QPainter *pPainter,qint32 nColumn,qint32 nLeft,qin
     }
 }
 
-void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight)
 {
     qint32 nNumberOfRows=g_listRecords.count();
 
