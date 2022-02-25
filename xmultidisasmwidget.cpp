@@ -128,6 +128,21 @@ void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions)
     XShortcutsWidget::setGlobal(pShortcuts,pXOptions);
 }
 
+void XMultiDisasmWidget::setReadonly(bool bState)
+{
+    ui->scrollAreaDisasm->setReadonly(bState);
+}
+
+void XMultiDisasmWidget::enableReadOnly(bool bState)
+{
+    ui->scrollAreaDisasm->enableReadOnly(bState);
+}
+
+void XMultiDisasmWidget::setEdited(bool bState)
+{
+    ui->scrollAreaDisasm->setEdited(bState);
+}
+
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 {
     ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);

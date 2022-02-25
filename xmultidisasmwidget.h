@@ -51,6 +51,9 @@ public:
     void setCurrentIPAddress(qint64 nAddress);
     void goToOffset(qint64 nOffset);
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
+    void setReadonly(bool bState);
+    void enableReadOnly(bool bState);
+    void setEdited(bool bState);
 
 private:
     void addMode(XBinary::DM disasmMode);
