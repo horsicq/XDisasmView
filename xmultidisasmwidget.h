@@ -52,7 +52,6 @@ public:
     void goToOffset(qint64 nOffset);
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
     void setReadonly(bool bState);
-    void enableReadOnly(bool bState);
     void setEdited(bool bState);
 
 private:

@@ -64,6 +64,11 @@ FORMS += \
     include($$PWD/../FormatDialogs/dialoghexsignature.pri)
 }
 
+!contains(XCONFIG, xhexedit) {
+    XCONFIG += xhexedit
+    include($$PWD/../XHexEdit/xhexedit.pri)
+}
+
 DISTFILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \

@@ -133,14 +133,11 @@ void XMultiDisasmWidget::setReadonly(bool bState)
     ui->scrollAreaDisasm->setReadonly(bState);
 }
 
-void XMultiDisasmWidget::enableReadOnly(bool bState)
-{
-    ui->scrollAreaDisasm->enableReadOnly(bState);
-}
-
 void XMultiDisasmWidget::setEdited(bool bState)
 {
-    ui->scrollAreaDisasm->setEdited(bState);
+    ui->scrollAreaDisasm->setEdited();
+
+//    emit changed();
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
