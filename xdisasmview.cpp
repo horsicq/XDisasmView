@@ -1025,6 +1025,6 @@ void XDisasmView::_hexSlot()
 {
     if(g_options.bMenu_Hex)
     {
-        // TODO
+        // TODO !!!
     }
 }
