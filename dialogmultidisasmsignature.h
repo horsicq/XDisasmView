@@ -21,10 +21,10 @@
 #ifndef DIALOGMULTIDISASMSIGNATURE_H
 #define DIALOGMULTIDISASMSIGNATURE_H
 
-#include <QDialog>
 #include "xcapstone.h"
 #include "xdisasmview.h"
 #include "xlineedithex.h"
+#include "xshortcutsdialog.h"
 
 namespace Ui {
 class DialogMultiDisasmSignature;
