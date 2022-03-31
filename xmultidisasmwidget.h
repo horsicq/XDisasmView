@@ -37,8 +37,8 @@ public:
     struct OPTIONS
     {
         XBinary::FT fileType;
-        qint64 nStartAddress; // For FT_REGION
-        qint64 nInitAddress;
+        quint64 nStartAddress; // For FT_REGION
+        quint64 nInitAddress;
         QString sTitle;
         QString sArch;
     };
