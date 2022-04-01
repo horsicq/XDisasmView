@@ -27,6 +27,11 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) :
 {
     ui->setupUi(this);
 
+    this->g_pDevice=nullptr;
+    this->g_nOffset=0;
+    this->g_pMemoryMap=nullptr;
+    this->g_handle=0;
+
 //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XAbstractTableView::getMonoFont());
 
