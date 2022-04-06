@@ -27,6 +27,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 {
     ui->setupUi(this);
 
+    g_pDevice=nullptr;
     g_options={};
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
