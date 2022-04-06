@@ -155,10 +155,11 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
-XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,quint64 nAddress)
+XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,quint64 nAddress,MODE mode)
 {
     DISASM_RESULT result={};
 
+    result.mode=mode;
     result.nAddress=nAddress;
     result.nXrefTo=-1;
 
@@ -250,7 +251,7 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
         {
             qint64 _nOffset=nStartOffset+_nCurrentOffset;
 
-            DISASM_RESULT disasmResult=_disasm(baData.data()+_nCurrentOffset,nSize,_nCurrentOffset);
+            DISASM_RESULT disasmResult=_disasm(baData.data()+_nCurrentOffset,nSize,_nCurrentOffset,MODE_ADDRESS);
 
             if((_nOffset<=nOffset)&&(nOffset<_nOffset+disasmResult.nSize))
             {
@@ -603,7 +604,7 @@ void XDisasmView::updateData()
                     }
                 }
 
-                record.disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress);
+                record.disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress,getAddressMode());
 
                 nBufferSize=record.disasmResult.nSize;
 
@@ -994,11 +995,24 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow,qint32 nColumn)
 
         if(nRow<g_listRecords.count())
         {
-            g_nThisBase=g_listRecords.at(nRow).disasmResult.nAddress;
+            g_nThisBase=XBinary::offsetToAddress(getMemoryMap(),g_listRecords.at(nRow).nOffset);
         }
 
         adjust(true);
     }
+}
+
+qint64 XDisasmView::getRecordSize(qint64 nOffset)
+{
+    qint64 nResult=1;
+
+    QByteArray baData=read_array(nOffset,15); // TODO const
+
+    DISASM_RESULT disasmResult=_disasm(baData.data(),baData.size(),0,MODE_ADDRESS);
+
+    nResult=disasmResult.nSize;
+
+    return nResult;
 }
 
 void XDisasmView::_goToEntryPointSlot()

@@ -97,6 +97,7 @@ private:
         QString sMnemonic;
         QString sString;
         qint64 nXrefTo;
+        MODE mode;
     };
 
     struct RECORD
@@ -124,7 +125,7 @@ private:
         bool bHex;
     };
 
-    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,quint64 nAddress); // TODO move to XDisasm
+    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,quint64 nAddress,MODE mode); // TODO move to XDisasm
     qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
     MENU_STATE getMenuState();
 
@@ -155,6 +156,7 @@ protected:
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow,qint32 nColumn);
+    virtual qint64 getRecordSize(qint64 nOffset);
 
 protected slots:
     void _goToEntryPointSlot();
