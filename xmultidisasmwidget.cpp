@@ -80,7 +80,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     addMode(XBinary::DM_MOS65XX);
     addMode(XBinary::DM_WASM);
     // TODO BPF
-    // TODO Check more
+    // TODO Check more !!!
 
     connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
 
