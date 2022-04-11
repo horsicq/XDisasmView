@@ -77,7 +77,7 @@ void XDisasmView::adjustView()
     reload(true);
 }
 
-void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
+void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool bReload)
 {
     g_options=options;
 
@@ -117,7 +117,10 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options)
         setScrollValue(0);
     }
 
-    reload(true);
+    if(bReload)
+    {
+        reload(true);
+    }
 }
 
 void XDisasmView::setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax)

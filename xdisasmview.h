@@ -72,7 +72,7 @@ public:
     ~XDisasmView();
 
     void adjustView();
-    void setData(QIODevice *pDevice,OPTIONS options);
+    void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
     void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     XBinary::DM getMode();
     void setCurrentIPAddress(qint64 nAddress); // For Debugger
