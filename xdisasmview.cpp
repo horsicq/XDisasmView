@@ -538,6 +538,13 @@ void XDisasmView::updateData()
 
     if(getDevice())
     {
+        if(getXInfoDB())
+        {
+            QList<XBinary::MEMORY_REPLACE> listMR=getXInfoDB()->getMemoryReplaces(getMemoryMap()->nModuleAddress,getMemoryMap()->nImageSize);
+
+            setMemoryReplaces(listMR);
+        }
+
         XBinary::MODE mode=XBinary::getWidthModeFromByteSize(g_nAddressWidth);
 
         qint64 nBlockOffset=getViewStart()*g_nBytesProLine; // mb TODO remove BytesProLine!
