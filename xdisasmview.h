@@ -50,6 +50,7 @@ class XDisasmView : public XDeviceTableView
         SC_SIGNATURE,
         SC_HEX,
         __SC_SIZE,
+        // TODO more
     };
 
     struct OPCODECOLOR
