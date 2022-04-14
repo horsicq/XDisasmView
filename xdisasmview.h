@@ -30,6 +30,7 @@
 // Load symbols Save db
 // TODO Click on Comment Header All -> User Comments -> System Comments
 // TODO click on jmps
+// TODO Capstone info
 class XDisasmView : public XDeviceTableView
 {
     Q_OBJECT
