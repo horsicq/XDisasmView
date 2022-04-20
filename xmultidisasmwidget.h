@@ -37,8 +37,8 @@ public:
     struct OPTIONS
     {
         XBinary::FT fileType;
-        quint64 nStartAddress; // For FT_REGION
-        quint64 nInitAddress;
+        XADDR nStartAddress; // For FT_REGION
+        XADDR nInitAddress;
         QString sTitle;
         QString sArch;
     };
@@ -47,8 +47,8 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice,OPTIONS options);
-    void goToAddress(qint64 nAddress);
-    void setCurrentIPAddress(qint64 nAddress);
+    void goToAddress(XADDR nAddress);
+    void setCurrentIPAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
     void setReadonly(bool bState);

@@ -36,7 +36,7 @@ class DialogMultiDisasmSignature : public XShortcutsDialog
 
     struct SIGNATURE_RECORD
     {
-        qint64 nAddress;
+        XADDR nAddress;
         QString sOpcode;
         QByteArray baOpcode;
         qint32 nDispOffset;

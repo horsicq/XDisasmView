@@ -40,11 +40,13 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions)
     g_pOptions=pOptions;
 
     g_pOptions->setLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
+    g_pOptions->setCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::save()
 {
     g_pOptions->getLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
+    g_pOptions->getCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
@@ -60,6 +62,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
 #endif
 
     pOptions->addID(XOptions::ID_DISASM_SYNTAX,""); // TODO
+    pOptions->addID(XOptions::ID_DISASM_HIGHLIGHT,true);
 
     // Colors
     pOptions->addID(XOptions::ID_DISASM_COLOR_CALL,QString("%1|%2").arg(QColor(Qt::red).name(),""));

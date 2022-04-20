@@ -105,13 +105,13 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options)
     reloadFileType();
 }
 
-void XMultiDisasmWidget::goToAddress(qint64 nAddress)
+void XMultiDisasmWidget::goToAddress(XADDR nAddress)
 {
     ui->scrollAreaDisasm->goToAddress(nAddress);
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::setCurrentIPAddress(qint64 nAddress)
+void XMultiDisasmWidget::setCurrentIPAddress(XADDR nAddress)
 {
     ui->scrollAreaDisasm->setCurrentIPAddress(nAddress);
     ui->scrollAreaDisasm->goToAddress(nAddress);

@@ -37,6 +37,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_nOpcodeSize=16;
 
     g_nThisBase=0;
+    g_bIsHighlight=false;
 
     addColumn(""); // Arrows
 //    addColumn(tr("Address"),0,true);
@@ -71,6 +72,8 @@ void XDisasmView::adjustView()
         setTextFont(_font);
     }
     // mb TODO errorString
+
+    g_bIsHighlight=getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
 
     g_mapOpcodes=getOpcodeColorMap(g_disasmMode,g_syntax);
 
@@ -139,7 +142,7 @@ XBinary::DM XDisasmView::getMode()
     return g_disasmMode;
 }
 
-void XDisasmView::setCurrentIPAddress(qint64 nAddress)
+void XDisasmView::setCurrentIPAddress(XADDR nAddress)
 {
     g_nCurrentIP=nAddress;
 }
@@ -366,7 +369,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
     QString sString=sText.section("|",1,1);
     // TODO registers !!!
     // TODO upper case
-    if(g_mapOpcodes.contains(sMnemonic))
+    if(g_bIsHighlight&&g_mapOpcodes.contains(sMnemonic))
     {
         OPCODECOLOR opcodeColor=g_mapOpcodes.value(sMnemonic);
 
@@ -405,6 +408,25 @@ void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
         // TODO
         pPainter->drawText(rect,sOpcode);
     }
+}
+
+void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd)
+{
+    QPolygonF arrowHead;
+    qreal arrowSize=8;
+
+    QLineF line(pointEnd,pointStart);
+
+    double angle=std::atan2(-line.dy(),line.dx());
+
+    QPointF arrowP1=line.p1()+QPointF(sin(angle+M_PI/3)*arrowSize,cos(angle+M_PI/3)*arrowSize);
+    QPointF arrowP2=line.p1()+QPointF(sin(angle+M_PI-M_PI/3)*arrowSize,cos(angle+M_PI-M_PI/3)*arrowSize);
+
+    arrowHead.clear();
+    arrowHead << line.p1() << arrowP1 << arrowP2;
+
+    pPainter->drawLine(pointStart,pointEnd);
+    pPainter->drawPolygon(arrowHead);
 }
 
 QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
@@ -574,14 +596,15 @@ void XDisasmView::updateData()
 
                 RECORD record={};
                 record.nOffset=nCurrentOffset;
+                record.nAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
 
-                qint64 nCurrentAddress=0;
+                XADDR _nCurrent=0;
 
                 if(getAddressMode()==MODE_THIS)
                 {
-                    nCurrentAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
+                    _nCurrent=record.nAddress;
 
-                    qint64 nDelta=nCurrentAddress-g_nThisBase;
+                    qint64 nDelta=(qint64)_nCurrent-(qint64)g_nThisBase;
 
                     record.sAddress=XBinary::thisToString(nDelta);
                 }
@@ -589,32 +612,32 @@ void XDisasmView::updateData()
                 {
                     if(getAddressMode()==MODE_ADDRESS)
                     {
-                        nCurrentAddress=XBinary::offsetToAddress(getMemoryMap(),nCurrentOffset);
+                        _nCurrent=record.nAddress;
                     }
                     else if(getAddressMode()==MODE_OFFSET)
                     {
-                        nCurrentAddress=nCurrentOffset;
+                        _nCurrent=record.nOffset;
                     }
                     else if(getAddressMode()==MODE_RELADDRESS)
                     {
-                        nCurrentAddress=XBinary::offsetToRelAddress(getMemoryMap(),nCurrentOffset);
+                        _nCurrent=XBinary::offsetToRelAddress(getMemoryMap(),nCurrentOffset);
                     }
 
     //                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
 
-                    if(nCurrentAddress!=-1)
+                    if(_nCurrent!=-1)
                     {
                         // TODO !!!
-                        record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                        record.sAddress=XBinary::valueToHexColon(mode,_nCurrent);
                     }
                     else
                     {
-                        nCurrentAddress=nCurrentOffset;
-                        record.sAddress=XBinary::valueToHexColon(mode,nCurrentAddress);
+                        _nCurrent=nCurrentOffset;
+                        record.sAddress=XBinary::valueToHexColon(mode,_nCurrent);
                     }
                 }
 
-                record.disasmResult=_disasm(baBuffer.data(),nBufferSize,nCurrentAddress,getAddressMode());
+                record.disasmResult=_disasm(baBuffer.data(),nBufferSize,record.nAddress,getAddressMode());
 
                 nBufferSize=record.disasmResult.nSize;
 
@@ -633,25 +656,75 @@ void XDisasmView::updateData()
             }
         }
 
-//        qint32 nNumberOfRecords=g_listRecords.count();
+        qint32 nNumberOfRecords=g_listRecords.count();
 
-//        if(nNumberOfRecords)
-//        {
-////            qint64 nMinAddress=g_listRecords.first().disasmResult.nAddress;
-////            qint64 nMaxAddress=g_listRecords.last().disasmResult.nAddress+g_listRecords.last().disasmResult.nSize;
+        if(nNumberOfRecords)
+        {
+            for(qint32 i=0;i<nNumberOfRecords;i++)
+            {
+                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
+                {
+                    XADDR nXrefTo=g_listRecords.at(i).disasmResult.nXrefTo;
+                    XADDR nCurrentAddress=g_listRecords.at(i).nAddress;
 
-//            for(qint32 i=0;i<nNumberOfRecords;i++)
-//            {
-//                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
-//                {
-//                    ARROW arrow={};
-//                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
-//                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+                    qint32 nStart=0;
+                    qint32 nEnd=nNumberOfRecords-1;
+                    qint32 nMaxLevel=0;
 
-//                    g_listArrows.append(arrow);
-//                }
-//            }
-//        }
+                    if(nCurrentAddress>nXrefTo)
+                    {
+                        nEnd=i;
+
+                        g_listRecords[i].nArraySize=nEnd;
+
+                        for(qint32 j=i;j>=nStart;j--)
+                        {
+                            nMaxLevel=qMax(g_listRecords.at(j).nMaxLevel,nMaxLevel);
+
+                            if((nXrefTo>=g_listRecords.at(j).nAddress)&&(nXrefTo<(g_listRecords.at(j).nAddress+g_listRecords.at(j).disasmResult.nSize)))
+                            {
+                                nStart=j;
+                                g_listRecords[i].nArraySize=nEnd-nStart;
+                                g_listRecords[i].bIsEnd=true;
+
+                                break;
+                            }
+                        }
+
+                        g_listRecords[i].array=ARRAY_UP;
+                    }
+                    else if(nCurrentAddress<nXrefTo)
+                    {
+                        nStart=i;
+
+                        g_listRecords[i].nArraySize=nNumberOfRecords-nStart;
+
+                        for(qint32 j=i;j<=nEnd;j++)
+                        {
+                            nMaxLevel=qMax(g_listRecords.at(j).nMaxLevel,nMaxLevel);
+
+                            if((nXrefTo>=g_listRecords.at(j).nAddress)&&(nXrefTo<(g_listRecords.at(j).nAddress+g_listRecords.at(j).disasmResult.nSize)))
+                            {
+                                nEnd=j;
+                                g_listRecords[i].nArraySize=nEnd-nStart;
+                                g_listRecords[i].bIsEnd=true;
+
+                                break;
+                            }
+                        }
+
+                        g_listRecords[i].array=ARRAY_DOWN;
+                    }
+
+                    g_listRecords[i].nArrayLevel=nMaxLevel+1;
+
+                    for(qint32 j=nStart;j<=nEnd;j++)
+                    {
+                        g_listRecords[j].nMaxLevel=nMaxLevel+1;
+                    }
+                }
+            }
+        }
 
         setCurrentBlock(nBlockOffset,(nCurrentOffset-nBlockOffset));
     }
@@ -667,26 +740,58 @@ void XDisasmView::paintColumn(QPainter *pPainter,qint32 nColumn,qint32 nLeft,qin
 
         if(nNumberOfRecords)
         {
-//            qint64 nMinAddress=g_listRecords.first().disasmResult.nAddress;
-//            qint64 nMaxAddress=g_listRecords.last().disasmResult.nAddress+g_listRecords.last().disasmResult.nSize;
-
             for(qint32 i=0;i<nNumberOfRecords;i++)
             {
+                // TODO DashLine
                 if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
                 {
-                    pPainter->fillRect(nLeft,nTop+(i*getLineHeight()),nWidth,getLineHeight(),viewport()->palette().color(QPalette::Highlight));
+                    QPointF point1;
+                    point1.setX(nLeft+nWidth);
+                    point1.setY(nTop+((i+0.5)*getLineHeight()));
 
-                    // TODO
+                    QPointF point2;
+                    point2.setX((nLeft+nWidth)-getCharWidth()*(g_listRecords.at(i).nArrayLevel));
+                    point2.setY(point1.y());
 
-//                    ARROW arrow={};
-//                    arrow.nFrom=g_listRecords.at(i).disasmResult.nAddress;
-//                    arrow.nTo=g_listRecords.at(i).disasmResult.nXrefTo;
+                    QPointF point3;
 
-//                    g_listArrows.append(arrow);
+                    point3.setX(point2.x());
+
+                    qint32 nDelta=getLineHeight()*g_listRecords.at(i).nArraySize;
+
+                    if(!(g_listRecords.at(i).bIsEnd))
+                    {
+                        nDelta+=0.5*getLineHeight();
+                    }
+
+                    if(g_listRecords.at(i).array==ARRAY_UP)
+                    {
+                        point3.setY(point1.y()-nDelta);
+                    }
+                    else if(g_listRecords.at(i).array==ARRAY_DOWN)
+                    {
+                        point3.setY(point1.y()+nDelta);
+                    }
+
+                    pPainter->drawLine(point1,point2);
+
+                    if(g_listRecords.at(i).bIsEnd)
+                    {
+                        pPainter->drawLine(point2,point3);
+
+                        QPointF point4;
+                        point4.setX(point1.x());
+                        point4.setY(point3.y());
+
+                        drawArrow(pPainter,point3,point4);
+                    }
+                    else
+                    {
+                        drawArrow(pPainter,point2,point3);
+                    }
                 }
             }
         }
-        // TODO
     }
 }
 
@@ -697,7 +802,7 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
     if(nRow<nNumberOfRows)
     {
         qint64 nOffset=g_listRecords.at(nRow).nOffset;
-        qint64 nAddress=g_listRecords.at(nRow).disasmResult.nAddress;
+        XADDR nAddress=g_listRecords.at(nRow).disasmResult.nAddress;
 
         TEXT_OPTION textOption={};
         textOption.bSelected=isOffsetSelected(nOffset);

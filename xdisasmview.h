@@ -29,6 +29,7 @@
 // TODO AbstractQuery
 // Load symbols Save db
 // TODO Click on Comment Header All -> User Comments -> System Comments
+// TODO Click on Opcode label -> Addresses
 // TODO click on jmps
 // TODO Capstone info
 class XDisasmView : public XDeviceTableView
@@ -77,7 +78,7 @@ public:
     void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
     void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     XBinary::DM getMode();
-    void setCurrentIPAddress(qint64 nAddress); // For Debugger
+    void setCurrentIPAddress(XADDR nAddress); // For Debugger
     qint64 getSelectionInitAddress();
 
 private:
@@ -91,14 +92,21 @@ private:
         COLUMN_COMMENT
     };
 
+    enum ARRAY
+    {
+        ARRAY_NONE=0,
+        ARRAY_UP,
+        ARRAY_DOWN
+    };
+
     struct DISASM_RESULT
     {
         bool bIsValid;
-        qint64 nAddress;
+        XADDR nAddress;
         qint32 nSize;
         QString sMnemonic;
         QString sString;
-        qint64 nXrefTo;
+        XADDR nXrefTo;
         MODE mode;
     };
 
@@ -109,16 +117,16 @@ private:
         QString sHEX;
         QString sCommemt;
         qint64 nOffset;
+        XADDR nAddress;
         DISASM_RESULT disasmResult;
         bool bIsReplaced;
+        ARRAY array;
+        qint32 nArrayLevel;
+        qint32 nMaxLevel;
+        qint32 nArraySize;
+        bool bIsEnd;
+        // TODO jmp/jcc
     };
-
-//    struct ARROW
-//    {
-//        qint64 nFrom;
-//        qint64 nTo;
-//        qint32 nLevel;
-//    };
 
     struct MENU_STATE
     {
@@ -141,6 +149,7 @@ private:
 
     void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
     void drawDisasmText(QPainter *pPainter,QRect rect,QString sText);
+    void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd);
     QMap<QString,OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     OPCODECOLOR getOpcodeColor(XOptions::ID id);
 
@@ -180,12 +189,13 @@ private:
     qint32 g_nOpcodeSize;
 
     // Debugger
-    qint64 g_nCurrentIP;
+    XADDR g_nCurrentIP;
 
     QMap<QString,OPCODECOLOR> g_mapOpcodes;
     XBinary::SYNTAX g_syntax;
 
-    qint64 g_nThisBase;
+    XADDR g_nThisBase;
+    bool g_bIsHighlight;
 };
 
 #endif // XDISASMVIEW_H

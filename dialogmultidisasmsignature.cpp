@@ -78,7 +78,7 @@ void DialogMultiDisasmSignature::reload()
     bool bStopBranch=false;
     qint32 nCount=ui->spinBoxCount->value();
     qint64 nOffset=g_nOffset;
-    qint64 nAddress=XBinary::offsetToAddress(g_pMemoryMap,nOffset);
+    XADDR nAddress=XBinary::offsetToAddress(g_pMemoryMap,nOffset);
     qint32 nMethod=ui->comboBoxMethod->currentData().toInt();
 
     XBinary::DMFAMILY dmFamily=XBinary::getDisasmFamily(g_pMemoryMap);
