@@ -47,7 +47,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     addColumn(tr("Opcode"));
     addColumn(tr("Comment"));
 
-    setLastColumnStretch(true);
+//    setLastColumnStretch(true);
 
     setTextFont(getMonoFont());
 
@@ -1043,7 +1043,7 @@ void XDisasmView::adjustColumns()
 
     setColumnWidth(COLUMN_ARROWS,5*getCharWidth());
     setColumnWidth(COLUMN_OPCODE,40*getCharWidth());
-    setColumnWidth(COLUMN_COMMENT,40*getCharWidth());
+    setColumnWidth(COLUMN_COMMENT,60*getCharWidth());
 }
 
 void XDisasmView::registerShortcuts(bool bState)
