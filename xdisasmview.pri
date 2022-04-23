@@ -69,6 +69,11 @@ FORMS += \
     include($$PWD/../XHexEdit/xhexedit.pri)
 }
 
+!contains(XCONFIG, xinfodb) {
+    XCONFIG += xinfodb
+    include($$PWD/../XInfoDB/xinfodb.pri)
+}
+
 DISTFILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
