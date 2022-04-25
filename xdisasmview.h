@@ -78,7 +78,7 @@ public:
     void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
     void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     XBinary::DM getMode();
-    void setCurrentIPAddress(XADDR nAddress); // For Debugger
+    void setCurrentPointerAddress(XADDR nAddress); // For Debugger
     qint64 getSelectionInitAddress();
 
 private:

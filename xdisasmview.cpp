@@ -102,7 +102,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
 
     setTotalLineCount(nTotalLineCount);
 
-    setCurrentIPAddress(options.nCurrentIPAddress);
+    setCurrentPointerAddress(options.nCurrentIPAddress);
 
     if(options.nInitAddress!=-1)
     {
@@ -142,7 +142,7 @@ XBinary::DM XDisasmView::getMode()
     return g_disasmMode;
 }
 
-void XDisasmView::setCurrentIPAddress(XADDR nAddress)
+void XDisasmView::setCurrentPointerAddress(XADDR nAddress)
 {
     g_nCurrentIP=nAddress;
 }
