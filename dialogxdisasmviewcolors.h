@@ -42,6 +42,7 @@ class DialogXDisasmViewColors : public QDialog
         COLUMN_TEXT_COLOR_REMOVE,
         COLUMN_BACKGROUND_COLOR,
         COLUMN_BACKGROUND_COLOR_REMOVE,
+        COLUMN_GROUP,
         COLUMN_STRING
     };
 
@@ -54,7 +55,7 @@ public:
 
 private slots:
     void on_pushButtonCancel_clicked();
-    void addRecord(qint32 nRow,QString sText,XOptions::ID id);
+    void addRecord(qint32 nRow, QString sGroup, QString sText, XOptions::ID id);
     void updateRow(qint32 nRow);
     void on_pushButtonOK_clicked();
     void pushButtonSlot();

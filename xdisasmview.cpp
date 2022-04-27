@@ -435,13 +435,13 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
 
     if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_X86)
     {
-        OPCODECOLOR colorCALL=getOpcodeColor(XOptions::ID_DISASM_COLOR_CALL);
-        OPCODECOLOR colorJCC=getOpcodeColor(XOptions::ID_DISASM_COLOR_JCC);
-        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_RET);
-        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_PUSH);
-        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_POP);
-        OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_NOP);
-        OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_JMP);
+        OPCODECOLOR colorCALL=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL);
+        OPCODECOLOR colorJCC=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JCC);
+        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET);
+        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH);
+        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP);
+        OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP);
+        OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP);
 
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
         {
@@ -475,6 +475,14 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
             mapResult.insert("ja",colorJCC);
             // TODO
         }
+    }
+    else if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM)
+    {
+        OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
+        OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
+
+        mapResult.insert("push",colorPUSH);
+        mapResult.insert("pop",colorPOP);
     }
 
     return mapResult;

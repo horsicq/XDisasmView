@@ -37,17 +37,20 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 {
     g_pOptions=pOptions;
 
-    ui->tableWidgetColors->setColumnCount(5);
-    ui->tableWidgetColors->setRowCount(7);
+    ui->tableWidgetColors->setColumnCount(6);
+    ui->tableWidgetColors->setRowCount(9);
 
+    qint32 nRow=0;
     // TODO another assemblers
-    addRecord(0,"CALL",XOptions::ID_DISASM_COLOR_CALL);
-    addRecord(1,"RET",XOptions::ID_DISASM_COLOR_RET);
-    addRecord(2,"JCC",XOptions::ID_DISASM_COLOR_JCC);
-    addRecord(3,"PUSH",XOptions::ID_DISASM_COLOR_PUSH);
-    addRecord(4,"POP",XOptions::ID_DISASM_COLOR_POP);
-    addRecord(5,"NOP",XOptions::ID_DISASM_COLOR_NOP);
-    addRecord(6,"JMP",XOptions::ID_DISASM_COLOR_JMP);
+    addRecord(nRow++,"x86","CALL",XOptions::ID_DISASM_COLOR_X86_CALL);
+    addRecord(nRow++,"x86","RET",XOptions::ID_DISASM_COLOR_X86_RET);
+    addRecord(nRow++,"x86","JCC",XOptions::ID_DISASM_COLOR_X86_JCC);
+    addRecord(nRow++,"x86","PUSH",XOptions::ID_DISASM_COLOR_X86_PUSH);
+    addRecord(nRow++,"x86","POP",XOptions::ID_DISASM_COLOR_X86_POP);
+    addRecord(nRow++,"x86","NOP",XOptions::ID_DISASM_COLOR_X86_NOP);
+    addRecord(nRow++,"x86","JMP",XOptions::ID_DISASM_COLOR_X86_JMP);
+    addRecord(nRow++,"arm","PUSH",XOptions::ID_DISASM_COLOR_ARM_PUSH);
+    addRecord(nRow++,"arm","POP",XOptions::ID_DISASM_COLOR_ARM_POP);
 
 //    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE,20);
@@ -75,7 +78,7 @@ void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
     this->close();
 }
 
-void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID id)
+void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sGroup,QString sText,XOptions::ID id)
 {
     QPushButton *pButtonTextColor=new QPushButton;
     pButtonTextColor->setText(tr("Text"));
@@ -114,6 +117,8 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sText,XOptions::ID i
     pButtonBackgroundColorRemove->setProperty("ID",id);
 
     connect(pButtonBackgroundColorRemove,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+
+    ui->tableWidgetColors->setItem(nRow,COLUMN_GROUP,new QTableWidgetItem(sGroup));
 
     ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE,pButtonBackgroundColorRemove);
 

@@ -39,8 +39,7 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions)
 {
     g_pOptions=pOptions;
 
-    g_pOptions->setLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
-    g_pOptions->setCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
+    reload();
 }
 
 void XDisasmViewOptionsWidget::save()
@@ -65,14 +64,24 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_HIGHLIGHT,true);
 
     // Colors
-    pOptions->addID(XOptions::ID_DISASM_COLOR_CALL,QString("%1|%2").arg(QColor(Qt::red).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_RET,QString("%1|%2").arg(QColor(Qt::red).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_NOP,QString("%1|%2").arg(QColor(Qt::gray).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_PUSH,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_POP,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_JCC,QString("%1|%2").arg(QColor(Qt::green).name(),""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_JMP,QString("%1|%2").arg(QColor(Qt::darkBlue).name(),""));
+    // X86
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL,QString("%1|%2").arg(QColor(Qt::red).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET,QString("%1|%2").arg(QColor(Qt::red).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP,QString("%1|%2").arg(QColor(Qt::gray).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC,QString("%1|%2").arg(QColor(Qt::green).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JMP,QString("%1|%2").arg(QColor(Qt::darkBlue).name(),""));
+    // ARM
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_PUSH,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_POP,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
     // TODO more
+}
+
+void XDisasmViewOptionsWidget::reload()
+{
+    g_pOptions->setLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
+    g_pOptions->setCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
