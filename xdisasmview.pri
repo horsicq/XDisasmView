@@ -69,9 +69,9 @@ FORMS += \
     include($$PWD/../XHexEdit/xhexedit.pri)
 }
 
-!contains(XCONFIG, xinfodb) {
-    XCONFIG += xinfodb
-    include($$PWD/../XInfoDB/xinfodb.pri)
+!contains(XCONFIG, dialogxinfodbtransferprocess) {
+    XCONFIG += dialogxinfodbtransferprocess
+    include($$PWD/../XInfoDB/dialogxinfodbtransferprocess.pri)
 }
 
 DISTFILES += \

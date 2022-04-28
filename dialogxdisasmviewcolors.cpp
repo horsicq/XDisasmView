@@ -38,19 +38,21 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     g_pOptions=pOptions;
 
     ui->tableWidgetColors->setColumnCount(6);
-    ui->tableWidgetColors->setRowCount(9);
+    ui->tableWidgetColors->setRowCount(11);
 
     qint32 nRow=0;
     // TODO another assemblers
-    addRecord(nRow++,"x86","CALL",XOptions::ID_DISASM_COLOR_X86_CALL);
-    addRecord(nRow++,"x86","RET",XOptions::ID_DISASM_COLOR_X86_RET);
-    addRecord(nRow++,"x86","JCC",XOptions::ID_DISASM_COLOR_X86_JCC);
-    addRecord(nRow++,"x86","PUSH",XOptions::ID_DISASM_COLOR_X86_PUSH);
-    addRecord(nRow++,"x86","POP",XOptions::ID_DISASM_COLOR_X86_POP);
-    addRecord(nRow++,"x86","NOP",XOptions::ID_DISASM_COLOR_X86_NOP);
-    addRecord(nRow++,"x86","JMP",XOptions::ID_DISASM_COLOR_X86_JMP);
-    addRecord(nRow++,"arm","PUSH",XOptions::ID_DISASM_COLOR_ARM_PUSH);
-    addRecord(nRow++,"arm","POP",XOptions::ID_DISASM_COLOR_ARM_POP);
+    addRecord(nRow++,"x86/amd64","CALL",XOptions::ID_DISASM_COLOR_X86_CALL);
+    addRecord(nRow++,"x86/amd64","RET",XOptions::ID_DISASM_COLOR_X86_RET);
+    addRecord(nRow++,"x86/amd64","JCC",XOptions::ID_DISASM_COLOR_X86_JCC);
+    addRecord(nRow++,"x86/amd64","PUSH",XOptions::ID_DISASM_COLOR_X86_PUSH);
+    addRecord(nRow++,"x86/amd64","POP",XOptions::ID_DISASM_COLOR_X86_POP);
+    addRecord(nRow++,"x86/amd64","NOP",XOptions::ID_DISASM_COLOR_X86_NOP);
+    addRecord(nRow++,"x86/amd64","JMP",XOptions::ID_DISASM_COLOR_X86_JMP);
+    addRecord(nRow++,"arm/arm64","BL",XOptions::ID_DISASM_COLOR_ARM_BL);
+    addRecord(nRow++,"arm/arm64","RET",XOptions::ID_DISASM_COLOR_ARM_RET);
+    addRecord(nRow++,"arm/arm64","PUSH",XOptions::ID_DISASM_COLOR_ARM_PUSH);
+    addRecord(nRow++,"arm/arm64","POP",XOptions::ID_DISASM_COLOR_ARM_POP);
 
 //    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE,20);

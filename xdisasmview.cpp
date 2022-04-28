@@ -207,6 +207,31 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                             }
                         }
                     }
+                    else if(XBinary::getDisasmFamily(g_disasmMode)==XBinary::DMFAMILY_ARM)
+                    {
+                        for(qint32 j=0;j<pInsn->detail->arm.op_count;j++)
+                        {
+                            if(pInsn->detail->arm.operands[j].type==ARM_OP_IMM)
+                            {
+                                result.nXrefTo=pInsn->detail->arm.operands[j].imm;
+
+                                break;
+                            }
+                        }
+                    }
+                    else if(XBinary::getDisasmFamily(g_disasmMode)==XBinary::DMFAMILY_ARM64)
+                    {
+                        for(qint32 j=0;j<pInsn->detail->arm64.op_count;j++)
+                        {
+                            if(pInsn->detail->arm64.operands[j].type==ARM_OP_IMM)
+                            {
+                                result.nXrefTo=pInsn->detail->arm64.operands[j].imm;
+
+                                break;
+                            }
+                        }
+                    }
+
                     break;
                 }
             }
@@ -235,6 +260,15 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
     {
         qint64 nStartOffset=nOffset-5*g_nOpcodeSize;
         qint64 nEndOffset=nOffset+5*g_nOpcodeSize;
+
+        if(XBinary::getDisasmFamily(g_disasmMode)==XBinary::DMFAMILY_ARM) // TODO Check
+        {
+            nStartOffset=S_ALIGN_DOWN(nStartOffset,4);
+        }
+        else if(XBinary::getDisasmFamily(g_disasmMode)==XBinary::DMFAMILY_ARM64)
+        {
+            nStartOffset=S_ALIGN_DOWN(nStartOffset,4);
+        }
 
         nStartOffset=qMax(nStartOffset,(qint64)0);
         nEndOffset=qMin(nEndOffset,getDataSize());
@@ -476,11 +510,15 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
             // TODO
         }
     }
-    else if(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM)
+    else if((XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM)||(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM64))
     {
+        OPCODECOLOR colorBL=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);
+        OPCODECOLOR colorRET=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_RET);
         OPCODECOLOR colorPUSH=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
         OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
 
+        mapResult.insert("bl",colorBL);
+        mapResult.insert("ret",colorRET);
         mapResult.insert("push",colorPUSH);
         mapResult.insert("pop",colorPOP);
     }

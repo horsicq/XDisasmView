@@ -73,6 +73,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC,QString("%1|%2").arg(QColor(Qt::green).name(),""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JMP,QString("%1|%2").arg(QColor(Qt::darkBlue).name(),""));
     // ARM
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_BL,QString("%1|%2").arg(QColor(Qt::red).name(),""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_RET,QString("%1|%2").arg(QColor(Qt::red).name(),""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_PUSH,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_POP,QString("%1|%2").arg(QColor(Qt::blue).name(),""));
     // TODO more

@@ -128,39 +128,51 @@ void DialogMultiDisasmSignature::reload()
                         record.nImmOffset=pInsn->detail->x86.encoding.imm_offset;
                         record.nImmSize=pInsn->detail->x86.encoding.imm_size;
                     }
+                    else if(dmFamily==XBinary::DMFAMILY_ARM)
+                    {
+                        // TODO
+                    }
+                    else if(dmFamily==XBinary::DMFAMILY_ARM64)
+                    {
+                        // TODO
+                    }
 
                     nAddress+=pInsn->size;
 
                     if(nMethod==1)
                     {
-                        // TODO another archs !!!
-                        if(dmFamily==XBinary::DMFAMILY_X86)
+                        qint32 nNumberOfGroups=pInsn->detail->groups_count;
+
+                        for(qint32 i=0;i<nNumberOfGroups;i++)
                         {
-                            for(qint32 i=0;i<pInsn->detail->x86.op_count;i++)
+                            if(pInsn->detail->groups[i]==CS_GRP_BRANCH_RELATIVE)
                             {
-                                if(pInsn->detail->x86.operands[i].type==X86_OP_IMM)
+                                if(dmFamily==XBinary::DMFAMILY_X86)
                                 {
-                                    qint64 nImm=pInsn->detail->x86.operands[i].imm;
-
-                                    // mb TODO CS_GRP_BRANCH_RELATIVE
-                                    if(XCapstone::isJmpOpcode(pInsn->id)||XCapstone::isCallOpcode(pInsn->id))
+                                    for(qint32 i=0;i<pInsn->detail->x86.op_count;i++)
                                     {
-                                        nAddress=nImm;
-
-                                        if((g_pMemoryMap->fileType==XBinary::FT_COM)&&(pInsn->detail->x86.encoding.imm_size==2))
+                                        if(pInsn->detail->x86.operands[i].type==X86_OP_IMM)
                                         {
-                                            if(nAddress>0xFFFF)
-                                            {
-                                                nAddress&=0xFFFF;
-                                            }
-                                        }
+                                            qint64 nImm=pInsn->detail->x86.operands[i].imm;
 
-                                        record.bIsConst=true;
+                                            nAddress=nImm;
+
+                                            if((g_pMemoryMap->fileType==XBinary::FT_COM)&&(pInsn->detail->x86.encoding.imm_size==2))
+                                            {
+                                                if(nAddress>0xFFFF)
+                                                {
+                                                    nAddress&=0xFFFF;
+                                                }
+                                            }
+
+                                            record.bIsConst=true;
+                                        }
                                     }
                                 }
+
+                                break;
                             }
                         }
-                        // TODO ARM
                     }
 
                     g_listRecords.append(record);
