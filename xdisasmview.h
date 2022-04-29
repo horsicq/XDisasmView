@@ -74,9 +74,10 @@ public:
     explicit XDisasmView(QWidget *pParent=nullptr);
     ~XDisasmView();
 
+    void _adjustView();
     void adjustView();
     void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
-    void setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
+    void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
     void setCurrentPointerAddress(XADDR nAddress); // For Debugger
     qint64 getSelectionInitAddress();
@@ -195,6 +196,7 @@ private:
     XBinary::SYNTAX g_syntax;
 
     XADDR g_nThisBase;
+    bool g_bIsAddressColon;
     bool g_bIsHighlight;
 };
 

@@ -45,7 +45,9 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions)
 void XDisasmViewOptionsWidget::save()
 {
     g_pOptions->getLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
-    g_pOptions->getCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
+    g_pOptions->getComboBox(ui->comboBoxDisasmSyntax,XOptions::ID_DISASM_SYNTAX);
+    g_pOptions->getCheckBox(ui->checkBoxDisasmAddressColon,XOptions::ID_DISASM_ADDRESSCOLON);
+    g_pOptions->getCheckBox(ui->groupBoxDisasmHighlight,XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
@@ -60,7 +62,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_FONT,"Menlo,10,-1,5,50,0,0,0,0,0"); // TODO Check
 #endif
 
-    pOptions->addID(XOptions::ID_DISASM_SYNTAX,""); // TODO
+    pOptions->addID(XOptions::ID_DISASM_SYNTAX,"");
+    pOptions->addID(XOptions::ID_DISASM_ADDRESSCOLON,true);
     pOptions->addID(XOptions::ID_DISASM_HIGHLIGHT,true);
 
     // Colors
@@ -83,7 +86,9 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
 void XDisasmViewOptionsWidget::reload()
 {
     g_pOptions->setLineEdit(ui->lineEditDisasmFont,XOptions::ID_DISASM_FONT);
-    g_pOptions->setCheckBox(ui->groupBoxHighlight,XOptions::ID_DISASM_HIGHLIGHT);
+    g_pOptions->setComboBox(ui->comboBoxDisasmSyntax,XOptions::ID_DISASM_SYNTAX);
+    g_pOptions->setCheckBox(ui->checkBoxDisasmAddressColon,XOptions::ID_DISASM_ADDRESSCOLON);
+    g_pOptions->setCheckBox(ui->groupBoxDisasmHighlight,XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
@@ -100,7 +105,7 @@ void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
     }
 }
 
-void XDisasmViewOptionsWidget::on_pushButtonColors_clicked()
+void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
 {
     DialogXDisasmViewColors dialogColors(this);
 

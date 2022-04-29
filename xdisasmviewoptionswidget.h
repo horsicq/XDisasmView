@@ -47,7 +47,7 @@ public slots:
 
 private slots:
     void on_toolButtonDisasmFont_clicked();
-    void on_pushButtonColors_clicked();
+    void on_pushButtonDisasmColors_clicked();
 
 private:
     Ui::XDisasmViewOptionsWidget *ui;

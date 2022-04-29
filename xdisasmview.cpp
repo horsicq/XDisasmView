@@ -37,7 +37,9 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_nOpcodeSize=16;
 
     g_nThisBase=0;
+    g_bIsAddressColon=false;
     g_bIsHighlight=false;
+    g_syntax=XBinary::SYNTAX_DEFAULT;
 
     addColumn(""); // Arrows
 //    addColumn(tr("Address"),0,true);
@@ -58,11 +60,11 @@ XDisasmView::~XDisasmView()
 {
     if(g_handle)
     {
-        cs_close(&g_handle);
+        XCapstone::closeHandle(&g_handle);
     }
 }
 
-void XDisasmView::adjustView()
+void XDisasmView::_adjustView()
 {
     QFont _font;
     QString sFont=getGlobalOptions()->getValue(XOptions::ID_DISASM_FONT).toString();
@@ -74,8 +76,23 @@ void XDisasmView::adjustView()
     // mb TODO errorString
 
     g_bIsHighlight=getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
+    g_bIsAddressColon=getGlobalOptions()->getValue(XOptions::ID_DISASM_ADDRESSCOLON).toBool();
+
+    g_syntax=XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
 
     g_mapOpcodes=getOpcodeColorMap(g_disasmMode,g_syntax);
+
+    if(g_handle)
+    {
+        XCapstone::closeHandle(&g_handle);
+    }
+
+    XCapstone::openHandle(g_disasmMode,&g_handle,true,g_syntax);
+}
+
+void XDisasmView::adjustView()
+{
+    _adjustView();
 
     reload(true);
 }
@@ -126,15 +143,11 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
     }
 }
 
-void XDisasmView::setMode(XBinary::DM disasmMode,XBinary::SYNTAX syntax)
+void XDisasmView::setMode(XBinary::DM disasmMode)
 {
     g_disasmMode=disasmMode;
-    g_syntax=syntax;
 
-    g_mapOpcodes=getOpcodeColorMap(disasmMode,syntax);
-
-    XCapstone::closeHandle(&g_handle);
-    XCapstone::openHandle(disasmMode,&g_handle,true,syntax);
+    _adjustView();
 }
 
 XBinary::DM XDisasmView::getMode()
@@ -490,24 +503,37 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
             mapResult.insert("jz",colorJCC);
             mapResult.insert("jnz",colorJCC);
             mapResult.insert("ja",colorJCC);
-            // TODO more
         }
         else if(syntax==XBinary::SYNTAX_ATT)
         {
-            mapResult.insert("callq",colorCALL);
-            mapResult.insert("retq",colorRET);
-            mapResult.insert("pushw",colorPUSH);
-            mapResult.insert("pushl",colorPUSH);
-            mapResult.insert("popw",colorPOP);
-            mapResult.insert("popl",colorPOP);
+            {
+                mapResult.insert("callw",colorCALL);
+                mapResult.insert("calll",colorCALL);
+                mapResult.insert("callq",colorCALL);
+            }
+            {
+                mapResult.insert("retw",colorRET);
+                mapResult.insert("retl",colorRET);
+                mapResult.insert("retq",colorRET);
+            }
+            {
+                mapResult.insert("pushw",colorPUSH);
+                mapResult.insert("pushl",colorPUSH);
+                mapResult.insert("pushq",colorPUSH);
+            }
+            {
+                mapResult.insert("popw",colorPUSH);
+                mapResult.insert("popl",colorPUSH);
+                mapResult.insert("popq",colorPUSH);
+            }
+
             mapResult.insert("nop",colorNOP);
-            mapResult.insert("jmpq",colorJMP);
+            mapResult.insert("jmp",colorJMP);
             mapResult.insert("je",colorJCC);
             mapResult.insert("jne",colorJCC);
             mapResult.insert("jz",colorJCC);
             mapResult.insert("jnz",colorJCC);
             mapResult.insert("ja",colorJCC);
-            // TODO
         }
     }
     else if((XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM)||(XBinary::getDisasmFamily(disasmMode)==XBinary::DMFAMILY_ARM64))
@@ -671,15 +697,18 @@ void XDisasmView::updateData()
 
     //                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
 
-                    if(_nCurrent!=-1)
+                    if(_nCurrent==-1)
                     {
-                        // TODO !!!
+                        _nCurrent=nCurrentOffset;
+                    }
+
+                    if(g_bIsAddressColon)
+                    {
                         record.sAddress=XBinary::valueToHexColon(mode,_nCurrent);
                     }
                     else
                     {
-                        _nCurrent=nCurrentOffset;
-                        record.sAddress=XBinary::valueToHexColon(mode,_nCurrent);
+                        record.sAddress=XBinary::valueToHex(mode,_nCurrent);
                     }
                 }
 

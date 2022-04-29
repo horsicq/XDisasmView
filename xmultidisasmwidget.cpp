@@ -32,10 +32,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker blocker1(ui->comboBoxMode);
-    const QSignalBlocker blocker2(ui->comboBoxSyntax);
 #else
     const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
-    const bool bBlocked2=ui->comboBoxSyntax->blockSignals(true);
 #endif
 
     addMode(XBinary::DM_X86_16);
@@ -86,7 +84,6 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
-    ui->comboBoxSyntax->blockSignals(bBlocked2);
 #endif
 }
 
@@ -147,19 +144,12 @@ void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
     ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode),disasmMode);
 }
 
-void XMultiDisasmWidget::addSyntax(XBinary::SYNTAX syntax)
-{
-    ui->comboBoxSyntax->addItem(XBinary::syntaxIdToString(syntax),syntax);
-}
-
 void XMultiDisasmWidget::reloadFileType()
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     const QSignalBlocker blocker1(ui->comboBoxMode);
-    const QSignalBlocker blocker2(ui->comboBoxSyntax);
 #else
     const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
-    const bool bBlocked2=ui->comboBoxSyntax->blockSignals(true);
 #endif
 
     XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
@@ -202,44 +192,14 @@ void XMultiDisasmWidget::reloadFileType()
 
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
-    ui->comboBoxSyntax->blockSignals(bBlocked2);
 #endif
 }
 
 void XMultiDisasmWidget::adjustMode()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-    const QSignalBlocker blocker1(ui->comboBoxSyntax);
-#else
-    const bool bBlocked1=ui->comboBoxSyntax->blockSignals(true);
-#endif
-
     XBinary::DM disasmMode=(XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
-    QList<XBinary::SYNTAX> listSyntax=XBinary::getDisasmSyntax(disasmMode);
-
-    ui->comboBoxSyntax->clear();
-
-    qint32 nNumberOfRecords=listSyntax.count();
-
-    for(qint32 i=0;i<nNumberOfRecords;i++)
-    {
-        addSyntax(listSyntax.at(i));
-    }
-
-    adjustSyntax();
-
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
-    ui->comboBoxSyntax->blockSignals(bBlocked1);
-#endif
-}
-
-void XMultiDisasmWidget::adjustSyntax()
-{
-    XBinary::DM disasmMode=(XBinary::DM)(ui->comboBoxMode->currentData().toInt());
-    XBinary::SYNTAX syntax=(XBinary::SYNTAX)(ui->comboBoxSyntax->currentData().toInt());
-
-    ui->scrollAreaDisasm->setMode(disasmMode,syntax);
+    ui->scrollAreaDisasm->setMode(disasmMode);
     ui->scrollAreaDisasm->reload(true);
 }
 
@@ -265,11 +225,4 @@ void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
 void XMultiDisasmWidget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)
-}
-
-void XMultiDisasmWidget::on_comboBoxSyntax_currentIndexChanged(int nIndex)
-{
-    Q_UNUSED(nIndex)
-
-    adjustSyntax();
 }
