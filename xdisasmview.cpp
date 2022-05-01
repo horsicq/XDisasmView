@@ -457,7 +457,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
     }
 }
 
-void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd)
+void XDisasmView::drawArrow(QPainter *pPainter,QPointF pointStart,QPointF pointEnd)
 {
     QPolygonF arrowHead;
     qreal arrowSize=8;
@@ -697,7 +697,7 @@ void XDisasmView::updateData()
 
     //                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
 
-                    if(_nCurrent==-1)
+                    if(_nCurrent==(XADDR)-1)
                     {
                         _nCurrent=nCurrentOffset;
                     }
