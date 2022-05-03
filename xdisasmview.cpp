@@ -40,13 +40,14 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
     g_bIsAddressColon=false;
     g_bIsHighlight=false;
     g_syntax=XBinary::SYNTAX_DEFAULT;
+    g_modeOpcode=MODE_OPCODE_SYMBOLADDRESS;
 
     addColumn(""); // Arrows
 //    addColumn(tr("Address"),0,true);
     addColumn(tr("Address"),0,true);
 //    addColumn(tr("Offset"));
     addColumn(tr("Bytes"));
-    addColumn(tr("Opcode"));
+    addColumn(QString("%1(%2->%3)").arg(tr("Opcode"),tr("Symbol"),tr("Address")),0,true); // TODO fix it in _adjustWindow
     addColumn(tr("Comment"));
 
 //    setLastColumnStretch(true);
@@ -180,7 +181,6 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
 
     result.mode=mode;
     result.nAddress=nAddress;
-    result.nXrefTo=-1;
 
     if(g_handle)
     {
@@ -214,6 +214,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                         {
                             if(pInsn->detail->x86.operands[j].type==X86_OP_IMM)
                             {
+                                result.bRelative=true;
                                 result.nXrefTo=pInsn->detail->x86.operands[j].imm;
 
                                 break;
@@ -226,6 +227,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                         {
                             if(pInsn->detail->arm.operands[j].type==ARM_OP_IMM)
                             {
+                                result.bRelative=true;
                                 result.nXrefTo=pInsn->detail->arm.operands[j].imm;
 
                                 break;
@@ -238,6 +240,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                         {
                             if(pInsn->detail->arm64.operands[j].type==ARM_OP_IMM)
                             {
+                                result.bRelative=true;
                                 result.nXrefTo=pInsn->detail->arm64.operands[j].imm;
 
                                 break;
@@ -246,6 +249,37 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                     }
 
                     break;
+                }
+            }
+
+            if(result.bRelative)
+            {
+                if( (g_modeOpcode==MODE_OPCODE_SYMBOLADDRESS)||
+                    (g_modeOpcode==MODE_OPCODE_SYMBOL)||
+                    (g_modeOpcode==MODE_OPCODE_ADDRESS))
+                {
+                    XInfoDB::RI_TYPE riType=XInfoDB::RI_TYPE_SYMBOLADDRESS;
+
+                    if(g_modeOpcode==MODE_OPCODE_SYMBOLADDRESS)
+                    {
+                        riType=XInfoDB::RI_TYPE_SYMBOLADDRESS;
+                    }
+                    else if(g_modeOpcode==MODE_OPCODE_SYMBOL)
+                    {
+                        riType=XInfoDB::RI_TYPE_SYMBOL;
+                    }
+                    else if(g_modeOpcode==MODE_OPCODE_ADDRESS)
+                    {
+                        riType=XInfoDB::RI_TYPE_ADDRESS;
+                    }
+
+                    QString sReplace=XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefTo),riType);
+
+                    if(sReplace!="")
+                    {
+                        QString sOrigin=QString("0x%1").arg(QString::number(result.nXrefTo,16));
+                        result.sString=result.sString.replace(sOrigin,sReplace);
+                    }
                 }
             }
 
@@ -737,7 +771,7 @@ void XDisasmView::updateData()
         {
             for(qint32 i=0;i<nNumberOfRecords;i++)
             {
-                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
+                if(g_listRecords.at(i).disasmResult.bRelative)
                 {
                     XADDR nXrefTo=g_listRecords.at(i).disasmResult.nXrefTo;
                     XADDR nCurrentAddress=g_listRecords.at(i).nAddress;
@@ -818,7 +852,7 @@ void XDisasmView::paintColumn(QPainter *pPainter,qint32 nColumn,qint32 nLeft,qin
             for(qint32 i=0;i<nNumberOfRecords;i++)
             {
                 // TODO DashLine
-                if(g_listRecords.at(i).disasmResult.nXrefTo!=-1)
+                if(g_listRecords.at(i).disasmResult.bRelative)
                 {
                     QPointF point1;
                     point1.setX(nLeft+nWidth);
@@ -1170,6 +1204,31 @@ void XDisasmView::_headerClicked(qint32 nColumn)
         {
             setColumnTitle(COLUMN_ADDRESS,tr("Address"));
             setAddressMode(MODE_ADDRESS);
+        }
+
+        adjust(true);
+    }
+    else if(nColumn==COLUMN_OPCODE)
+    {
+        if(g_modeOpcode==MODE_OPCODE_SYMBOLADDRESS)
+        {
+            setColumnTitle(COLUMN_OPCODE,tr("Opcode"));
+            g_modeOpcode=MODE_OPCODE_ORIGINAL;
+        }
+        else if(g_modeOpcode==MODE_OPCODE_ORIGINAL)
+        {
+            setColumnTitle(COLUMN_OPCODE,QString("%1(%2)").arg(tr("Opcode"),tr("Symbol")));
+            g_modeOpcode=MODE_OPCODE_SYMBOL;
+        }
+        else if(g_modeOpcode==MODE_OPCODE_SYMBOL)
+        {
+            setColumnTitle(COLUMN_OPCODE,QString("%1(%2)").arg(tr("Opcode"),tr("Address")));
+            g_modeOpcode=MODE_OPCODE_ADDRESS;
+        }
+        else if(g_modeOpcode==MODE_OPCODE_ADDRESS)
+        {
+            setColumnTitle(COLUMN_OPCODE,QString("%1(%2->%3)").arg(tr("Opcode"),tr("Symbol"),tr("Address")));
+            g_modeOpcode=MODE_OPCODE_SYMBOLADDRESS;
         }
 
         adjust(true);

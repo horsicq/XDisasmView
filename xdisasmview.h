@@ -107,6 +107,7 @@ private:
         qint32 nSize;
         QString sMnemonic;
         QString sString;
+        bool bRelative;
         XADDR nXrefTo;
         MODE mode;
     };
@@ -134,6 +135,14 @@ private:
 //        bool bOffset;
         bool bSize;
         bool bHex;
+    };
+
+    enum MODE_OPCODE
+    {
+        MODE_OPCODE_ORIGINAL=0,
+        MODE_OPCODE_SYMBOLADDRESS,
+        MODE_OPCODE_SYMBOL,
+        MODE_OPCODE_ADDRESS,
     };
 
     DISASM_RESULT _disasm(char *pData,qint32 nDataSize,quint64 nAddress,MODE mode); // TODO move to XDisasm
@@ -198,6 +207,7 @@ private:
     XADDR g_nThisBase;
     bool g_bIsAddressColon;
     bool g_bIsHighlight;
+    MODE_OPCODE g_modeOpcode;
 };
 
 #endif // XDISASMVIEW_H
