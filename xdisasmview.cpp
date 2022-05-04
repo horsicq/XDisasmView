@@ -273,12 +273,15 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                         riType=XInfoDB::RI_TYPE_ADDRESS;
                     }
 
-                    QString sReplace=XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefTo),riType);
-
-                    if(sReplace!="")
+                    if(getXInfoDB())
                     {
-                        QString sOrigin=QString("0x%1").arg(QString::number(result.nXrefTo,16));
-                        result.sString=result.sString.replace(sOrigin,sReplace);
+                        QString sReplace=XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefTo),riType);
+
+                        if(sReplace!="")
+                        {
+                            QString sOrigin=QString("0x%1").arg(QString::number(result.nXrefTo,16));
+                            result.sString=result.sString.replace(sOrigin,sReplace);
+                        }
                     }
                 }
             }

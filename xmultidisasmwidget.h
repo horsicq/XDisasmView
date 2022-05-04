@@ -24,6 +24,7 @@
 #include <QComboBox>
 #include "xformats.h"
 #include "xdisasmview.h"
+#include "dialogxsymbols.h"
 
 namespace Ui {
 class XMultiDisasmWidget;
@@ -53,6 +54,7 @@ public:
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
     void setReadonly(bool bState);
     void setEdited(bool bState);
+    void setXIinfoDB(XInfoDB *pXInfoDB);
 
 private:
     void addMode(XBinary::DM disasmMode);
@@ -63,6 +65,7 @@ private slots:
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void errorMessageSlot(QString sErrorMessage);
+    void on_pushButtonSymbols_clicked();
 
 protected:
     virtual void registerShortcuts(bool bState);

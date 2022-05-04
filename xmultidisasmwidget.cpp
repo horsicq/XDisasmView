@@ -136,7 +136,12 @@ void XMultiDisasmWidget::setEdited(bool bState)
 {
     ui->scrollAreaDisasm->setEdited();
 
-//    emit changed();
+    //    emit changed();
+}
+
+void XMultiDisasmWidget::setXIinfoDB(XInfoDB *pXInfoDB)
+{
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
@@ -225,4 +230,12 @@ void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
 void XMultiDisasmWidget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)
+}
+
+void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
+{
+    DialogXSymbols dialogSymbols(this);
+
+    dialogSymbols.exec();
+    // TODO
 }

@@ -120,6 +120,13 @@
         </property>
        </spacer>
       </item>
+      <item>
+       <widget class="QPushButton" name="pushButtonSymbols">
+        <property name="text">
+         <string>Symbols</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
