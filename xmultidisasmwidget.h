@@ -48,6 +48,7 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(QIODevice *pDevice,OPTIONS options);
+    void setBackupDevice(QIODevice *pDevice);
     void goToAddress(XADDR nAddress);
     void setCurrentIPAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
