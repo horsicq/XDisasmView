@@ -97,8 +97,6 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options)
     g_pDevice=pDevice;
     g_options=options;
 
-    XFormats::setFileTypeComboBox(options.fileType,g_pDevice,ui->comboBoxType);
-
     reloadFileType();
 }
 
@@ -147,6 +145,8 @@ void XMultiDisasmWidget::setEdited(bool bState)
 void XMultiDisasmWidget::setXIinfoDB(XInfoDB *pXInfoDB)
 {
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
+
+    // TODO Check symbols. If not -> load
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
@@ -162,7 +162,7 @@ void XMultiDisasmWidget::reloadFileType()
     const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
 #endif
 
-    XBinary::FT fileType=(XBinary::FT)(ui->comboBoxType->currentData().toInt());
+    XBinary::FT fileType=g_options.fileType;
 
     XDisasmView::OPTIONS options={};
     options.nInitAddress=g_options.nInitAddress;
@@ -211,13 +211,6 @@ void XMultiDisasmWidget::adjustMode()
 
     ui->scrollAreaDisasm->setMode(disasmMode);
     ui->scrollAreaDisasm->reload(true);
-}
-
-void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
-{
-    Q_UNUSED(nIndex)
-
-    reloadFileType();
 }
 
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
