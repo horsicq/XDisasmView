@@ -146,6 +146,16 @@ void XMultiDisasmWidget::setXIinfoDB(XInfoDB *pXInfoDB)
 {
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
+    if(pXInfoDB->getSymbols()->count()==0)
+    {
+        // TODO Load
+        DialogXInfoDBTransferProcess dialogTransfer(this);
+
+        dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
+
+        dialogTransfer.exec();
+    }
+
     // TODO Check symbols. If not -> load
 }
 
@@ -234,6 +244,7 @@ void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
 {
     DialogXSymbols dialogSymbols(this);
 
+    dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(),true);
+
     dialogSymbols.exec();
-    // TODO
 }

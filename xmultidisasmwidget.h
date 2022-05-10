@@ -25,6 +25,7 @@
 #include "xformats.h"
 #include "xdisasmview.h"
 #include "dialogxsymbols.h"
+#include "dialogxinfodbtransferprocess.h"
 
 namespace Ui {
 class XMultiDisasmWidget;
