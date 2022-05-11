@@ -9,6 +9,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../FormatDialogs/dialogdump.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../FormatDialogs/dialoghexsignature.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/SearchSignatures/searchsignatureswidget.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XHexEdit/xhexedit.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/../XSymbolsWidget/xsymbolswidget.cmake)
 
 set(XDISASMVIEW_SOURCES
     ${XFORMATS_SOURCES}
@@ -20,6 +21,7 @@ set(XDISASMVIEW_SOURCES
     ${DIALOGHEXSIGNATURE_SOURCES}
     ${SEARCHSIGNATURESWIDGET_SOURCES}
     ${XHEXEDIT_SOURCES}
+    ${XSYMBOLSWIDGET_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.ui
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.cpp

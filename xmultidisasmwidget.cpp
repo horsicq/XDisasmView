@@ -144,19 +144,19 @@ void XMultiDisasmWidget::setEdited(bool bState)
 
 void XMultiDisasmWidget::setXIinfoDB(XInfoDB *pXInfoDB)
 {
-    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
-
-    if(pXInfoDB->getSymbols()->count()==0)
+    if(pXInfoDB)
     {
-        // TODO Load
-        DialogXInfoDBTransferProcess dialogTransfer(this);
+        ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
-        dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
+        if(pXInfoDB->getSymbols()->count()==0)
+        {
+            DialogXInfoDBTransferProcess dialogTransfer(this);
 
-        dialogTransfer.exec();
+            dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
+
+            dialogTransfer.exec();
+        }
     }
-
-    // TODO Check symbols. If not -> load
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
