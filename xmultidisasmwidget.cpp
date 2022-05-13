@@ -177,6 +177,7 @@ void XMultiDisasmWidget::reloadFileType()
     XDisasmView::OPTIONS options={};
     options.nInitAddress=g_options.nInitAddress;
     options.nEntryPointAddress=XFormats::getEntryPointAddress(fileType,g_pDevice);
+    options.bMenu_Hex=g_options.bMenu_Hex;
 
     if(fileType==XBinary::FT_REGION)
     {

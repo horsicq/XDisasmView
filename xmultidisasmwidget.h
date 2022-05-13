@@ -43,6 +43,7 @@ public:
         XADDR nInitAddress;
         QString sTitle;
         QString sArch;
+        bool bMenu_Hex;
     };
 
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
