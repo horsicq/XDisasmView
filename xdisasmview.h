@@ -159,7 +159,7 @@ private:
 
     void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
     void drawDisasmText(QPainter *pPainter,QRect rect,QString sText);
-    void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd);
+    void drawArrow(QPainter *pPainter,QPointF pointStart,QPointF pointEnd);
     QMap<QString,OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
     OPCODECOLOR getOpcodeColor(XOptions::ID id);
 
