@@ -72,6 +72,10 @@ private slots:
 protected:
     virtual void registerShortcuts(bool bState);
 
+signals:
+    void dataChanged();
+    void showOffsetHex(qint64 nOffset);
+
 private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *g_pDevice;

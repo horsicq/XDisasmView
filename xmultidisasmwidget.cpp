@@ -80,7 +80,11 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     // TODO BPF
     // TODO Check more !!!
 
+    connect(ui->scrollAreaDisasm,SIGNAL(showOffsetHex(qint64)),this,SIGNAL(showOffsetHex(qint64)));
     connect(ui->scrollAreaDisasm,SIGNAL(errorMessage(QString)),this,SLOT(errorMessageSlot(QString)));
+//    connect(ui->scrollAreaDisasm,SIGNAL(cursorChanged(qint64)),this,SLOT(cursorChanged(qint64)));
+//    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
+    connect(ui->scrollAreaDisasm,SIGNAL(dataChanged()),this,SIGNAL(dataChanged()));
 
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);

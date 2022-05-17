@@ -954,69 +954,81 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 void XDisasmView::contextMenu(const QPoint &pos)
 {
     QAction actionGoToAddress(tr("Go to address"),this);
-    actionGoToAddress.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOADDRESS));
+    actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
     connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddressSlot()));
 
     QAction actionGoToOffset(tr("Go to offset"),this);
-    actionGoToOffset.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOOFFSET));
+    actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
     connect(&actionGoToOffset,SIGNAL(triggered()),this,SLOT(_goToOffsetSlot()));
 
     QAction actionGoToEntryPoint(tr("Go to entry point"),this);
-    actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOENTRYPOINT));
+    actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
     connect(&actionGoToEntryPoint,SIGNAL(triggered()),this,SLOT(_goToEntryPointSlot()));
 
     QAction actionDumpToFile(tr("Dump to file"),this);
-    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE));
+    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
 
     QAction actionHexSignature(tr("Hex signature"),this);
-    actionHexSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEXSIGNATURE));
+    actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
     connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_hexSignatureSlot()));
 
     QAction actionSignature(tr("Signature"),this);
-    actionSignature.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE));
+    actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
     connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signatureSlot()));
 
-    QAction actionFind(tr("Find"),this);
-    actionFind.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FIND));
-    connect(&actionFind,SIGNAL(triggered()),this,SLOT(_findStringSlot()));
+    QAction actionFindString(tr("String"),this);
+    actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
+    connect(&actionFindString,SIGNAL(triggered()),this,SLOT(_findStringSlot()));
+
+    QAction actionFindSignature(tr("Signature"),this);
+    actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
+    connect(&actionFindSignature,SIGNAL(triggered()),this,SLOT(_findSignatureSlot()));
+
+    QAction actionFindValue(tr("Value"),this);
+    actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
+    connect(&actionFindValue,SIGNAL(triggered()),this,SLOT(_findValueSlot()));
 
     QAction actionFindNext(tr("Find next"),this);
-    actionFindNext.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FINDNEXT));
+    actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
     connect(&actionFindNext,SIGNAL(triggered()),this,SLOT(_findNextSlot()));
 
     QAction actionSelectAll(tr("Select all"),this);
-    actionSelectAll.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SELECTALL));
+    actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
     connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAllSlot()));
 
     QAction actionCopyAsHex(tr("Copy as hex"),this);
-    actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYASHEX));
+    actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
     connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyHexSlot()));
 
     QAction actionCopyCursorOffset(tr("Copy cursor offset"),this);
-    actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYCURSOROFFSET));
+    actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
     connect(&actionCopyCursorOffset,SIGNAL(triggered()),this,SLOT(_copyOffsetSlot()));
 
     QAction actionCopyCursorAddress(tr("Copy cursor address"),this);
-    actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYCURSORADDRESS));
+    actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
     connect(&actionCopyCursorAddress,SIGNAL(triggered()),this,SLOT(_copyAddressSlot()));
 
     QAction actionHex(tr("Hex"),this);
-    actionHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEX));
+    actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
     connect(&actionHex,SIGNAL(triggered()),this,SLOT(_hexSlot()));
 
     MENU_STATE menuState=getMenuState();
 
     QMenu contextMenu(this);
     QMenu menuGoTo(tr("Go to"),this);
+    QMenu menuFind(tr("Find"),this);
+    QMenu menuHex(tr("Hex"),this);
     QMenu menuSelect(tr("Select"),this);
     QMenu menuCopy(tr("Copy"),this);
-
-    menuSelect.addAction(&actionSelectAll);
+    QMenu menuFollowIn(tr("Follow in"),this);
+    QMenu menuEdit(tr("Edit"),this);
 
     menuGoTo.addAction(&actionGoToAddress);
     menuGoTo.addAction(&actionGoToOffset);
     menuGoTo.addAction(&actionGoToEntryPoint);
+
+    contextMenu.addMenu(&menuGoTo);
 
     menuCopy.addAction(&actionCopyCursorAddress);
     menuCopy.addAction(&actionCopyCursorOffset);
@@ -1026,23 +1038,34 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuCopy.addAction(&actionCopyAsHex);
     }
 
-    contextMenu.addAction(&actionFind);
-    contextMenu.addAction(&actionFindNext);
+    contextMenu.addMenu(&menuCopy);
+
+    menuFind.addAction(&actionFindString);
+    menuFind.addAction(&actionFindSignature);
+    menuFind.addAction(&actionFindValue);
+    menuFind.addAction(&actionFindNext);
+
+    contextMenu.addMenu(&menuFind);
 
     if(menuState.bSize)
     {
         contextMenu.addAction(&actionDumpToFile);
         contextMenu.addAction(&actionSignature);
-        contextMenu.addAction(&actionHexSignature);
+        menuCopy.addAction(&actionCopyAsHex);
+
+        menuHex.addAction(&actionHexSignature);
+
+        contextMenu.addMenu(&menuHex);
     }
 
     if(menuState.bHex)
     {
-        contextMenu.addAction(&actionHex);
+        menuFollowIn.addAction(&actionHex);
+
+        contextMenu.addMenu(&menuFollowIn);
     }
 
-    contextMenu.addMenu(&menuGoTo);
-    contextMenu.addMenu(&menuCopy);
+    menuSelect.addAction(&actionSelectAll);
     contextMenu.addMenu(&menuSelect);
 
     // TODO reset select
@@ -1162,19 +1185,19 @@ void XDisasmView::registerShortcuts(bool bState)
 {
     if(bState)
     {
-        if(!shortCuts[SC_GOTOADDRESS])              shortCuts[SC_GOTOADDRESS]               =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOADDRESS),          this,SLOT(_goToAddressSlot()));
-        if(!shortCuts[SC_GOTOOFFSET])               shortCuts[SC_GOTOOFFSET]                =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOOFFSET),           this,SLOT(_goToOffsetSlot()));
-        if(!shortCuts[SC_GOTOENTRYPOINT])           shortCuts[SC_GOTOENTRYPOINT]            =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_GOTOENTRYPOINT),       this,SLOT(_goToEntryPointSlot()));
-        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_DUMPTOFILE),           this,SLOT(_dumpToFileSlot()));
-        if(!shortCuts[SC_SELECTALL])                shortCuts[SC_SELECTALL]                 =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SELECTALL),            this,SLOT(_selectAllSlot()));
-        if(!shortCuts[SC_COPYASHEX])                shortCuts[SC_COPYASHEX]                 =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYASHEX),            this,SLOT(_copyHexSlot()));
-        if(!shortCuts[SC_COPYCURSORADDRESS])        shortCuts[SC_COPYCURSORADDRESS]         =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYCURSORADDRESS),    this,SLOT(_copyAddressSlot()));
-        if(!shortCuts[SC_COPYCURSOROFFSET])         shortCuts[SC_COPYCURSOROFFSET]          =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_COPYCURSOROFFSET),     this,SLOT(_copyOffsetSlot()));
-        if(!shortCuts[SC_FIND])                     shortCuts[SC_FIND]                      =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FIND),                 this,SLOT(_findStringSlot()));
-        if(!shortCuts[SC_FINDNEXT])                 shortCuts[SC_FINDNEXT]                  =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_FINDNEXT),             this,SLOT(_findNextSlot()));
-        if(!shortCuts[SC_SIGNATURE])                shortCuts[SC_SIGNATURE]                 =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_SIGNATURE),            this,SLOT(_signatureSlot()));
-        if(!shortCuts[SC_HEXSIGNATURE])             shortCuts[SC_HEXSIGNATURE]              =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEXSIGNATURE),         this,SLOT(_hexSignatureSlot()));
-        if(!shortCuts[SC_HEX])                      shortCuts[SC_HEX]                       =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_DISASM_HEX),                  this,SLOT(_hexSlot()));
+        if(!shortCuts[SC_GOTOADDRESS])              shortCuts[SC_GOTOADDRESS]               =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS),           this,SLOT(_goToAddressSlot()));
+        if(!shortCuts[SC_GOTOOFFSET])               shortCuts[SC_GOTOOFFSET]                =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET),            this,SLOT(_goToOffsetSlot()));
+        if(!shortCuts[SC_GOTOENTRYPOINT])           shortCuts[SC_GOTOENTRYPOINT]            =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT),        this,SLOT(_goToEntryPointSlot()));
+        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE),             this,SLOT(_dumpToFileSlot()));
+        if(!shortCuts[SC_SELECTALL])                shortCuts[SC_SELECTALL]                 =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL),             this,SLOT(_selectAllSlot()));
+        if(!shortCuts[SC_COPYASHEX])                shortCuts[SC_COPYASHEX]                 =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX),               this,SLOT(_copyHexSlot()));
+        if(!shortCuts[SC_COPYCURSORADDRESS])        shortCuts[SC_COPYCURSORADDRESS]         =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS),           this,SLOT(_copyAddressSlot()));
+        if(!shortCuts[SC_COPYCURSOROFFSET])         shortCuts[SC_COPYCURSOROFFSET]          =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET),            this,SLOT(_copyOffsetSlot()));
+        if(!shortCuts[SC_FIND])                     shortCuts[SC_FIND]                      =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING),            this,SLOT(_findStringSlot()));
+        if(!shortCuts[SC_FINDNEXT])                 shortCuts[SC_FINDNEXT]                  =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT),              this,SLOT(_findNextSlot()));
+        if(!shortCuts[SC_SIGNATURE])                shortCuts[SC_SIGNATURE]                 =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE),              this,SLOT(_signatureSlot()));
+        if(!shortCuts[SC_HEXSIGNATURE])             shortCuts[SC_HEXSIGNATURE]              =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE),          this,SLOT(_hexSignatureSlot()));
+        if(!shortCuts[SC_HEX])                      shortCuts[SC_HEX]                       =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX),           this,SLOT(_hexSlot()));
     }
     else
     {
@@ -1291,6 +1314,8 @@ void XDisasmView::_hexSlot()
 {
     if(g_options.bMenu_Hex)
     {
-        // TODO !!!
+        STATE state=getState();
+
+        emit showOffsetHex(state.nCursorOffset);
     }
 }

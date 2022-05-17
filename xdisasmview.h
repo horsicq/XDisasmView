@@ -184,6 +184,9 @@ protected slots:
     void _signatureSlot();
     void _hexSlot();
 
+signals:
+    void showOffsetHex(qint64 nOffset);
+
 private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
