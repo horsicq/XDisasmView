@@ -133,10 +133,10 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
 
         _goToOffset(nOffset);
     }
-    else
-    {
-        setScrollValue(0);
-    }
+//    else
+//    {
+//        setScrollValue(0);
+//    }
 
     if(bReload)
     {
@@ -1013,6 +1013,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
     connect(&actionHex,SIGNAL(triggered()),this,SLOT(_hexSlot()));
 
+    QAction actionEditHex(tr("Hex"),this);
+    actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
+    connect(&actionEditHex,SIGNAL(triggered()),this,SLOT(_editHex()));
+
     MENU_STATE menuState=getMenuState();
 
     QMenu contextMenu(this);
@@ -1063,6 +1067,15 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuFollowIn.addAction(&actionHex);
 
         contextMenu.addMenu(&menuFollowIn);
+    }
+
+    menuEdit.setEnabled(!isReadonly());
+
+    if(menuState.bSize)
+    {
+        menuEdit.addAction(&actionEditHex);
+
+        contextMenu.addMenu(&menuEdit);
     }
 
     menuSelect.addAction(&actionSelectAll);
@@ -1197,7 +1210,8 @@ void XDisasmView::registerShortcuts(bool bState)
         if(!shortCuts[SC_FINDNEXT])                 shortCuts[SC_FINDNEXT]                  =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT),              this,SLOT(_findNextSlot()));
         if(!shortCuts[SC_SIGNATURE])                shortCuts[SC_SIGNATURE]                 =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE),              this,SLOT(_signatureSlot()));
         if(!shortCuts[SC_HEXSIGNATURE])             shortCuts[SC_HEXSIGNATURE]              =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE),          this,SLOT(_hexSignatureSlot()));
-        if(!shortCuts[SC_HEX])                      shortCuts[SC_HEX]                       =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX),           this,SLOT(_hexSlot()));
+        if(!shortCuts[SC_FOLLOWIN_HEX])             shortCuts[SC_FOLLOWIN_HEX]              =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX),           this,SLOT(_hexSlot()));
+        if(!shortCuts[SC_EDIT_HEX])                 shortCuts[SC_EDIT_HEX]                  =new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX),               this,SLOT(_hexSlot()));
     }
     else
     {
@@ -1317,5 +1331,33 @@ void XDisasmView::_hexSlot()
         STATE state=getState();
 
         emit showOffsetHex(state.nCursorOffset);
+    }
+}
+
+void XDisasmView::_editHex()
+{
+    if(!isReadonly())
+    {
+        STATE state=getState();
+
+        SubDevice sd(getDevice(),state.nSelectionOffset,state.nSelectionSize);
+
+        if(sd.open(QIODevice::ReadWrite))
+        {
+            DialogHexEdit dialogHexEdit(this);
+
+            dialogHexEdit.setGlobal(getShortcuts(),getGlobalOptions());
+
+    //        connect(&dialogHexEdit,SIGNAL(changed()),this,SLOT(_setEdited()));
+
+            dialogHexEdit.setData(&sd,state.nSelectionOffset);
+            dialogHexEdit.setBackupDevice(getBackupDevice());
+
+            dialogHexEdit.exec();
+
+            _setEdited();
+
+            sd.close();
+        }
     }
 }

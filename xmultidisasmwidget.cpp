@@ -104,6 +104,11 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options)
     reloadFileType();
 }
 
+void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
+{
+    ui->scrollAreaDisasm->setDevice(pDevice);
+}
+
 void XMultiDisasmWidget::setBackupDevice(QIODevice *pDevice)
 {
     ui->scrollAreaDisasm->setBackupDevice(pDevice);

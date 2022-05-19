@@ -25,6 +25,7 @@
 #include "dialogmultidisasmsignature.h"
 #include "xcapstone.h"
 #include "xdevicetableview.h"
+#include "dialoghexedit.h"
 
 // TODO AbstractQuery
 // Load symbols Save db
@@ -50,7 +51,8 @@ class XDisasmView : public XDeviceTableView
         SC_FINDNEXT,
         SC_HEXSIGNATURE,
         SC_SIGNATURE,
-        SC_HEX,
+        SC_FOLLOWIN_HEX,
+        SC_EDIT_HEX,
         __SC_SIZE,
         // TODO more
     };
@@ -64,9 +66,9 @@ class XDisasmView : public XDeviceTableView
 public:
     struct OPTIONS
     {
-        qint64 nInitAddress;
-        qint64 nCurrentIPAddress; // For Debugger
-        qint64 nEntryPointAddress;
+        XADDR nInitAddress;
+        XADDR nCurrentIPAddress; // For Debugger
+        XADDR nEntryPointAddress;
         XBinary::_MEMORY_MAP memoryMap;
         bool bMenu_Hex;
     };
@@ -183,6 +185,7 @@ protected slots:
     void _goToEntryPointSlot();
     void _signatureSlot();
     void _hexSlot();
+    void _editHex();
 
 signals:
     void showOffsetHex(qint64 nOffset);
