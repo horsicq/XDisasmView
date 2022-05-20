@@ -96,10 +96,24 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options)
+void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB)
 { 
     g_pDevice=pDevice;
     g_options=options;
+
+    if(pXInfoDB)
+    {
+        if(pXInfoDB->getSymbols()->count()==0)
+        {
+            DialogXInfoDBTransferProcess dialogTransfer(this);
+
+            dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
+
+            dialogTransfer.exec();
+        }
+    }
+
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
     reloadFileType();
 }
@@ -149,23 +163,6 @@ void XMultiDisasmWidget::setEdited(bool bState)
     ui->scrollAreaDisasm->setEdited();
 
     //    emit changed();
-}
-
-void XMultiDisasmWidget::setXIinfoDB(XInfoDB *pXInfoDB)
-{
-    if(pXInfoDB)
-    {
-        ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
-
-        if(pXInfoDB->getSymbols()->count()==0)
-        {
-            DialogXInfoDBTransferProcess dialogTransfer(this);
-
-            dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
-
-            dialogTransfer.exec();
-        }
-    }
 }
 
 void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)

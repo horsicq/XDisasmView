@@ -49,7 +49,7 @@ public:
     explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice,OPTIONS options);
+    void setData(QIODevice *pDevice,OPTIONS options,XInfoDB *pXInfoDB);
     void setDevice(QIODevice *pDevice);
     void setBackupDevice(QIODevice *pDevice);
     void goToAddress(XADDR nAddress);
@@ -58,7 +58,6 @@ public:
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
     void setReadonly(bool bState);
     void setEdited(bool bState);
-    void setXIinfoDB(XInfoDB *pXInfoDB);
 
 private:
     void addMode(XBinary::DM disasmMode);

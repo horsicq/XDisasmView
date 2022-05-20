@@ -35,7 +35,7 @@ DialogMultiDisasm::~DialogMultiDisasm()
 
 void DialogMultiDisasm::setData(QIODevice *pDevice,XMultiDisasmWidget::OPTIONS options)
 {
-    ui->widgetDisasm->setData(pDevice,options);
+    ui->widgetDisasm->setData(pDevice,options,0);
 
     setWindowTitle(options.sTitle);
 }

@@ -953,15 +953,15 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 
 void XDisasmView::contextMenu(const QPoint &pos)
 {
-    QAction actionGoToAddress(tr("Go to address"),this);
+    QAction actionGoToAddress(tr("Address"),this);
     actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
     connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddressSlot()));
 
-    QAction actionGoToOffset(tr("Go to offset"),this);
+    QAction actionGoToOffset(tr("Offset"),this);
     actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
     connect(&actionGoToOffset,SIGNAL(triggered()),this,SLOT(_goToOffsetSlot()));
 
-    QAction actionGoToEntryPoint(tr("Go to entry point"),this);
+    QAction actionGoToEntryPoint(tr("Entry point"),this);
     actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
     connect(&actionGoToEntryPoint,SIGNAL(triggered()),this,SLOT(_goToEntryPointSlot()));
 
@@ -997,15 +997,15 @@ void XDisasmView::contextMenu(const QPoint &pos)
     actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
     connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAllSlot()));
 
-    QAction actionCopyAsHex(tr("Copy as hex"),this);
+    QAction actionCopyAsHex(tr("Hex"),this);
     actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
     connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyHexSlot()));
 
-    QAction actionCopyCursorOffset(tr("Copy cursor offset"),this);
+    QAction actionCopyCursorOffset(tr("Offset"),this);
     actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
     connect(&actionCopyCursorOffset,SIGNAL(triggered()),this,SLOT(_copyOffsetSlot()));
 
-    QAction actionCopyCursorAddress(tr("Copy cursor address"),this);
+    QAction actionCopyCursorAddress(tr("Address"),this);
     actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
     connect(&actionCopyCursorAddress,SIGNAL(triggered()),this,SLOT(_copyAddressSlot()));
 
