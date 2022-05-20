@@ -1330,7 +1330,16 @@ void XDisasmView::_hexSlot()
     {
         STATE state=getState();
 
-        emit showOffsetHex(state.nCursorOffset);
+        qint64 nOffset=state.nCursorOffset;
+
+        SubDevice *pSubDevice=static_cast<SubDevice *>(getDevice());
+
+        if(pSubDevice)
+        {
+            nOffset+=pSubDevice->getInitOffset();
+        }
+
+        emit showOffsetHex(nOffset);
     }
 }
 
