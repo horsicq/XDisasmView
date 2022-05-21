@@ -238,7 +238,7 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
                     {
                         for(qint32 j=0;j<pInsn->detail->arm64.op_count;j++)
                         {
-                            if(pInsn->detail->arm64.operands[j].type==ARM_OP_IMM)
+                            if(pInsn->detail->arm64.operands[j].type==ARM64_OP_IMM)
                             {
                                 result.bRelative=true;
                                 result.nXrefTo=pInsn->detail->arm64.operands[j].imm;
