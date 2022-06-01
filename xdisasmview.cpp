@@ -103,7 +103,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
     g_options=options;
 
     setDevice(pDevice);
-    setMemoryMap(g_options.memoryMap);
+    setMemoryMap(g_options.memoryMapRegion);
 
     XBinary::DM disasmMode=XBinary::getDisasmMode(getMemoryMap());
 

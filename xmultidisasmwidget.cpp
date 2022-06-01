@@ -187,16 +187,16 @@ void XMultiDisasmWidget::reloadFileType()
 
     if(fileType==XBinary::FT_REGION)
     {
-        options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice,true,g_options.nStartAddress);
+        options.memoryMapRegion=XFormats::getMemoryMap(fileType,g_pDevice,true,g_options.nStartAddress);
     }
     else
     {
-        options.memoryMap=XFormats::getMemoryMap(fileType,g_pDevice);
+        options.memoryMapRegion=XFormats::getMemoryMap(fileType,g_pDevice);
     }
 
     if(g_options.sArch!="")
     {
-        options.memoryMap.sArch=g_options.sArch;
+        options.memoryMapRegion.sArch=g_options.sArch;
     }
 
     ui->scrollAreaDisasm->setData(g_pDevice,options);

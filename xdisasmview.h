@@ -71,7 +71,7 @@ public:
         XADDR nInitAddress;
         XADDR nCurrentIPAddress; // For Debugger
         XADDR nEntryPointAddress;
-        XBinary::_MEMORY_MAP memoryMap;
+        XBinary::_MEMORY_MAP memoryMapRegion;
         bool bMenu_Hex;
     };
 
