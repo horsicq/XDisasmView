@@ -24,7 +24,7 @@
 #include <QTextDocument>
 #include "dialogmultidisasmsignature.h"
 #include "xcapstone.h"
-#include "xdevicetableview.h"
+#include "xdevicetableeditview.h"
 #include "dialoghexedit.h"
 
 // TODO AbstractQuery
@@ -33,7 +33,7 @@
 // TODO Click on Opcode label -> Addresses
 // TODO click on jmps
 // TODO Capstone info
-class XDisasmView : public XDeviceTableView
+class XDisasmView : public XDeviceTableEditView
 {
     Q_OBJECT
 
@@ -187,7 +187,6 @@ protected slots:
     void _goToEntryPointSlot();
     void _signatureSlot();
     void _hexSlot();
-    void _editHex();
 
 signals:
     void showOffsetHex(qint64 nOffset);

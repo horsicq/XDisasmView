@@ -21,7 +21,7 @@
 #include "xdisasmview.h"
 #include "xdisasmview.h"
 
-XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableView(pParent)
+XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 {
     // TODO click on Address -> Offset
     g_handle=0;
@@ -1342,33 +1342,5 @@ void XDisasmView::_hexSlot()
         }
 
         emit showOffsetHex(nOffset);
-    }
-}
-
-void XDisasmView::_editHex()
-{
-    if(!isReadonly())
-    {
-        STATE state=getState();
-
-        SubDevice sd(getDevice(),state.nSelectionOffset,state.nSelectionSize);
-
-        if(sd.open(QIODevice::ReadWrite))
-        {
-            DialogHexEdit dialogHexEdit(this);
-
-            dialogHexEdit.setGlobal(getShortcuts(),getGlobalOptions());
-
-    //        connect(&dialogHexEdit,SIGNAL(changed()),this,SLOT(_setEdited()));
-
-            dialogHexEdit.setData(&sd,state.nSelectionOffset);
-            dialogHexEdit.setBackupDevice(getBackupDevice());
-
-            dialogHexEdit.exec();
-
-            _setEdited();
-
-            sd.close();
-        }
     }
 }
