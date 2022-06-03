@@ -319,6 +319,15 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
         {
             nStartOffset=S_ALIGN_DOWN(nStartOffset,4);
         }
+        else if(XBinary::getDisasmFamily(g_disasmMode)==XBinary::DMFAMILY_X86)
+        {
+            QByteArray _baData=read_array(nStartOffset,2);
+
+            if(*((quint16 *)_baData.data())==0) // 0000
+            {
+                nStartOffset=S_ALIGN_DOWN(nStartOffset,4);
+            }
+        }
 
         nStartOffset=qMax(nStartOffset,(qint64)0);
         nEndOffset=qMin(nEndOffset,getDataSize());
@@ -1330,17 +1339,6 @@ void XDisasmView::_hexSlot()
 {
     if(g_options.bMenu_Hex)
     {
-        STATE state=getState();
-
-        qint64 nOffset=state.nCursorOffset;
-
-        SubDevice *pSubDevice=static_cast<SubDevice *>(getDevice());
-
-        if(pSubDevice)
-        {
-            nOffset+=pSubDevice->getInitOffset();
-        }
-
-        emit showOffsetHex(nOffset);
+        emit showOffsetHex(getStateOffset());
     }
 }
