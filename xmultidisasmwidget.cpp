@@ -96,7 +96,7 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB)
+void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options,XInfoDB *pXInfoDB)
 { 
     g_pDevice=pDevice;
     g_options=options;
