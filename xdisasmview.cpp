@@ -32,7 +32,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     g_options=OPTIONS();
 
-    g_nCurrentIP=-1;
+    g_nCurrentIntructionPointer=-1;
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
@@ -120,7 +120,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
 
     setTotalLineCount(nTotalLineCount);
 
-    setCurrentPointerAddress(options.nCurrentIPAddress);
+    setCurrentIntructionPointer(options.nCurrentIntructionPointer);
 
     if(options.nInitAddress!=-1)
     {
@@ -131,7 +131,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
             nOffset=0;
         }
 
-        _goToOffset(nOffset);
+        _goToOffset(nOffset,false,false,options.bAprox);
     }
 //    else
 //    {
@@ -156,9 +156,9 @@ XBinary::DM XDisasmView::getMode()
     return g_disasmMode;
 }
 
-void XDisasmView::setCurrentPointerAddress(XADDR nAddress)
+void XDisasmView::setCurrentIntructionPointer(XADDR nAddress)
 {
-    g_nCurrentIP=nAddress;
+    g_nCurrentIntructionPointer=nAddress;
 }
 
 qint64 XDisasmView::getSelectionInitAddress()
@@ -352,7 +352,7 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
 
             DISASM_RESULT disasmResult=_disasm(baData.data()+_nCurrentOffset,nSize,_nCurrentOffset,MODE_ADDRESS);
 
-            if((_nOffset<=nOffset)&&(nOffset<_nOffset+disasmResult.nSize))
+            if((nOffset>=_nOffset)&&(nOffset<_nOffset+disasmResult.nSize))
             {
                 if(_nOffset==nOffset)
                 {
@@ -360,9 +360,16 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset,qint64 nOldOffset)
                 }
                 else
                 {
-                    if(nOffset>nOldOffset)
+                    if(nOldOffset!=-1)
                     {
-                        nResult=_nOffset+disasmResult.nSize;
+                        if(nOffset>nOldOffset)
+                        {
+                            nResult=_nOffset+disasmResult.nSize;
+                        }
+                        else
+                        {
+                            nResult=_nOffset;
+                        }
                     }
                     else
                     {
@@ -416,7 +423,7 @@ void XDisasmView::drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nW
 
     bool bSave=false;
 
-    if((pTextOption->bCurrentIP))
+    if((pTextOption->bCursor)||(pTextOption->bCurrentIP))
     {
         bSave=true;
     }
@@ -426,7 +433,7 @@ void XDisasmView::drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nW
         pPainter->save();
     }
 
-    if((pTextOption->bSelected)&&(!pTextOption->bCurrentIP))
+    if((pTextOption->bSelected)&&(!pTextOption->bCursor)&&(!pTextOption->bCurrentIP))
     {
         pPainter->fillRect(nLeft,nTop,nWidth,nHeight,viewport()->palette().color(QPalette::Highlight));
     }
@@ -435,7 +442,7 @@ void XDisasmView::drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nW
     {
         pPainter->fillRect(nLeft,nTop,nWidth,nHeight,QColor(Qt::red));
     }
-    else if(pTextOption->bCurrentIP)
+    else if((pTextOption->bCursor)||(pTextOption->bCurrentIP))
     {
         pPainter->fillRect(nLeft,nTop,nWidth,nHeight,viewport()->palette().color(QPalette::WindowText));
         pPainter->setPen(viewport()->palette().color(QPalette::Base));
@@ -920,6 +927,8 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 {
     qint32 nNumberOfRows=g_listRecords.count();
 
+    qint64 nCursorOffset=getState().nCursorOffset;
+
     if(nRow<nNumberOfRows)
     {
         qint64 nOffset=g_listRecords.at(nRow).nOffset;
@@ -927,7 +936,8 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 
         TEXT_OPTION textOption={};
         textOption.bSelected=isOffsetSelected(nOffset);
-        textOption.bCurrentIP=((g_nCurrentIP!=-1)&&(nAddress==g_nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
+        textOption.bCurrentIP=((g_nCurrentIntructionPointer!=-1)&&(nAddress==g_nCurrentIntructionPointer)&&(nColumn==COLUMN_ADDRESS));
+        textOption.bCursor=(nOffset==nCursorOffset)&&(nColumn==COLUMN_BYTES);
         textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS)); 
 
         if(nColumn==COLUMN_ARROWS)
@@ -1311,6 +1321,13 @@ qint64 XDisasmView::getRecordSize(qint64 nOffset)
     DISASM_RESULT disasmResult=_disasm(baData.data(),baData.size(),0,MODE_ADDRESS);
 
     nResult=disasmResult.nSize;
+
+    return nResult;
+}
+
+qint64 XDisasmView::getFixOffset(qint64 nOffset)
+{
+    qint64 nResult=getDisasmOffset(nOffset,-1);
 
     return nResult;
 }
