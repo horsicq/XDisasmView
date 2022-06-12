@@ -122,7 +122,7 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
 
     setCurrentIntructionPointer(options.nCurrentIntructionPointer);
 
-    if(options.nInitAddress!=-1)
+    if(options.nInitAddress!=(XADDR)-1)
     {
         qint64 nOffset=XBinary::addressToOffset(getMemoryMap(),options.nInitAddress);
 
