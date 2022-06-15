@@ -40,6 +40,7 @@ public:
     void setOptions(XOptions *pOptions);
 
     static void setDefaultValues(XOptions *pOptions);
+    static void setDefaultColorValues(XOptions *pOptions);
 
 public slots:
     void save();

@@ -542,6 +542,7 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
         OPCODECOLOR colorPOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP);
         OPCODECOLOR colorNOP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP);
         OPCODECOLOR colorJMP=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP);
+        OPCODECOLOR colorINT3=getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_INT3);
 
         if((syntax==XBinary::SYNTAX_DEFAULT)||(syntax==XBinary::SYNTAX_INTEL)||(syntax==XBinary::SYNTAX_MASM))
         {
@@ -551,6 +552,7 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
             mapResult.insert("pop",colorPOP);
             mapResult.insert("nop",colorNOP);
             mapResult.insert("jmp",colorJMP);
+            mapResult.insert("int3",colorINT3);
             mapResult.insert("je",colorJCC);
             mapResult.insert("jne",colorJCC);
             mapResult.insert("jz",colorJCC);
@@ -582,6 +584,7 @@ QMap<QString,XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::D
 
             mapResult.insert("nop",colorNOP);
             mapResult.insert("jmp",colorJMP);
+            mapResult.insert("int3",colorINT3);
             mapResult.insert("je",colorJCC);
             mapResult.insert("jne",colorJCC);
             mapResult.insert("jz",colorJCC);

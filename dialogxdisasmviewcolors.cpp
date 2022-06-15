@@ -38,7 +38,7 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     g_pOptions=pOptions;
 
     ui->tableWidgetColors->setColumnCount(6);
-    ui->tableWidgetColors->setRowCount(11);
+    ui->tableWidgetColors->setRowCount(12);
 
     qint32 nRow=0;
     // TODO another assemblers
@@ -49,6 +49,7 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     addRecord(nRow++,"x86/amd64","POP",XOptions::ID_DISASM_COLOR_X86_POP);
     addRecord(nRow++,"x86/amd64","NOP",XOptions::ID_DISASM_COLOR_X86_NOP);
     addRecord(nRow++,"x86/amd64","JMP",XOptions::ID_DISASM_COLOR_X86_JMP);
+    addRecord(nRow++,"x86/amd64","INT3",XOptions::ID_DISASM_COLOR_X86_INT3);
     addRecord(nRow++,"arm/arm64","BL",XOptions::ID_DISASM_COLOR_ARM_BL);
     addRecord(nRow++,"arm/arm64","RET",XOptions::ID_DISASM_COLOR_ARM_RET);
     addRecord(nRow++,"arm/arm64","PUSH",XOptions::ID_DISASM_COLOR_ARM_PUSH);
