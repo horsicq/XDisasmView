@@ -107,6 +107,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBoxDisasmUppercase">
+         <property name="text">
+          <string>Uppercase</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBoxDisasmAddressColon">
          <property name="text">
           <string>Address colon</string>

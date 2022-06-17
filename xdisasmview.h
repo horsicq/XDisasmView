@@ -216,6 +216,7 @@ private:
 
     XADDR g_nThisBase;
     bool g_bIsAddressColon;
+    bool g_bIsUppercase;
     bool g_bIsHighlight;
     MODE_OPCODE g_modeOpcode;
 };

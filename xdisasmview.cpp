@@ -38,6 +38,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     g_nThisBase=0;
     g_bIsAddressColon=false;
+    g_bIsUppercase=false;
     g_bIsHighlight=false;
     g_syntax=XBinary::SYNTAX_DEFAULT;
     g_modeOpcode=MODE_OPCODE_SYMBOLADDRESS;
@@ -77,6 +78,7 @@ void XDisasmView::_adjustView()
     // mb TODO errorString
 
     g_bIsHighlight=getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
+    g_bIsUppercase=getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
     g_bIsAddressColon=getGlobalOptions()->getValue(XOptions::ID_DISASM_ADDRESSCOLON).toBool();
 
     g_syntax=XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
@@ -299,6 +301,12 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData,qint32 nDataSize,qui
         result.nSize=1;
     }
 
+    if(g_bIsUppercase)
+    {
+        result.sMnemonic=result.sMnemonic.toUpper();
+        result.sString=result.sString.toUpper();
+    }
+
     return result;
 }
 
@@ -467,11 +475,21 @@ void XDisasmView::drawDisasmText(QPainter *pPainter,QRect rect,QString sText)
 {
     QString sMnemonic=sText.section("|",0,0);
     QString sString=sText.section("|",1,1);
-    // TODO registers !!!
-    // TODO upper case
-    if(g_bIsHighlight&&g_mapOpcodes.contains(sMnemonic))
+
+    QString _sMnenonic;
+
+    if(g_bIsUppercase)
     {
-        OPCODECOLOR opcodeColor=g_mapOpcodes.value(sMnemonic);
+        _sMnenonic=sMnemonic.toLower();
+    }
+    else
+    {
+        _sMnenonic=sMnemonic;
+    }
+    // TODO registers !!!
+    if(g_bIsHighlight&&g_mapOpcodes.contains(_sMnenonic))
+    {
+        OPCODECOLOR opcodeColor=g_mapOpcodes.value(_sMnenonic);
 
         pPainter->save();
 
