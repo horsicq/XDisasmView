@@ -237,11 +237,6 @@ void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
     adjustMode();
 }
 
-void XMultiDisasmWidget::errorMessageSlot(QString sErrorMessage)
-{
-    QMessageBox::critical(XOptions::getMainWidget(this),tr("Error"),sErrorMessage);
-}
-
 void XMultiDisasmWidget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)

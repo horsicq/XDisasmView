@@ -66,7 +66,6 @@ private:
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
-    void errorMessageSlot(QString sErrorMessage);
     void on_pushButtonSymbols_clicked();
 
 protected:

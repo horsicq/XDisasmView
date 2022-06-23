@@ -28,6 +28,8 @@ XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) :
     ui->setupUi(this);
 
     g_pOptions=nullptr;
+
+    setProperty("GROUPID",XOptions::GROUPID_DISASM);
 }
 
 XDisasmViewOptionsWidget::~XDisasmViewOptionsWidget()
