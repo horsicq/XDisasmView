@@ -109,7 +109,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice,OPTIONS options,XInfoDB *pXI
 
             dialogTransfer.importData(pXInfoDB,pXInfoDB->getDevice(),pXInfoDB->getFileType());
 
-            dialogTransfer.exec();
+            dialogTransfer.showDialogDelay(1000);
         }
     }
 
