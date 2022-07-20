@@ -61,7 +61,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
 #ifdef Q_OS_LINUX
     pOptions->addID(XOptions::ID_DISASM_FONT,"DejaVu Sans Mono,10,-1,5,50,0,0,0,0,0");
 #endif
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
     pOptions->addID(XOptions::ID_DISASM_FONT,"Menlo,10,-1,5,50,0,0,0,0,0"); // TODO Check
 #endif
 
