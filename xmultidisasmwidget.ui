@@ -78,6 +78,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButtonSymbols">
+        <property name="text">
+         <string>Symbols</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -91,9 +98,9 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonSymbols">
+       <widget class="QCheckBox" name="checkBoxReadonly">
         <property name="text">
-         <string>Symbols</string>
+         <string>Read only</string>
         </property>
        </widget>
       </item>

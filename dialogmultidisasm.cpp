@@ -26,6 +26,12 @@ DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) :
     ui(new Ui::DialogMultiDisasm)
 {
     ui->setupUi(this);
+
+    setWindowFlags(Qt::Window);
+
+    connect(ui->widgetDisasm,SIGNAL(dataChanged()),this,SIGNAL(dataChanged()));
+
+    ui->widgetDisasm->setReadonlyVisible(true);
 }
 
 DialogMultiDisasm::~DialogMultiDisasm()

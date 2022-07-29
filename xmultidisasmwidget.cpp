@@ -89,6 +89,9 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 #if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
 #endif
+
+    setReadonlyVisible(false);
+    ui->checkBoxReadonly->setChecked(true);
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -156,6 +159,18 @@ void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions)
 void XMultiDisasmWidget::setReadonly(bool bState)
 {
     ui->scrollAreaDisasm->setReadonly(bState);
+}
+
+void XMultiDisasmWidget::setReadonlyVisible(bool bState)
+{
+    if(bState)
+    {
+        ui->checkBoxReadonly->show();
+    }
+    else
+    {
+        ui->checkBoxReadonly->hide();
+    }
 }
 
 void XMultiDisasmWidget::setEdited(bool bState)
@@ -249,4 +264,9 @@ void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
     dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(),true);
 
     dialogSymbols.exec();
+}
+
+void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked)
+{
+    ui->scrollAreaDisasm->setReadonly(bChecked);
 }

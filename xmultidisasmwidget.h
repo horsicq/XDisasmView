@@ -57,6 +57,7 @@ public:
     void goToOffset(qint64 nOffset);
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
     void setReadonly(bool bState);
+    void setReadonlyVisible(bool bState);
     void setEdited(bool bState);
 
 private:
@@ -67,6 +68,7 @@ private:
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void on_pushButtonSymbols_clicked();
+    void on_checkBoxReadonly_toggled(bool bChecked);
 
 protected:
     virtual void registerShortcuts(bool bState);

@@ -39,6 +39,9 @@ public:
     void setData(QIODevice *pDevice,XMultiDisasmWidget::OPTIONS options);
     void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
 
+signals:
+    void dataChanged();
+
 private slots:
     void on_pushButtonClose_clicked();
 
