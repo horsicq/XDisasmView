@@ -100,7 +100,7 @@
       <item>
        <widget class="QCheckBox" name="checkBoxReadonly">
         <property name="text">
-         <string>Read only</string>
+         <string>Readonly</string>
         </property>
        </widget>
       </item>
