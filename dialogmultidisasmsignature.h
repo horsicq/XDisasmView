@@ -22,7 +22,8 @@
 #define DIALOGMULTIDISASMSIGNATURE_H
 
 #include "xcapstone.h"
-#include "xdisasmview.h"
+#include "xabstracttableview.h"
+#include "dialogsearchsignatures.h"
 #include "xlineedithex.h"
 #include "xshortcutsdialog.h"
 

@@ -22,10 +22,10 @@
 #define XDISASMVIEW_H
 
 #include <QTextDocument>
+#include "dialoghexedit.h"
 #include "dialogmultidisasmsignature.h"
 #include "xcapstone.h"
 #include "xdevicetableeditview.h"
-#include "dialoghexedit.h"
 
 // TODO AbstractQuery
 // Load symbols Save db
