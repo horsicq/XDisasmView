@@ -993,137 +993,140 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 
 void XDisasmView::contextMenu(const QPoint &pos)
 {
-    QAction actionGoToAddress(tr("Address"),this);
-    actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
-    connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddressSlot()));
-
-    QAction actionGoToOffset(tr("Offset"),this);
-    actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
-    connect(&actionGoToOffset,SIGNAL(triggered()),this,SLOT(_goToOffsetSlot()));
-
-    QAction actionGoToEntryPoint(tr("Entry point"),this);
-    actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
-    connect(&actionGoToEntryPoint,SIGNAL(triggered()),this,SLOT(_goToEntryPointSlot()));
-
-    QAction actionDumpToFile(tr("Dump to file"),this);
-    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
-    connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
-
-    QAction actionHexSignature(tr("Hex signature"),this);
-    actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
-    connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_hexSignatureSlot()));
-
-    QAction actionSignature(tr("Signature"),this);
-    actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
-    connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signatureSlot()));
-
-    QAction actionFindString(tr("String"),this);
-    actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
-    connect(&actionFindString,SIGNAL(triggered()),this,SLOT(_findStringSlot()));
-
-    QAction actionFindSignature(tr("Signature"),this);
-    actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
-    connect(&actionFindSignature,SIGNAL(triggered()),this,SLOT(_findSignatureSlot()));
-
-    QAction actionFindValue(tr("Value"),this);
-    actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
-    connect(&actionFindValue,SIGNAL(triggered()),this,SLOT(_findValueSlot()));
-
-    QAction actionFindNext(tr("Find next"),this);
-    actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
-    connect(&actionFindNext,SIGNAL(triggered()),this,SLOT(_findNextSlot()));
-
-    QAction actionSelectAll(tr("Select all"),this);
-    actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
-    connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAllSlot()));
-
-    QAction actionCopyAsHex(tr("Hex"),this);
-    actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
-    connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyHexSlot()));
-
-    QAction actionCopyCursorOffset(tr("Offset"),this);
-    actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
-    connect(&actionCopyCursorOffset,SIGNAL(triggered()),this,SLOT(_copyOffsetSlot()));
-
-    QAction actionCopyCursorAddress(tr("Address"),this);
-    actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
-    connect(&actionCopyCursorAddress,SIGNAL(triggered()),this,SLOT(_copyAddressSlot()));
-
-    QAction actionHex(tr("Hex"),this);
-    actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
-    connect(&actionHex,SIGNAL(triggered()),this,SLOT(_hexSlot()));
-
-    QAction actionEditHex(tr("Hex"),this);
-    actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
-    connect(&actionEditHex,SIGNAL(triggered()),this,SLOT(_editHex()));
-
-    MENU_STATE menuState=getMenuState();
-
-    QMenu contextMenu(this);
-    QMenu menuGoTo(tr("Go to"),this);
-    QMenu menuFind(tr("Find"),this);
-    QMenu menuHex(tr("Hex"),this);
-    QMenu menuSelect(tr("Select"),this);
-    QMenu menuCopy(tr("Copy"),this);
-    QMenu menuFollowIn(tr("Follow in"),this);
-    QMenu menuEdit(tr("Edit"),this);
-
-    menuGoTo.addAction(&actionGoToAddress);
-    menuGoTo.addAction(&actionGoToOffset);
-    menuGoTo.addAction(&actionGoToEntryPoint);
-
-    contextMenu.addMenu(&menuGoTo);
-
-    menuCopy.addAction(&actionCopyCursorAddress);
-    menuCopy.addAction(&actionCopyCursorOffset);
-
-    if(menuState.bSize)
+    if(isContextMenuEnable())
     {
-        menuCopy.addAction(&actionCopyAsHex);
+        QAction actionGoToAddress(tr("Address"),this);
+        actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
+        connect(&actionGoToAddress,SIGNAL(triggered()),this,SLOT(_goToAddressSlot()));
+
+        QAction actionGoToOffset(tr("Offset"),this);
+        actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
+        connect(&actionGoToOffset,SIGNAL(triggered()),this,SLOT(_goToOffsetSlot()));
+
+        QAction actionGoToEntryPoint(tr("Entry point"),this);
+        actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
+        connect(&actionGoToEntryPoint,SIGNAL(triggered()),this,SLOT(_goToEntryPointSlot()));
+
+        QAction actionDumpToFile(tr("Dump to file"),this);
+        actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
+        connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
+
+        QAction actionHexSignature(tr("Hex signature"),this);
+        actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
+        connect(&actionHexSignature,SIGNAL(triggered()),this,SLOT(_hexSignatureSlot()));
+
+        QAction actionSignature(tr("Signature"),this);
+        actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
+        connect(&actionSignature,SIGNAL(triggered()),this,SLOT(_signatureSlot()));
+
+        QAction actionFindString(tr("String"),this);
+        actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
+        connect(&actionFindString,SIGNAL(triggered()),this,SLOT(_findStringSlot()));
+
+        QAction actionFindSignature(tr("Signature"),this);
+        actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
+        connect(&actionFindSignature,SIGNAL(triggered()),this,SLOT(_findSignatureSlot()));
+
+        QAction actionFindValue(tr("Value"),this);
+        actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
+        connect(&actionFindValue,SIGNAL(triggered()),this,SLOT(_findValueSlot()));
+
+        QAction actionFindNext(tr("Find next"),this);
+        actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
+        connect(&actionFindNext,SIGNAL(triggered()),this,SLOT(_findNextSlot()));
+
+        QAction actionSelectAll(tr("Select all"),this);
+        actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
+        connect(&actionSelectAll,SIGNAL(triggered()),this,SLOT(_selectAllSlot()));
+
+        QAction actionCopyAsHex(tr("Hex"),this);
+        actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
+        connect(&actionCopyAsHex,SIGNAL(triggered()),this,SLOT(_copyHexSlot()));
+
+        QAction actionCopyCursorOffset(tr("Offset"),this);
+        actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
+        connect(&actionCopyCursorOffset,SIGNAL(triggered()),this,SLOT(_copyOffsetSlot()));
+
+        QAction actionCopyCursorAddress(tr("Address"),this);
+        actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
+        connect(&actionCopyCursorAddress,SIGNAL(triggered()),this,SLOT(_copyAddressSlot()));
+
+        QAction actionHex(tr("Hex"),this);
+        actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
+        connect(&actionHex,SIGNAL(triggered()),this,SLOT(_hexSlot()));
+
+        QAction actionEditHex(tr("Hex"),this);
+        actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
+        connect(&actionEditHex,SIGNAL(triggered()),this,SLOT(_editHex()));
+
+        MENU_STATE menuState=getMenuState();
+
+        QMenu contextMenu(this);
+        QMenu menuGoTo(tr("Go to"),this);
+        QMenu menuFind(tr("Find"),this);
+        QMenu menuHex(tr("Hex"),this);
+        QMenu menuSelect(tr("Select"),this);
+        QMenu menuCopy(tr("Copy"),this);
+        QMenu menuFollowIn(tr("Follow in"),this);
+        QMenu menuEdit(tr("Edit"),this);
+
+        menuGoTo.addAction(&actionGoToAddress);
+        menuGoTo.addAction(&actionGoToOffset);
+        menuGoTo.addAction(&actionGoToEntryPoint);
+
+        contextMenu.addMenu(&menuGoTo);
+
+        menuCopy.addAction(&actionCopyCursorAddress);
+        menuCopy.addAction(&actionCopyCursorOffset);
+
+        if(menuState.bSize)
+        {
+            menuCopy.addAction(&actionCopyAsHex);
+        }
+
+        contextMenu.addMenu(&menuCopy);
+
+        menuFind.addAction(&actionFindString);
+        menuFind.addAction(&actionFindSignature);
+        menuFind.addAction(&actionFindValue);
+        menuFind.addAction(&actionFindNext);
+
+        contextMenu.addMenu(&menuFind);
+
+        if(menuState.bSize)
+        {
+            contextMenu.addAction(&actionDumpToFile);
+            contextMenu.addAction(&actionSignature);
+            menuCopy.addAction(&actionCopyAsHex);
+
+            menuHex.addAction(&actionHexSignature);
+
+            contextMenu.addMenu(&menuHex);
+        }
+
+        if(menuState.bHex)
+        {
+            menuFollowIn.addAction(&actionHex);
+
+            contextMenu.addMenu(&menuFollowIn);
+        }
+
+        menuEdit.setEnabled(!isReadonly());
+
+        if(menuState.bSize)
+        {
+            menuEdit.addAction(&actionEditHex);
+
+            contextMenu.addMenu(&menuEdit);
+        }
+
+        menuSelect.addAction(&actionSelectAll);
+        contextMenu.addMenu(&menuSelect);
+
+        // TODO reset select
+
+        contextMenu.exec(pos);
     }
-
-    contextMenu.addMenu(&menuCopy);
-
-    menuFind.addAction(&actionFindString);
-    menuFind.addAction(&actionFindSignature);
-    menuFind.addAction(&actionFindValue);
-    menuFind.addAction(&actionFindNext);
-
-    contextMenu.addMenu(&menuFind);
-
-    if(menuState.bSize)
-    {
-        contextMenu.addAction(&actionDumpToFile);
-        contextMenu.addAction(&actionSignature);
-        menuCopy.addAction(&actionCopyAsHex);
-
-        menuHex.addAction(&actionHexSignature);
-
-        contextMenu.addMenu(&menuHex);
-    }
-
-    if(menuState.bHex)
-    {
-        menuFollowIn.addAction(&actionHex);
-
-        contextMenu.addMenu(&menuFollowIn);
-    }
-
-    menuEdit.setEnabled(!isReadonly());
-
-    if(menuState.bSize)
-    {
-        menuEdit.addAction(&actionEditHex);
-
-        contextMenu.addMenu(&menuEdit);
-    }
-
-    menuSelect.addAction(&actionSelectAll);
-    contextMenu.addMenu(&menuSelect);
-
-    // TODO reset select
-
-    contextMenu.exec(pos);
 }
 
 void XDisasmView::wheelEvent(QWheelEvent *pEvent)
