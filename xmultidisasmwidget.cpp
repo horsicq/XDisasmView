@@ -137,13 +137,6 @@ void XMultiDisasmWidget::goToAddress(XADDR nAddress)
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::setCurrentIPAddress(XADDR nAddress)
-{
-    ui->scrollAreaDisasm->setCurrentIntructionPointer(nAddress);
-    ui->scrollAreaDisasm->goToAddress(nAddress);
-    ui->scrollAreaDisasm->reload(true);
-}
-
 void XMultiDisasmWidget::goToOffset(qint64 nOffset)
 {
     ui->scrollAreaDisasm->goToOffset(nOffset);

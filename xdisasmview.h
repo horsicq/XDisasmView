@@ -69,8 +69,7 @@ public:
     struct OPTIONS
     {
         XADDR nInitAddress;
-        XADDR nCurrentIntructionPointer; // For Debugger
-        XADDR nEntryPointAddress;
+        XADDR nEntryPointAddress; // TODO move to xdb
         XBinary::_MEMORY_MAP memoryMapRegion;
         bool bAprox;
         bool bMenu_Hex;
@@ -84,7 +83,6 @@ public:
     void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
-    void setCurrentIntructionPointer(XADDR nAddress); // For Debugger
     qint64 getSelectionInitAddress();
 
 private:
@@ -199,7 +197,6 @@ private:
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
 
-//    QList<ARROW> g_listArrows;
     XBinary::DM g_disasmMode;
     csh g_handle;
 
@@ -207,9 +204,6 @@ private:
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-
-    // Debugger
-    XADDR g_nCurrentIntructionPointer;
 
     QMap<QString,OPCODECOLOR> g_mapOpcodes;
     XBinary::SYNTAX g_syntax;

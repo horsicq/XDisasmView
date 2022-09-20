@@ -32,7 +32,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     g_options=OPTIONS();
 
-    g_nCurrentIntructionPointer=-1;
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
 
@@ -122,8 +121,6 @@ void XDisasmView::setData(QIODevice *pDevice,XDisasmView::OPTIONS options,bool b
 
     setTotalLineCount(nTotalLineCount);
 
-    setCurrentIntructionPointer(options.nCurrentIntructionPointer);
-
     if(options.nInitAddress!=(XADDR)-1)
     {
         qint64 nOffset=XBinary::addressToOffset(getMemoryMap(),options.nInitAddress);
@@ -156,11 +153,6 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 XBinary::DM XDisasmView::getMode()
 {
     return g_disasmMode;
-}
-
-void XDisasmView::setCurrentIntructionPointer(XADDR nAddress)
-{
-    g_nCurrentIntructionPointer=nAddress;
 }
 
 qint64 XDisasmView::getSelectionInitAddress()
@@ -957,9 +949,18 @@ void XDisasmView::paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32
 
         TEXT_OPTION textOption={};
         textOption.bSelected=isOffsetSelected(nOffset);
-        textOption.bCurrentIP=((g_nCurrentIntructionPointer!=-1)&&(nAddress==g_nCurrentIntructionPointer)&&(nColumn==COLUMN_ADDRESS));
+
         textOption.bCursor=(nOffset==nCursorOffset)&&(nColumn==COLUMN_BYTES);
-        textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS)); 
+        textOption.bIsReplaced=((g_listRecords.at(nRow).bIsReplaced)&&(nColumn==COLUMN_ADDRESS));
+
+        if(getXInfoDB())
+        {
+        #ifdef USE_XPROCESS
+            XADDR nCurrentIP=getXInfoDB()->getCurrentInstructionPointerCache();
+
+            textOption.bCurrentIP=((nCurrentIP!=-1)&&(nAddress==nCurrentIP)&&(nColumn==COLUMN_ADDRESS));
+        #endif
+        }
 
         if(nColumn==COLUMN_ARROWS)
         {
