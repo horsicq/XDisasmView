@@ -104,16 +104,7 @@ void XDisasmViewOptionsWidget::reload()
 
 void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
 {
-    QFont _font;
-    _font.fromString(ui->lineEditDisasmFont->text());
-
-    bool bOK=false;
-    _font=QFontDialog::getFont(&bOK,_font,this);
-
-    if(bOK)
-    {
-        ui->lineEditDisasmFont->setText(_font.toString());
-    }
+    XOptions::handleFontButton(this,ui->lineEditDisasmFont);
 }
 
 void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
