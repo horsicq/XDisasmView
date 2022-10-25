@@ -392,8 +392,8 @@ void DialogMultiDisasmSignature::on_lineEditWildcard_textChanged(const QString &
 
 void DialogMultiDisasmSignature::on_pushButtonCopy_clicked()
 {
-    QClipboard *clipboard=QApplication::clipboard();
-    clipboard->setText(ui->textEditSignature->toPlainText());
+    QClipboard *pClipboard=QApplication::clipboard();
+    pClipboard->setText(ui->textEditSignature->toPlainText());
 }
 
 void DialogMultiDisasmSignature::on_spinBoxCount_valueChanged(int nValue)
