@@ -174,11 +174,7 @@ void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-    const QSignalBlocker blocker1(ui->comboBoxMode);
-#else
     const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
-#endif
 
     XBinary::FT fileType=g_options.fileType;
 
@@ -219,9 +215,7 @@ void XMultiDisasmWidget::reloadFileType()
 
     adjustMode();
 
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
-#endif
 }
 
 void XMultiDisasmWidget::adjustMode()
