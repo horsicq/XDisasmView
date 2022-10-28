@@ -30,11 +30,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
     g_pDevice=nullptr;
     g_options={};
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
-    const QSignalBlocker blocker1(ui->comboBoxMode);
-#else
     const bool bBlocked1=ui->comboBoxMode->blockSignals(true);
-#endif
 
     addMode(XBinary::DM_X86_16);
     addMode(XBinary::DM_X86_32);
@@ -86,9 +82,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) :
 //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
     connect(ui->scrollAreaDisasm,SIGNAL(dataChanged()),this,SIGNAL(dataChanged()));
 
-#if QT_VERSION < QT_VERSION_CHECK(5,3,0)
     ui->comboBoxMode->blockSignals(bBlocked1);
-#endif
 
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
