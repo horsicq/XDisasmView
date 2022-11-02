@@ -207,7 +207,6 @@ private:
 
     QMap<QString,OPCODECOLOR> g_mapOpcodes;
     XBinary::SYNTAX g_syntax;
-
     XADDR g_nThisBase;
     bool g_bIsAddressColon;
     bool g_bIsUppercase;
