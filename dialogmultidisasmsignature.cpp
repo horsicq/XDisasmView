@@ -308,17 +308,17 @@ void DialogMultiDisasmSignature::reloadSignature()
 
             if(!bDisp)
             {
-                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nDispOffset,g_listRecords.at(i).nDispSize,cWild);
+                sRecord=XCapstone::replaceWildChar(sRecord,g_listRecords.at(i).nDispOffset,g_listRecords.at(i).nDispSize,cWild);
             }
 
             if(!bImm)
             {
-                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,cWild);
+                sRecord=XCapstone::replaceWildChar(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,cWild);
             }
 
             if(g_listRecords.at(i).bIsConst)
             {
-                sRecord=XCapstone::replaceWild(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,QChar('$'));
+                sRecord=XCapstone::replaceWildChar(sRecord,g_listRecords.at(i).nImmOffset,g_listRecords.at(i).nImmSize,QChar('$'));
             }
         }
         else
