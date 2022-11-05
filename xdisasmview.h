@@ -148,7 +148,7 @@ private:
         MODE_OPCODE_ADDRESS,
     };
 
-    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,XADDR nAddress,MODE mode); // TODO move to XDisasm
+    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,XADDR nAddress,MODE mode); // TODO move to XDisasm !!!
     qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
     MENU_STATE getMenuState();
 
