@@ -204,7 +204,6 @@ private:
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-
     QMap<QString,OPCODECOLOR> g_mapOpcodes;
     XBinary::SYNTAX g_syntax;
     XADDR g_nThisBase;
