@@ -34,7 +34,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     g_nAddressWidth=8;
     g_nOpcodeSize=16;
-
     g_nThisBase=0;
     g_bIsAddressColon=false;
     g_bIsUppercase=false;
