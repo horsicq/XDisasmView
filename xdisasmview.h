@@ -196,7 +196,6 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-
     XBinary::DM g_disasmMode;
     csh g_handle;
 

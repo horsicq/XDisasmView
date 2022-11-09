@@ -66,14 +66,7 @@ XDisasmView::~XDisasmView()
 
 void XDisasmView::_adjustView()
 {
-    QFont _font;
-    QString sFont=getGlobalOptions()->getValue(XOptions::ID_DISASM_FONT).toString();
-
-    if((sFont!="")&&_font.fromString(sFont))
-    {
-        setTextFont(_font);
-    }
-    // mb TODO errorString
+    setTextFontFromOptions(XOptions::ID_DISASM_FONT);
 
     g_bIsHighlight=getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
     g_bIsUppercase=getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
