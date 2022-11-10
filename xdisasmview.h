@@ -190,7 +190,7 @@ protected slots:
     void _hexSlot();
 
 signals:
-    void showOffsetHex(qint64 nOffset);
+    void showOffsetHex(qint64 nOffset); // TODO Offset/Size
 
 private:
     OPTIONS g_options;
