@@ -22,22 +22,22 @@
 #define DIALOGMULTIDISASM_H
 
 #include <QDialog>
+
 #include "xmultidisasmwidget.h"
 
 namespace Ui {
 class DialogMultiDisasm;
 }
 
-class DialogMultiDisasm : public XShortcutsDialog
-{
+class DialogMultiDisasm : public XShortcutsDialog {
     Q_OBJECT
 
 public:
-    explicit DialogMultiDisasm(QWidget *pParent=nullptr);
+    explicit DialogMultiDisasm(QWidget *pParent = nullptr);
     ~DialogMultiDisasm();
 
-    void setData(QIODevice *pDevice,XMultiDisasmWidget::OPTIONS options);
-    void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
+    void setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options);
+    void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
 
 signals:
     void dataChanged();
@@ -49,4 +49,4 @@ private:
     Ui::DialogMultiDisasm *ui;
 };
 
-#endif // DIALOGMULTIDISASM_H
+#endif  // DIALOGMULTIDISASM_H

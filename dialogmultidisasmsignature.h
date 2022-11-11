@@ -31,12 +31,10 @@ namespace Ui {
 class DialogMultiDisasmSignature;
 }
 
-class DialogMultiDisasmSignature : public XShortcutsDialog
-{
+class DialogMultiDisasmSignature : public XShortcutsDialog {
     Q_OBJECT
 
-    struct SIGNATURE_RECORD
-    {
+    struct SIGNATURE_RECORD {
         XADDR nAddress;
         QString sOpcode;
         QByteArray baOpcode;
@@ -51,7 +49,7 @@ public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
 
-    void setData(QIODevice *pDevice,qint64 nOffset,XBinary::_MEMORY_MAP *pMemoryMap,csh handle);
+    void setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle);
     void reload();
 
 private slots:
@@ -75,4 +73,4 @@ private:
     qint32 g_nSymbolWidth;
 };
 
-#endif // DIALOGMULTIDISASMSIGNATURE_H
+#endif  // DIALOGMULTIDISASMSIGNATURE_H

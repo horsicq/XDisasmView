@@ -22,6 +22,7 @@
 #define XDISASMVIEW_H
 
 #include <QTextDocument>
+
 #include "dialoghexedit.h"
 #include "dialogmultidisasmsignature.h"
 #include "xcapstone.h"
@@ -33,12 +34,10 @@
 // TODO Click on Opcode label -> Addresses
 // TODO click on jmps
 // TODO Capstone info
-class XDisasmView : public XDeviceTableEditView
-{
+class XDisasmView : public XDeviceTableEditView {
     Q_OBJECT
 
-    enum SHORTCUT
-    {
+    enum SHORTCUT {
         SC_GOTOADDRESS,
         SC_GOTOOFFSET,
         SC_GOTOENTRYPOINT,
@@ -59,52 +58,47 @@ class XDisasmView : public XDeviceTableEditView
         // TODO more
     };
 
-    struct OPCODECOLOR
-    {
+    struct OPCODECOLOR {
         QColor colText;
         QColor colBackground;
     };
 
 public:
-    struct OPTIONS
-    {
+    struct OPTIONS {
         XADDR nInitAddress;
-        XADDR nEntryPointAddress; // TODO move to xdb
+        XADDR nEntryPointAddress;  // TODO move to xdb
         XBinary::_MEMORY_MAP memoryMapRegion;
         bool bAprox;
         bool bMenu_Hex;
     };
 
-    explicit XDisasmView(QWidget *pParent=nullptr);
+    explicit XDisasmView(QWidget *pParent = nullptr);
     ~XDisasmView();
 
     void _adjustView();
     void adjustView();
-    void setData(QIODevice *pDevice,OPTIONS options,bool bReload=true);
+    void setData(QIODevice *pDevice, OPTIONS options, bool bReload = true);
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
     qint64 getSelectionInitAddress();
 
 private:
-    enum COLUMN
-    {
-        COLUMN_ARROWS=0,
+    enum COLUMN {
+        COLUMN_ARROWS = 0,
         COLUMN_ADDRESS,
-//        COLUMN_OFFSET,
+        //        COLUMN_OFFSET,
         COLUMN_BYTES,
         COLUMN_OPCODE,
         COLUMN_COMMENT
     };
 
-    enum ARRAY
-    {
-        ARRAY_NONE=0,
+    enum ARRAY {
+        ARRAY_NONE = 0,
         ARRAY_UP,
         ARRAY_DOWN
     };
 
-    struct DISASM_RESULT
-    {
+    struct DISASM_RESULT {
         bool bIsValid;
         XADDR nAddress;
         qint32 nSize;
@@ -115,10 +109,9 @@ private:
         MODE mode;
     };
 
-    struct RECORD
-    {
+    struct RECORD {
         QString sAddress;
-//        QString sOffset;
+        //        QString sOffset;
         QString sHEX;
         QString sCommemt;
         qint64 nOffset;
@@ -133,27 +126,24 @@ private:
         // TODO jmp/jcc
     };
 
-    struct MENU_STATE
-    {
-//        bool bOffset;
+    struct MENU_STATE {
+        //        bool bOffset;
         bool bSize;
         bool bHex;
     };
 
-    enum MODE_OPCODE
-    {
-        MODE_OPCODE_ORIGINAL=0,
+    enum MODE_OPCODE {
+        MODE_OPCODE_ORIGINAL = 0,
         MODE_OPCODE_SYMBOLADDRESS,
         MODE_OPCODE_SYMBOL,
         MODE_OPCODE_ADDRESS,
     };
 
-    DISASM_RESULT _disasm(char *pData,qint32 nDataSize,XADDR nAddress,MODE mode); // TODO move to XDisasm !!!
-    qint64 getDisasmOffset(qint64 nOffset,qint64 nOldOffset);
+    DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nAddress, MODE mode);  // TODO move to XDisasm !!!
+    qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
     MENU_STATE getMenuState();
 
-    struct TEXT_OPTION
-    {
+    struct TEXT_OPTION {
         bool bSelected;
         bool bCurrentIP;
         bool bCursor;
@@ -161,17 +151,17 @@ private:
         bool bHighlight;
     };
 
-    void drawText(QPainter *pPainter,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight,QString sText,TEXT_OPTION *pTextOption);
-    void drawDisasmText(QPainter *pPainter,QRect rect,QString sText);
-    void drawArrow(QPainter *pPainter,QPointF pointStart,QPointF pointEnd);
-    QMap<QString,OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode,XBinary::SYNTAX syntax=XBinary::SYNTAX_DEFAULT);
+    void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption);
+    void drawDisasmText(QPainter *pPainter, QRect rect, QString sText);
+    void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd);
+    QMap<QString, OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
     OPCODECOLOR getOpcodeColor(XOptions::ID id);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
     virtual void updateData();
-    virtual void paintColumn(QPainter *pPainter,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
-    virtual void paintCell(QPainter *pPainter,qint32 nRow,qint32 nColumn,qint32 nLeft,qint32 nTop,qint32 nWidth,qint32 nHeight);
+    virtual void paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight);
+    virtual void paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight);
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
@@ -180,7 +170,7 @@ protected:
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
-    virtual void _cellDoubleClicked(qint32 nRow,qint32 nColumn);
+    virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
     virtual qint64 getRecordSize(qint64 nOffset);
     virtual qint64 getFixOffset(qint64 nOffset);
 
@@ -190,7 +180,7 @@ protected slots:
     void _hexSlot();
 
 signals:
-    void showOffsetHex(qint64 nOffset); // TODO Offset/Size
+    void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
 
 private:
     OPTIONS g_options;
@@ -203,7 +193,7 @@ private:
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QMap<QString,OPCODECOLOR> g_mapOpcodes;
+    QMap<QString, OPCODECOLOR> g_mapOpcodes;
     XBinary::SYNTAX g_syntax;
     XADDR g_nThisBase;
     bool g_bIsAddressColon;
@@ -212,4 +202,4 @@ private:
     MODE_OPCODE g_modeOpcode;
 };
 
-#endif // XDISASMVIEW_H
+#endif  // XDISASMVIEW_H

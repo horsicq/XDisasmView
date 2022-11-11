@@ -25,19 +25,17 @@
 #include <QDialog>
 #include <QLineEdit>
 #include <QToolButton>
-#include <QColorDialog>
+
 #include "xoptions.h"
 
 namespace Ui {
 class DialogXDisasmViewColors;
 }
 
-class DialogXDisasmViewColors : public QDialog
-{
+class DialogXDisasmViewColors : public QDialog {
     Q_OBJECT
 
-    enum COLUMN
-    {
+    enum COLUMN {
         COLUMN_TEXT_COLOR,
         COLUMN_TEXT_COLOR_REMOVE,
         COLUMN_BACKGROUND_COLOR,
@@ -47,7 +45,7 @@ class DialogXDisasmViewColors : public QDialog
     };
 
 public:
-    explicit DialogXDisasmViewColors(QWidget *pParent=nullptr);
+    explicit DialogXDisasmViewColors(QWidget *pParent = nullptr);
     ~DialogXDisasmViewColors();
 
     void setOptions(XOptions *pOptions);
@@ -55,7 +53,7 @@ public:
 
 private slots:
     void on_pushButtonCancel_clicked();
-    void addRecord(qint32 nRow,QString sGroup,QString sText,XOptions::ID id);
+    void addRecord(qint32 nRow, QString sGroup, QString sText, XOptions::ID id);
     void updateRow(qint32 nRow);
     void on_pushButtonOK_clicked();
     void pushButtonSlot();
@@ -63,7 +61,7 @@ private slots:
 private:
     Ui::DialogXDisasmViewColors *ui;
     XOptions *g_pOptions;
-    QMap<XOptions::ID,QString> g_mapColors;
+    QMap<XOptions::ID, QString> g_mapColors;
 };
 
-#endif // DIALOGXDISASMVIEWCOLORS_H
+#endif  // DIALOGXDISASMVIEWCOLORS_H

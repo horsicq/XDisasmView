@@ -22,6 +22,7 @@
 #define XDISASMVIEWOPTIONSWIDGET_H
 
 #include <QFontDialog>
+
 #include "dialogxdisasmviewcolors.h"
 #include "xoptions.h"
 
@@ -29,12 +30,11 @@ namespace Ui {
 class XDisasmViewOptionsWidget;
 }
 
-class XDisasmViewOptionsWidget : public QWidget
-{
+class XDisasmViewOptionsWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit XDisasmViewOptionsWidget(QWidget *pParent=nullptr);
+    explicit XDisasmViewOptionsWidget(QWidget *pParent = nullptr);
     ~XDisasmViewOptionsWidget();
 
     void setOptions(XOptions *pOptions);
@@ -55,4 +55,4 @@ private:
     XOptions *g_pOptions;
 };
 
-#endif // XDISASMVIEWOPTIONSWIDGET_H
+#endif  // XDISASMVIEWOPTIONSWIDGET_H

@@ -22,39 +22,38 @@
 #define XMULTIDISASMWIDGET_H
 
 #include <QComboBox>
-#include "xformats.h"
-#include "xdisasmview.h"
-#include "dialogxsymbols.h"
+
 #include "dialogxinfodbtransferprocess.h"
+#include "dialogxsymbols.h"
+#include "xdisasmview.h"
+#include "xformats.h"
 
 namespace Ui {
 class XMultiDisasmWidget;
 }
 
-class XMultiDisasmWidget : public XShortcutsWidget
-{
+class XMultiDisasmWidget : public XShortcutsWidget {
     Q_OBJECT
 
 public:
-    struct OPTIONS
-    {
+    struct OPTIONS {
         XBinary::FT fileType;
-        XADDR nStartAddress; // For FT_REGION
+        XADDR nStartAddress;  // For FT_REGION
         XADDR nInitAddress;
         QString sTitle;
         QString sArch;
         bool bMenu_Hex;
     };
 
-    explicit XMultiDisasmWidget(QWidget *pParent=nullptr);
+    explicit XMultiDisasmWidget(QWidget *pParent = nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice,OPTIONS options,XInfoDB *pXInfoDB);
+    void setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB);
     void setDevice(QIODevice *pDevice);
     void setBackupDevice(QIODevice *pDevice);
     void goToAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
-    void setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions);
+    void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
     void setEdited(bool bState);
@@ -82,4 +81,4 @@ private:
     OPTIONS g_options;
 };
 
-#endif // XMULTIDISASMWIDGET_H
+#endif  // XMULTIDISASMWIDGET_H

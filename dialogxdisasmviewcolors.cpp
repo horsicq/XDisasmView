@@ -19,200 +19,178 @@
  * SOFTWARE.
  */
 #include "dialogxdisasmviewcolors.h"
+
 #include "ui_dialogxdisasmviewcolors.h"
 
-DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent) :
-    QDialog(pParent),
-    ui(new Ui::DialogXDisasmViewColors)
-{
+DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogXDisasmViewColors) {
     ui->setupUi(this);
 }
 
-DialogXDisasmViewColors::~DialogXDisasmViewColors()
-{
+DialogXDisasmViewColors::~DialogXDisasmViewColors() {
     delete ui;
 }
 
-void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
-{
-    g_pOptions=pOptions;
+void DialogXDisasmViewColors::setOptions(XOptions *pOptions) {
+    g_pOptions = pOptions;
 
     ui->tableWidgetColors->setColumnCount(6);
     ui->tableWidgetColors->setRowCount(12);
 
-    qint32 nRow=0;
+    qint32 nRow = 0;
     // TODO another assemblers
-    addRecord(nRow++,"x86/amd64","CALL",XOptions::ID_DISASM_COLOR_X86_CALL);
-    addRecord(nRow++,"x86/amd64","RET",XOptions::ID_DISASM_COLOR_X86_RET);
-    addRecord(nRow++,"x86/amd64","JCC",XOptions::ID_DISASM_COLOR_X86_JCC);
-    addRecord(nRow++,"x86/amd64","PUSH",XOptions::ID_DISASM_COLOR_X86_PUSH);
-    addRecord(nRow++,"x86/amd64","POP",XOptions::ID_DISASM_COLOR_X86_POP);
-    addRecord(nRow++,"x86/amd64","NOP",XOptions::ID_DISASM_COLOR_X86_NOP);
-    addRecord(nRow++,"x86/amd64","JMP",XOptions::ID_DISASM_COLOR_X86_JMP);
-    addRecord(nRow++,"x86/amd64","INT3",XOptions::ID_DISASM_COLOR_X86_INT3);
-    addRecord(nRow++,"arm/arm64","BL",XOptions::ID_DISASM_COLOR_ARM_BL);
-    addRecord(nRow++,"arm/arm64","RET",XOptions::ID_DISASM_COLOR_ARM_RET);
-    addRecord(nRow++,"arm/arm64","PUSH",XOptions::ID_DISASM_COLOR_ARM_PUSH);
-    addRecord(nRow++,"arm/arm64","POP",XOptions::ID_DISASM_COLOR_ARM_POP);
+    addRecord(nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_CALL);
+    addRecord(nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_RET);
+    addRecord(nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_JCC);
+    addRecord(nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_PUSH);
+    addRecord(nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_POP);
+    addRecord(nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_NOP);
+    addRecord(nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_JMP);
+    addRecord(nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_INT3);
+    addRecord(nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_BL);
+    addRecord(nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_RET);
+    addRecord(nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_PUSH);
+    addRecord(nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_POP);
 
-//    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
-    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE,20);
-//    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR,80);
-    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR_REMOVE,20);
+    //    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
+    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE, 20);
+    //    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR,80);
+    ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR_REMOVE, 20);
 }
 
-void DialogXDisasmViewColors::save()
-{  
-    QMapIterator<XOptions::ID,QString> iter(g_mapColors);
+void DialogXDisasmViewColors::save() {
+    QMapIterator<XOptions::ID, QString> iter(g_mapColors);
 
-    while(iter.hasNext())
-    {
+    while (iter.hasNext()) {
         iter.next();
 
-        XOptions::ID id=iter.key();
-        QString sValue=iter.value();
+        XOptions::ID id = iter.key();
+        QString sValue = iter.value();
 
-        g_pOptions->setValue(id,sValue);
+        g_pOptions->setValue(id, sValue);
     }
 }
 
-void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
-{
+void DialogXDisasmViewColors::on_pushButtonCancel_clicked() {
     this->close();
 }
 
-void DialogXDisasmViewColors::addRecord(qint32 nRow,QString sGroup,QString sText,XOptions::ID id)
-{
-    QPushButton *pButtonTextColor=new QPushButton;
+void DialogXDisasmViewColors::addRecord(qint32 nRow, QString sGroup, QString sText, XOptions::ID id) {
+    QPushButton *pButtonTextColor = new QPushButton;
     pButtonTextColor->setText(tr("Text"));
-    pButtonTextColor->setProperty("ROW",nRow);
-    pButtonTextColor->setProperty("COLUMN",COLUMN_TEXT_COLOR);
-    pButtonTextColor->setProperty("ID",id);
+    pButtonTextColor->setProperty("ROW", nRow);
+    pButtonTextColor->setProperty("COLUMN", COLUMN_TEXT_COLOR);
+    pButtonTextColor->setProperty("ID", id);
 
-    connect(pButtonTextColor,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+    connect(pButtonTextColor, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR,pButtonTextColor);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR, pButtonTextColor);
 
-    QPushButton *pButtonTextColorRemove=new QPushButton;
+    QPushButton *pButtonTextColorRemove = new QPushButton;
     pButtonTextColorRemove->setText(QString("X"));
-    pButtonTextColorRemove->setProperty("ROW",nRow);
-    pButtonTextColorRemove->setProperty("COLUMN",COLUMN_TEXT_COLOR_REMOVE);
-    pButtonTextColorRemove->setProperty("ID",id);
+    pButtonTextColorRemove->setProperty("ROW", nRow);
+    pButtonTextColorRemove->setProperty("COLUMN", COLUMN_TEXT_COLOR_REMOVE);
+    pButtonTextColorRemove->setProperty("ID", id);
 
-    connect(pButtonTextColorRemove,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+    connect(pButtonTextColorRemove, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_TEXT_COLOR_REMOVE,pButtonTextColorRemove);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR_REMOVE, pButtonTextColorRemove);
 
-    QPushButton *pButtonBackgroundColor=new QPushButton;
+    QPushButton *pButtonBackgroundColor = new QPushButton;
     pButtonBackgroundColor->setText(tr("Background"));
-    pButtonBackgroundColor->setProperty("ROW",nRow);
-    pButtonBackgroundColor->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR);
-    pButtonBackgroundColor->setProperty("ID",id);
+    pButtonBackgroundColor->setProperty("ROW", nRow);
+    pButtonBackgroundColor->setProperty("COLUMN", COLUMN_BACKGROUND_COLOR);
+    pButtonBackgroundColor->setProperty("ID", id);
 
-    connect(pButtonBackgroundColor,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+    connect(pButtonBackgroundColor, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR,pButtonBackgroundColor);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_BACKGROUND_COLOR, pButtonBackgroundColor);
 
-    QPushButton *pButtonBackgroundColorRemove=new QPushButton;
+    QPushButton *pButtonBackgroundColorRemove = new QPushButton;
     pButtonBackgroundColorRemove->setText(QString("X"));
-    pButtonBackgroundColorRemove->setProperty("ROW",nRow);
-    pButtonBackgroundColorRemove->setProperty("COLUMN",COLUMN_BACKGROUND_COLOR_REMOVE);
-    pButtonBackgroundColorRemove->setProperty("ID",id);
+    pButtonBackgroundColorRemove->setProperty("ROW", nRow);
+    pButtonBackgroundColorRemove->setProperty("COLUMN", COLUMN_BACKGROUND_COLOR_REMOVE);
+    pButtonBackgroundColorRemove->setProperty("ID", id);
 
-    connect(pButtonBackgroundColorRemove,SIGNAL(clicked(bool)),this,SLOT(pushButtonSlot()));
+    connect(pButtonBackgroundColorRemove, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setItem(nRow,COLUMN_GROUP,new QTableWidgetItem(sGroup));
+    ui->tableWidgetColors->setItem(nRow, COLUMN_GROUP, new QTableWidgetItem(sGroup));
 
-    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE,pButtonBackgroundColorRemove);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_BACKGROUND_COLOR_REMOVE, pButtonBackgroundColorRemove);
 
-    QLineEdit *pLineEdit=new QLineEdit;
+    QLineEdit *pLineEdit = new QLineEdit;
     pLineEdit->setText(sText);
-    pLineEdit->setProperty("ROW",nRow);
-    pLineEdit->setProperty("COLUMN",COLUMN_STRING);
-    pLineEdit->setProperty("ID",id);
+    pLineEdit->setProperty("ROW", nRow);
+    pLineEdit->setProperty("COLUMN", COLUMN_STRING);
+    pLineEdit->setProperty("ID", id);
     pLineEdit->setReadOnly(true);
 
-    ui->tableWidgetColors->setCellWidget(nRow,COLUMN_STRING,pLineEdit);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_STRING, pLineEdit);
 
-    g_mapColors.insert(id,g_pOptions->getValue(id).toString());
+    g_mapColors.insert(id, g_pOptions->getValue(id).toString());
 
     updateRow(nRow);
 }
 
-void DialogXDisasmViewColors::updateRow(qint32 nRow)
-{
-    XOptions::ID id=(XOptions::ID)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_TEXT_COLOR)->property("ID").toUInt());
+void DialogXDisasmViewColors::updateRow(qint32 nRow) {
+    XOptions::ID id = (XOptions::ID)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_TEXT_COLOR)->property("ID").toUInt());
 
-    QString sColor=g_mapColors.value(id);
-    QString sTextColor=sColor.section("|",0,0);
-    QString sBackgroundColor=sColor.section("|",1,1);
+    QString sColor = g_mapColors.value(id);
+    QString sTextColor = sColor.section("|", 0, 0);
+    QString sBackgroundColor = sColor.section("|", 1, 1);
 
-    QLineEdit *pLineEdit=(QLineEdit *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_STRING));
+    QLineEdit *pLineEdit = (QLineEdit *)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_STRING));
 
-    pLineEdit->setStyleSheet(QString("color: %1;  background-color: %2").arg(sTextColor,sBackgroundColor));
+    pLineEdit->setStyleSheet(QString("color: %1;  background-color: %2").arg(sTextColor, sBackgroundColor));
 
-    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_TEXT_COLOR_REMOVE)))->setEnabled(sTextColor!="");
-    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow,COLUMN_BACKGROUND_COLOR_REMOVE)))->setEnabled(sBackgroundColor!="");
+    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_TEXT_COLOR_REMOVE)))->setEnabled(sTextColor != "");
+    ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_BACKGROUND_COLOR_REMOVE)))->setEnabled(sBackgroundColor != "");
 }
 
-void DialogXDisasmViewColors::on_pushButtonOK_clicked()
-{
+void DialogXDisasmViewColors::on_pushButtonOK_clicked() {
     save();
 
     this->close();
 }
 
-void DialogXDisasmViewColors::pushButtonSlot()
-{
-    QPushButton *pPushButton=qobject_cast<QPushButton*>(sender());
+void DialogXDisasmViewColors::pushButtonSlot() {
+    QPushButton *pPushButton = qobject_cast<QPushButton *>(sender());
 
-    if(pPushButton)
-    {
-        qint32 nRow=pPushButton->property("ROW").toInt();
-        qint32 nColumn=pPushButton->property("COLUMN").toInt();
-        XOptions::ID id=(XOptions::ID)(pPushButton->property("ID").toUInt());
+    if (pPushButton) {
+        qint32 nRow = pPushButton->property("ROW").toInt();
+        qint32 nColumn = pPushButton->property("COLUMN").toInt();
+        XOptions::ID id = (XOptions::ID)(pPushButton->property("ID").toUInt());
 
-        QString sColor=g_mapColors.value(id);
-        QString sTextColor=sColor.section("|",0,0);
-        QString sBackgroundColor=sColor.section("|",1,1);
+        QString sColor = g_mapColors.value(id);
+        QString sTextColor = sColor.section("|", 0, 0);
+        QString sBackgroundColor = sColor.section("|", 1, 1);
 
-        if(nColumn==COLUMN_TEXT_COLOR)
-        {
+        if (nColumn == COLUMN_TEXT_COLOR) {
             QColor color;
             color.setNamedColor(sTextColor);
 
-            color=QColorDialog::getColor(color,this,tr("Text"));
+            color = QColorDialog::getColor(color, this, tr("Text"));
 
-            sTextColor=color.name();
-        }
-        else if(nColumn==COLUMN_BACKGROUND_COLOR)
-        {
+            sTextColor = color.name();
+        } else if (nColumn == COLUMN_BACKGROUND_COLOR) {
             QColor color;
             color.setNamedColor(sBackgroundColor);
 
-            color=QColorDialog::getColor(color,this,tr("Background"));
+            color = QColorDialog::getColor(color, this, tr("Background"));
 
-            sBackgroundColor=color.name();
-        }
-        else if(nColumn==COLUMN_TEXT_COLOR_REMOVE)
-        {
-            sTextColor="";
-        }
-        else if(nColumn==COLUMN_BACKGROUND_COLOR_REMOVE)
-        {
-            sBackgroundColor="";
+            sBackgroundColor = color.name();
+        } else if (nColumn == COLUMN_TEXT_COLOR_REMOVE) {
+            sTextColor = "";
+        } else if (nColumn == COLUMN_BACKGROUND_COLOR_REMOVE) {
+            sBackgroundColor = "";
         }
 
-        if((sTextColor!="")||(sBackgroundColor!=""))
-        {
-            sColor=QString("%1|%2").arg(sTextColor,sBackgroundColor);
-        }
-        else
-        {
-            sColor="";
+        if ((sTextColor != "") || (sBackgroundColor != "")) {
+            sColor = QString("%1|%2").arg(sTextColor, sBackgroundColor);
+        } else {
+            sColor = "";
         }
 
-        g_mapColors.insert(id,sColor);
+        g_mapColors.insert(id, sColor);
 
         updateRow(nRow);
     }
