@@ -20,7 +20,8 @@
  */
 #include "xdisasmview.h"
 
-XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent) {
+XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
+{
     // TODO click on Address -> Offset
     g_handle = 0;
 
@@ -54,13 +55,15 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent) {
     setAddressMode(MODE_ADDRESS);
 }
 
-XDisasmView::~XDisasmView() {
+XDisasmView::~XDisasmView()
+{
     if (g_handle) {
         XCapstone::closeHandle(&g_handle);
     }
 }
 
-void XDisasmView::_adjustView() {
+void XDisasmView::_adjustView()
+{
     setTextFontFromOptions(XOptions::ID_DISASM_FONT);
 
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
@@ -78,13 +81,15 @@ void XDisasmView::_adjustView() {
     XCapstone::openHandle(g_disasmMode, &g_handle, true, g_syntax);
 }
 
-void XDisasmView::adjustView() {
+void XDisasmView::adjustView()
+{
     _adjustView();
 
     reload(true);
 }
 
-void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool bReload) {
+void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool bReload)
+{
     g_options = options;
 
     setDevice(pDevice);
@@ -124,17 +129,20 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
     }
 }
 
-void XDisasmView::setMode(XBinary::DM disasmMode) {
+void XDisasmView::setMode(XBinary::DM disasmMode)
+{
     g_disasmMode = disasmMode;
 
     _adjustView();
 }
 
-XBinary::DM XDisasmView::getMode() {
+XBinary::DM XDisasmView::getMode()
+{
     return g_disasmMode;
 }
 
-qint64 XDisasmView::getSelectionInitAddress() {
+qint64 XDisasmView::getSelectionInitAddress()
+{
     qint64 nResult = -1;
 
     qint64 nOffset = getSelectionInitOffset();
@@ -146,7 +154,8 @@ qint64 XDisasmView::getSelectionInitAddress() {
     return nResult;
 }
 
-XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nAddress, MODE mode) {
+XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nAddress, MODE mode)
+{
     DISASM_RESULT result = {};
 
     result.mode = mode;
@@ -247,7 +256,8 @@ XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, X
     return result;
 }
 
-qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset) {
+qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset)
+{
     qint64 nResult = nOffset;
 
     if (nOffset != nOldOffset) {
@@ -315,7 +325,8 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset) {
     return nResult;
 }
 
-XDisasmView::MENU_STATE XDisasmView::getMenuState() {
+XDisasmView::MENU_STATE XDisasmView::getMenuState()
+{
     MENU_STATE result = {};
 
     STATE state = getState();
@@ -336,7 +347,8 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState() {
     return result;
 }
 
-void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption) {
+void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption)
+{
     QRect rectText;
 
     rectText.setLeft(nLeft + getCharWidth());
@@ -376,7 +388,8 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText) {
+void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
+{
     QString sMnemonic = sText.section("|", 0, 0);
     QString sString = sText.section("|", 1, 1);
 
@@ -423,7 +436,8 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText) 
     }
 }
 
-void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd) {
+void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd)
+{
     QPolygonF arrowHead;
     qreal arrowSize = 8;
 
@@ -441,7 +455,8 @@ void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF poin
     pPainter->drawPolygon(arrowHead);
 }
 
-QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax) {
+QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
+{
     QMap<QString, OPCODECOLOR> mapResult;
 
     if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
@@ -513,7 +528,8 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
     return mapResult;
 }
 
-XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id) {
+XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id)
+{
     OPCODECOLOR result = {};
 
     QString sCode = getGlobalOptions()->getValue(id).toString();
@@ -531,7 +547,8 @@ XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id) {
     return result;
 }
 
-XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition) {
+XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
+{
     OS osResult = {};
     osResult.nOffset = -1;
 
@@ -571,7 +588,8 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
     return osResult;
 }
 
-void XDisasmView::updateData() {
+void XDisasmView::updateData()
+{
     g_listRecords.clear();
     //    g_listArrows.clear();
 
@@ -720,7 +738,8 @@ void XDisasmView::updateData() {
     }
 }
 
-void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight) {
+void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+{
     Q_UNUSED(nHeight)
 
     if (nColumn == COLUMN_ARROWS) {
@@ -773,7 +792,8 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
     }
 }
 
-void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight) {
+void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
+{
     qint32 nNumberOfRows = g_listRecords.count();
 
     qint64 nCursorOffset = getState().nCursorOffset;
@@ -818,7 +838,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
     }
 }
 
-void XDisasmView::contextMenu(const QPoint &pos) {
+void XDisasmView::contextMenu(const QPoint &pos)
+{
     if (isContextMenuEnable()) {
         QAction actionGoToAddress(tr("Address"), this);
         actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
@@ -950,15 +971,18 @@ void XDisasmView::contextMenu(const QPoint &pos) {
     }
 }
 
-void XDisasmView::wheelEvent(QWheelEvent *pEvent) {
+void XDisasmView::wheelEvent(QWheelEvent *pEvent)
+{
     XAbstractTableView::wheelEvent(pEvent);
 }
 
-void XDisasmView::keyPressEvent(QKeyEvent *pEvent) {
+void XDisasmView::keyPressEvent(QKeyEvent *pEvent)
+{
     XAbstractTableView::keyPressEvent(pEvent);
 }
 
-qint64 XDisasmView::getScrollValue() {
+qint64 XDisasmView::getScrollValue()
+{
     qint64 nResult = 0;
 
     qint32 nValue = verticalScrollBar()->value();
@@ -986,7 +1010,8 @@ qint64 XDisasmView::getScrollValue() {
     return nResult;
 }
 
-void XDisasmView::setScrollValue(qint64 nOffset) {
+void XDisasmView::setScrollValue(qint64 nOffset)
+{
     setViewStart(nOffset);
 
     qint32 nValue = 0;
@@ -1006,7 +1031,8 @@ void XDisasmView::setScrollValue(qint64 nOffset) {
     adjust(true);  // TODO mb Remove
 }
 
-void XDisasmView::adjustColumns() {
+void XDisasmView::adjustColumns()
+{
     //    setColumnEnabled(COLUMN_OFFSET,!(g_options.bHideOffset));
 
     const QFontMetricsF fm(getTextFont());
@@ -1036,7 +1062,8 @@ void XDisasmView::adjustColumns() {
     setColumnWidth(COLUMN_COMMENT, 60 * getCharWidth());
 }
 
-void XDisasmView::registerShortcuts(bool bState) {
+void XDisasmView::registerShortcuts(bool bState)
+{
     if (bState) {
         if (!shortCuts[SC_GOTOADDRESS]) shortCuts[SC_GOTOADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS), this, SLOT(_goToAddressSlot()));
         if (!shortCuts[SC_GOTOOFFSET]) shortCuts[SC_GOTOOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET), this, SLOT(_goToOffsetSlot()));
@@ -1066,7 +1093,8 @@ void XDisasmView::registerShortcuts(bool bState) {
     }
 }
 
-void XDisasmView::_headerClicked(qint32 nColumn) {
+void XDisasmView::_headerClicked(qint32 nColumn)
+{
     if (nColumn == COLUMN_ADDRESS) {
         if (getAddressMode() == MODE_ADDRESS) {
             setColumnTitle(COLUMN_ADDRESS, tr("Offset"));
@@ -1099,7 +1127,8 @@ void XDisasmView::_headerClicked(qint32 nColumn) {
     }
 }
 
-void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn) {
+void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
+{
     if (nColumn == COLUMN_ADDRESS) {
         setColumnTitle(COLUMN_ADDRESS, "");
         setAddressMode(MODE_THIS);
@@ -1112,7 +1141,8 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn) {
     }
 }
 
-qint64 XDisasmView::getRecordSize(qint64 nOffset) {
+qint64 XDisasmView::getRecordSize(qint64 nOffset)
+{
     qint64 nResult = 1;
 
     QByteArray baData = read_array(nOffset, 15);  // TODO const
@@ -1124,19 +1154,22 @@ qint64 XDisasmView::getRecordSize(qint64 nOffset) {
     return nResult;
 }
 
-qint64 XDisasmView::getFixOffset(qint64 nOffset) {
+qint64 XDisasmView::getFixOffset(qint64 nOffset)
+{
     qint64 nResult = getDisasmOffset(nOffset, -1);
 
     return nResult;
 }
 
-void XDisasmView::_goToEntryPointSlot() {
+void XDisasmView::_goToEntryPointSlot()
+{
     goToAddress(g_options.nEntryPointAddress);
     setFocus();
     viewport()->update();
 }
 
-void XDisasmView::_signatureSlot() {
+void XDisasmView::_signatureSlot()
+{
     STATE state = getState();
 
     DialogMultiDisasmSignature dmds(this);
@@ -1148,7 +1181,8 @@ void XDisasmView::_signatureSlot() {
     dmds.exec();
 }
 
-void XDisasmView::_hexSlot() {
+void XDisasmView::_hexSlot()
+{
     if (g_options.bMenu_Hex) {
         emit showOffsetHex(getStateOffset());
     }

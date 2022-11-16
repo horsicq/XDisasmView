@@ -22,7 +22,8 @@
 
 #include "ui_dialogmultidisasmsignature.h"
 
-DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasmSignature) {
+DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasmSignature)
+{
     ui->setupUi(this);
 
     this->g_pDevice = nullptr;
@@ -45,11 +46,13 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     ui->comboBoxMethod->blockSignals(bBlocked2);
 }
 
-DialogMultiDisasmSignature::~DialogMultiDisasmSignature() {
+DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
+{
     delete ui;
 }
 
-void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle) {
+void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
+{
     this->g_pDevice = pDevice;
     this->g_nOffset = nOffset;
     this->g_pMemoryMap = pMemoryMap;
@@ -58,7 +61,8 @@ void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBi
     reload();
 }
 
-void DialogMultiDisasmSignature::reload() {
+void DialogMultiDisasmSignature::reload()
+{
     const qint32 N_X64_OPCODE_SIZE = 16;
 
     g_listRecords.clear();
@@ -225,7 +229,8 @@ void DialogMultiDisasmSignature::reload() {
     reloadSignature();
 }
 
-void DialogMultiDisasmSignature::reloadSignature() {
+void DialogMultiDisasmSignature::reloadSignature()
+{
     QString sText;
 
     QChar cWild = QChar('.');
@@ -313,46 +318,54 @@ void DialogMultiDisasmSignature::reloadSignature() {
     ui->textEditSignature->setText(sText);
 }
 
-void DialogMultiDisasmSignature::on_pushButtonOK_clicked() {
+void DialogMultiDisasmSignature::on_pushButtonOK_clicked()
+{
     this->close();
 }
 
-void DialogMultiDisasmSignature::on_checkBoxSpaces_toggled(bool bChecked) {
+void DialogMultiDisasmSignature::on_checkBoxSpaces_toggled(bool bChecked)
+{
     Q_UNUSED(bChecked)
 
     reloadSignature();
 }
 
-void DialogMultiDisasmSignature::on_checkBoxUpper_toggled(bool bChecked) {
+void DialogMultiDisasmSignature::on_checkBoxUpper_toggled(bool bChecked)
+{
     Q_UNUSED(bChecked)
 
     reloadSignature();
 }
 
-void DialogMultiDisasmSignature::on_lineEditWildcard_textChanged(const QString &sText) {
+void DialogMultiDisasmSignature::on_lineEditWildcard_textChanged(const QString &sText)
+{
     Q_UNUSED(sText)
 
     reloadSignature();
 }
 
-void DialogMultiDisasmSignature::on_pushButtonCopy_clicked() {
+void DialogMultiDisasmSignature::on_pushButtonCopy_clicked()
+{
     QClipboard *pClipboard = QApplication::clipboard();
     pClipboard->setText(ui->textEditSignature->toPlainText());
 }
 
-void DialogMultiDisasmSignature::on_spinBoxCount_valueChanged(int nValue) {
+void DialogMultiDisasmSignature::on_spinBoxCount_valueChanged(int nValue)
+{
     Q_UNUSED(nValue)
 
     reload();
 }
 
-void DialogMultiDisasmSignature::on_comboBoxMethod_currentIndexChanged(int nIndex) {
+void DialogMultiDisasmSignature::on_comboBoxMethod_currentIndexChanged(int nIndex)
+{
     Q_UNUSED(nIndex)
 
     reload();
 }
 
-void DialogMultiDisasmSignature::on_pushButtonScan_clicked() {
+void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
+{
     SearchSignaturesWidget::OPTIONS options = {};
     options.bMenu_Hex = false;
     options.sUserSignature = ui->textEditSignature->toPlainText();

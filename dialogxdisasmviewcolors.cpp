@@ -22,15 +22,18 @@
 
 #include "ui_dialogxdisasmviewcolors.h"
 
-DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogXDisasmViewColors) {
+DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogXDisasmViewColors)
+{
     ui->setupUi(this);
 }
 
-DialogXDisasmViewColors::~DialogXDisasmViewColors() {
+DialogXDisasmViewColors::~DialogXDisasmViewColors()
+{
     delete ui;
 }
 
-void DialogXDisasmViewColors::setOptions(XOptions *pOptions) {
+void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
+{
     g_pOptions = pOptions;
 
     ui->tableWidgetColors->setColumnCount(6);
@@ -57,7 +60,8 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions) {
     ui->tableWidgetColors->setColumnWidth(COLUMN_BACKGROUND_COLOR_REMOVE, 20);
 }
 
-void DialogXDisasmViewColors::save() {
+void DialogXDisasmViewColors::save()
+{
     QMapIterator<XOptions::ID, QString> iter(g_mapColors);
 
     while (iter.hasNext()) {
@@ -70,11 +74,13 @@ void DialogXDisasmViewColors::save() {
     }
 }
 
-void DialogXDisasmViewColors::on_pushButtonCancel_clicked() {
+void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
+{
     this->close();
 }
 
-void DialogXDisasmViewColors::addRecord(qint32 nRow, QString sGroup, QString sText, XOptions::ID id) {
+void DialogXDisasmViewColors::addRecord(qint32 nRow, QString sGroup, QString sText, XOptions::ID id)
+{
     QPushButton *pButtonTextColor = new QPushButton;
     pButtonTextColor->setText(tr("Text"));
     pButtonTextColor->setProperty("ROW", nRow);
@@ -131,7 +137,8 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow, QString sGroup, QString sTe
     updateRow(nRow);
 }
 
-void DialogXDisasmViewColors::updateRow(qint32 nRow) {
+void DialogXDisasmViewColors::updateRow(qint32 nRow)
+{
     XOptions::ID id = (XOptions::ID)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_TEXT_COLOR)->property("ID").toUInt());
 
     QString sColor = g_mapColors.value(id);
@@ -146,13 +153,15 @@ void DialogXDisasmViewColors::updateRow(qint32 nRow) {
     ((QPushButton *)(ui->tableWidgetColors->cellWidget(nRow, COLUMN_BACKGROUND_COLOR_REMOVE)))->setEnabled(sBackgroundColor != "");
 }
 
-void DialogXDisasmViewColors::on_pushButtonOK_clicked() {
+void DialogXDisasmViewColors::on_pushButtonOK_clicked()
+{
     save();
 
     this->close();
 }
 
-void DialogXDisasmViewColors::pushButtonSlot() {
+void DialogXDisasmViewColors::pushButtonSlot()
+{
     QPushButton *pPushButton = qobject_cast<QPushButton *>(sender());
 
     if (pPushButton) {

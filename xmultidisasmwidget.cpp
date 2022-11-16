@@ -22,7 +22,8 @@
 
 #include "ui_xmultidisasmwidget.h"
 
-XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::XMultiDisasmWidget) {
+XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::XMultiDisasmWidget)
+{
     ui->setupUi(this);
 
     g_pDevice = nullptr;
@@ -86,11 +87,13 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->checkBoxReadonly->setChecked(true);
 }
 
-XMultiDisasmWidget::~XMultiDisasmWidget() {
+XMultiDisasmWidget::~XMultiDisasmWidget()
+{
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB) {
+void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB)
+{
     g_pDevice = pDevice;
     g_options = options;
 
@@ -109,34 +112,41 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     reloadFileType();
 }
 
-void XMultiDisasmWidget::setDevice(QIODevice *pDevice) {
+void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
+{
     ui->scrollAreaDisasm->setDevice(pDevice);
 }
 
-void XMultiDisasmWidget::setBackupDevice(QIODevice *pDevice) {
+void XMultiDisasmWidget::setBackupDevice(QIODevice *pDevice)
+{
     ui->scrollAreaDisasm->setBackupDevice(pDevice);
 }
 
-void XMultiDisasmWidget::goToAddress(XADDR nAddress) {
+void XMultiDisasmWidget::goToAddress(XADDR nAddress)
+{
     ui->scrollAreaDisasm->goToAddress(nAddress);
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::goToOffset(qint64 nOffset) {
+void XMultiDisasmWidget::goToOffset(qint64 nOffset)
+{
     ui->scrollAreaDisasm->goToOffset(nOffset);
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions) {
+void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
+{
     ui->scrollAreaDisasm->setGlobal(pShortcuts, pXOptions);
     XShortcutsWidget::setGlobal(pShortcuts, pXOptions);
 }
 
-void XMultiDisasmWidget::setReadonly(bool bState) {
+void XMultiDisasmWidget::setReadonly(bool bState)
+{
     ui->scrollAreaDisasm->setReadonly(bState);
 }
 
-void XMultiDisasmWidget::setReadonlyVisible(bool bState) {
+void XMultiDisasmWidget::setReadonlyVisible(bool bState)
+{
     if (bState) {
         ui->checkBoxReadonly->show();
     } else {
@@ -144,17 +154,20 @@ void XMultiDisasmWidget::setReadonlyVisible(bool bState) {
     }
 }
 
-void XMultiDisasmWidget::setEdited(bool bState) {
+void XMultiDisasmWidget::setEdited(bool bState)
+{
     ui->scrollAreaDisasm->setEdited();
 
     //    emit changed();
 }
 
-void XMultiDisasmWidget::addMode(XBinary::DM disasmMode) {
+void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
+{
     ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode), disasmMode);
 }
 
-void XMultiDisasmWidget::reloadFileType() {
+void XMultiDisasmWidget::reloadFileType()
+{
     const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
 
     XBinary::FT fileType = g_options.fileType;
@@ -193,24 +206,28 @@ void XMultiDisasmWidget::reloadFileType() {
     ui->comboBoxMode->blockSignals(bBlocked1);
 }
 
-void XMultiDisasmWidget::adjustMode() {
+void XMultiDisasmWidget::adjustMode()
+{
     XBinary::DM disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
     ui->scrollAreaDisasm->setMode(disasmMode);
     ui->scrollAreaDisasm->reload(true);
 }
 
-void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex) {
+void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
+{
     Q_UNUSED(nIndex)
 
     adjustMode();
 }
 
-void XMultiDisasmWidget::registerShortcuts(bool bState) {
+void XMultiDisasmWidget::registerShortcuts(bool bState)
+{
     Q_UNUSED(bState)
 }
 
-void XMultiDisasmWidget::on_pushButtonSymbols_clicked() {
+void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
+{
     DialogXSymbols dialogSymbols(this);
 
     dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(), true);
@@ -218,6 +235,7 @@ void XMultiDisasmWidget::on_pushButtonSymbols_clicked() {
     dialogSymbols.exec();
 }
 
-void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked) {
+void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked)
+{
     ui->scrollAreaDisasm->setReadonly(bChecked);
 }

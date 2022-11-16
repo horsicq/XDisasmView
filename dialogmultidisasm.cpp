@@ -22,7 +22,8 @@
 
 #include "ui_dialogmultidisasm.h"
 
-DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasm) {
+DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasm)
+{
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
@@ -32,11 +33,13 @@ DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) : XShortcutsDialog(pParen
     ui->widgetDisasm->setReadonlyVisible(true);
 }
 
-DialogMultiDisasm::~DialogMultiDisasm() {
+DialogMultiDisasm::~DialogMultiDisasm()
+{
     delete ui;
 }
 
-void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options) {
+void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options)
+{
     ui->widgetDisasm->setData(pDevice, options, 0);
 
     if (options.sTitle != "") {
@@ -44,11 +47,13 @@ void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS 
     }
 }
 
-void DialogMultiDisasm::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions) {
+void DialogMultiDisasm::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
+{
     ui->widgetDisasm->setGlobal(pShortcuts, pXOptions);
     XShortcutsDialog::setGlobal(pShortcuts, pXOptions);
 }
 
-void DialogMultiDisasm::on_pushButtonClose_clicked() {
+void DialogMultiDisasm::on_pushButtonClose_clicked()
+{
     this->close();
 }

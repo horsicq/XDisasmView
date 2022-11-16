@@ -22,7 +22,8 @@
 
 #include "ui_xdisasmviewoptionswidget.h"
 
-XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget) {
+XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget)
+{
     ui->setupUi(this);
 
     g_pOptions = nullptr;
@@ -30,17 +31,20 @@ XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(p
     setProperty("GROUPID", XOptions::GROUPID_DISASM);
 }
 
-XDisasmViewOptionsWidget::~XDisasmViewOptionsWidget() {
+XDisasmViewOptionsWidget::~XDisasmViewOptionsWidget()
+{
     delete ui;
 }
 
-void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions) {
+void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions)
+{
     g_pOptions = pOptions;
 
     reload();
 }
 
-void XDisasmViewOptionsWidget::save() {
+void XDisasmViewOptionsWidget::save()
+{
     g_pOptions->getLineEdit(ui->lineEditDisasmFont, XOptions::ID_DISASM_FONT);
     g_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
     g_pOptions->getCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
@@ -48,7 +52,8 @@ void XDisasmViewOptionsWidget::save() {
     g_pOptions->getCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
 }
 
-void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions) {
+void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
+{
 #ifdef Q_OS_WIN
     pOptions->addID(XOptions::ID_DISASM_FONT, "Courier,10,-1,5,50,0,0,0,0,0");
 #endif
@@ -67,7 +72,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions) {
     setDefaultColorValues(pOptions);
 }
 
-void XDisasmViewOptionsWidget::setDefaultColorValues(XOptions *pOptions) {
+void XDisasmViewOptionsWidget::setDefaultColorValues(XOptions *pOptions)
+{
     // Colors
     // X86
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -86,7 +92,8 @@ void XDisasmViewOptionsWidget::setDefaultColorValues(XOptions *pOptions) {
     // TODO more
 }
 
-void XDisasmViewOptionsWidget::reload() {
+void XDisasmViewOptionsWidget::reload()
+{
     g_pOptions->setLineEdit(ui->lineEditDisasmFont, XOptions::ID_DISASM_FONT);
     g_pOptions->setComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
     g_pOptions->setCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
@@ -94,11 +101,13 @@ void XDisasmViewOptionsWidget::reload() {
     g_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
 }
 
-void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked() {
+void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
+{
     XOptions::handleFontButton(this, ui->lineEditDisasmFont);
 }
 
-void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked() {
+void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
+{
     DialogXDisasmViewColors dialogColors(this);
 
     dialogColors.setOptions(g_pOptions);
