@@ -22,7 +22,8 @@
 
 #include "ui_dialogmultidisasmsignature.h"
 
-DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasmSignature)
+DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent)
+    : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasmSignature)
 {
     ui->setupUi(this);
 

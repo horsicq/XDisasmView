@@ -20,7 +20,8 @@
  */
 #include "xdisasmview.h"
 
-XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
+XDisasmView::XDisasmView(QWidget *pParent)
+    : XDeviceTableEditView(pParent)
 {
     // TODO click on Address -> Offset
     g_handle = 0;

@@ -22,7 +22,8 @@
 
 #include "ui_dialogmultidisasm.h"
 
-DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasm)
+DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent)
+    : XShortcutsDialog(pParent), ui(new Ui::DialogMultiDisasm)
 {
     ui->setupUi(this);
 

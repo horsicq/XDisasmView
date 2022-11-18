@@ -22,7 +22,8 @@
 
 #include "ui_xdisasmviewoptionswidget.h"
 
-XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget)
+XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent)
+    : QWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget)
 {
     ui->setupUi(this);
 
