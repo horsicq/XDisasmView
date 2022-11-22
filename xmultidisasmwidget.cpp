@@ -22,8 +22,7 @@
 
 #include "ui_xmultidisasmwidget.h"
 
-XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent)
-    : XShortcutsWidget(pParent), ui(new Ui::XMultiDisasmWidget)
+XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::XMultiDisasmWidget)
 {
     ui->setupUi(this);
 

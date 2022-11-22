@@ -22,8 +22,7 @@
 
 #include "ui_dialogxdisasmviewcolors.h"
 
-DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent)
-    : QDialog(pParent), ui(new Ui::DialogXDisasmViewColors)
+DialogXDisasmViewColors::DialogXDisasmViewColors(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogXDisasmViewColors)
 {
     ui->setupUi(this);
 }

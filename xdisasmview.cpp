@@ -20,8 +20,7 @@
  */
 #include "xdisasmview.h"
 
-XDisasmView::XDisasmView(QWidget *pParent)
-    : XDeviceTableEditView(pParent)
+XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 {
     // TODO click on Address -> Offset
     g_handle = 0;
@@ -1068,13 +1067,11 @@ void XDisasmView::registerShortcuts(bool bState)
     if (bState) {
         if (!shortCuts[SC_GOTOADDRESS]) shortCuts[SC_GOTOADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS), this, SLOT(_goToAddressSlot()));
         if (!shortCuts[SC_GOTOOFFSET]) shortCuts[SC_GOTOOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET), this, SLOT(_goToOffsetSlot()));
-        if (!shortCuts[SC_GOTOENTRYPOINT])
-            shortCuts[SC_GOTOENTRYPOINT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT), this, SLOT(_goToEntryPointSlot()));
+        if (!shortCuts[SC_GOTOENTRYPOINT]) shortCuts[SC_GOTOENTRYPOINT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT), this, SLOT(_goToEntryPointSlot()));
         if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!shortCuts[SC_SELECTALL]) shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
         if (!shortCuts[SC_COPYASHEX]) shortCuts[SC_COPYASHEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX), this, SLOT(_copyHexSlot()));
-        if (!shortCuts[SC_COPYCURSORADDRESS])
-            shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
+        if (!shortCuts[SC_COPYCURSORADDRESS]) shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
         if (!shortCuts[SC_COPYCURSOROFFSET]) shortCuts[SC_COPYCURSOROFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
         if (!shortCuts[SC_FIND_STRING]) shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
         if (!shortCuts[SC_FIND_SIGNATURE]) shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));
