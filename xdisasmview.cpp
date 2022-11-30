@@ -1074,9 +1074,11 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!shortCuts[SC_COPYASHEX]) shortCuts[SC_COPYASHEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX), this, SLOT(_copyHexSlot()));
         if (!shortCuts[SC_COPYCURSORADDRESS])
             shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
-        if (!shortCuts[SC_COPYCURSOROFFSET]) shortCuts[SC_COPYCURSOROFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
+        if (!shortCuts[SC_COPYCURSOROFFSET])
+            shortCuts[SC_COPYCURSOROFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
         if (!shortCuts[SC_FIND_STRING]) shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
-        if (!shortCuts[SC_FIND_SIGNATURE]) shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));
+        if (!shortCuts[SC_FIND_SIGNATURE])
+            shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));
         if (!shortCuts[SC_FIND_VALUE]) shortCuts[SC_FIND_VALUE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE), this, SLOT(_findValueSlot()));
         if (!shortCuts[SC_FINDNEXT]) shortCuts[SC_FINDNEXT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT), this, SLOT(_findNextSlot()));
         if (!shortCuts[SC_SIGNATURE]) shortCuts[SC_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE), this, SLOT(_signatureSlot()));
