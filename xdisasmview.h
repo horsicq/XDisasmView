@@ -157,6 +157,9 @@ private:
     QMap<QString, OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
     OPCODECOLOR getOpcodeColor(XOptions::ID id);
 
+private:
+    RECORD _getRecordByOffset(QList<RECORD> *pListRecord, qint64 nOffset);
+
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
     virtual void updateData();
@@ -176,6 +179,7 @@ protected:
 
 protected slots:
     void _goToEntryPointSlot();
+    void _goToXrefSlot();
     void _signatureSlot();
     void _hexSlot();
 
@@ -193,7 +197,7 @@ private:
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QMap<QString, OPCODECOLOR> g_mapOpcodes;
+    QMap<QString, OPCODECOLOR> g_mapOpcodeColorMap;
     XBinary::SYNTAX g_syntax;
     XADDR g_nThisBase;
     bool g_bIsAddressColon;

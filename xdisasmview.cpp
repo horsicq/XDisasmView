@@ -72,7 +72,7 @@ void XDisasmView::_adjustView()
 
     g_syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
 
-    g_mapOpcodes = getOpcodeColorMap(g_disasmMode, g_syntax);
+    g_mapOpcodeColorMap = getOpcodeColorMap(g_disasmMode, g_syntax);
 
     if (g_handle) {
         XCapstone::closeHandle(&g_handle);
@@ -401,8 +401,8 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         _sMnenonic = sMnemonic;
     }
     // TODO registers !!!
-    if (g_bIsHighlight && g_mapOpcodes.contains(_sMnenonic)) {
-        OPCODECOLOR opcodeColor = g_mapOpcodes.value(_sMnenonic);
+    if (g_bIsHighlight && g_mapOpcodeColorMap.contains(_sMnenonic)) {
+        OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
 
         pPainter->save();
 
@@ -542,6 +542,23 @@ XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id)
 
     if (sBackgroundCode != "") {
         result.colBackground.setNamedColor(sBackgroundCode);
+    }
+
+    return result;
+}
+
+XDisasmView::RECORD XDisasmView::_getRecordByOffset(QList<RECORD> *pListRecord, qint64 nOffset)
+{
+    RECORD result = {};
+
+    qint32 nNumberOfRecords = pListRecord->count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if (pListRecord->at(i).nOffset == nOffset) {
+            result = pListRecord->at(i);
+
+            break;
+        }
     }
 
     return result;
@@ -853,6 +870,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
+        QAction actionGoXref("XREF", this);
+        actionGoXref.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
+        connect(&actionGoXref, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
+
         QAction actionDumpToFile(tr("Dump to file"), this);
         actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
         connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
@@ -919,6 +940,17 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuGoTo.addAction(&actionGoToAddress);
         menuGoTo.addAction(&actionGoToOffset);
         menuGoTo.addAction(&actionGoToEntryPoint);
+
+        // TODO go to address
+        STATE state = getState();
+
+        XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionOffset);
+
+        if (record.disasmResult.bRelative) {
+            menuGoTo.addSeparator();
+            actionGoXref.setProperty("ADDRESS", record.disasmResult.nXrefTo);
+            menuGoTo.addAction(&actionGoXref);
+        }
 
         contextMenu.addMenu(&menuGoTo);
 
@@ -1169,6 +1201,19 @@ void XDisasmView::_goToEntryPointSlot()
     goToAddress(g_options.nEntryPointAddress);
     setFocus();
     viewport()->update();
+}
+
+void XDisasmView::_goToXrefSlot()
+{
+    QAction *pAction = qobject_cast<QAction *>(sender());
+
+    if (pAction) {
+        XADDR nAddress = pAction->property("ADDRESS").toULongLong();
+
+        goToAddress(nAddress);
+        setFocus();
+        viewport()->update();
+    }
 }
 
 void XDisasmView::_signatureSlot()
