@@ -154,103 +154,43 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
-XDisasmView::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nAddress, MODE mode)
+XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nAddress)
 {
-    DISASM_RESULT result = {};
+    XCapstone::DISASM_OPTIONS disasmOptions = {};
+    disasmOptions.bIsUppercase = g_bIsUppercase;
 
-    result.mode = mode;
-    result.nAddress = nAddress;
+    XCapstone::DISASM_RESULT result = XCapstone::disasm_ex(g_handle, g_disasmMode, pData, nDataSize, nAddress, disasmOptions);
 
-    if (g_handle) {
-        cs_insn *pInsn = nullptr;
+    if (getXInfoDB()) {
+        if ((g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) || (g_modeOpcode == MODE_OPCODE_SYMBOL) || (g_modeOpcode == MODE_OPCODE_ADDRESS)) {
+            XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
 
-        quint64 nNumberOfOpcodes = cs_disasm(g_handle, (uint8_t *)pData, nDataSize, nAddress, 1, &pInsn);
-
-        if (nNumberOfOpcodes > 0) {
-            result.sMnemonic = pInsn->mnemonic;
-            result.sString = pInsn->op_str;
-
-            //            result.sOpcode+=sMnemonic;
-            //            if(sStr!="")
-            //            {
-            //                result.sOpcode+=QString("|%1").arg(sStr);
-            //            }
-
-            result.nSize = pInsn->size;
-            result.bIsValid = true;
-
-            qint32 nNumberOfGroups = pInsn->detail->groups_count;
-
-            for (qint32 i = 0; i < nNumberOfGroups; i++) {
-                if (pInsn->detail->groups[i] == CS_GRP_BRANCH_RELATIVE) {
-                    if (XBinary::getDisasmFamily(g_disasmMode) == XBinary::DMFAMILY_X86) {
-                        for (qint32 j = 0; j < pInsn->detail->x86.op_count; j++) {
-                            if (pInsn->detail->x86.operands[j].type == X86_OP_IMM) {
-                                result.bRelative = true;
-                                result.nXrefTo = pInsn->detail->x86.operands[j].imm;
-
-                                break;
-                            }
-                        }
-                    } else if (XBinary::getDisasmFamily(g_disasmMode) == XBinary::DMFAMILY_ARM) {
-                        for (qint32 j = 0; j < pInsn->detail->arm.op_count; j++) {
-                            if (pInsn->detail->arm.operands[j].type == ARM_OP_IMM) {
-                                result.bRelative = true;
-                                result.nXrefTo = pInsn->detail->arm.operands[j].imm;
-
-                                break;
-                            }
-                        }
-                    } else if (XBinary::getDisasmFamily(g_disasmMode) == XBinary::DMFAMILY_ARM64) {
-                        for (qint32 j = 0; j < pInsn->detail->arm64.op_count; j++) {
-                            if (pInsn->detail->arm64.operands[j].type == ARM64_OP_IMM) {
-                                result.bRelative = true;
-                                result.nXrefTo = pInsn->detail->arm64.operands[j].imm;
-
-                                break;
-                            }
-                        }
-                    }
-
-                    break;
-                }
+            if (g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) {
+                riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
+            } else if (g_modeOpcode == MODE_OPCODE_SYMBOL) {
+                riType = XInfoDB::RI_TYPE_SYMBOL;
+            } else if (g_modeOpcode == MODE_OPCODE_ADDRESS) {
+                riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
             if (result.bRelative) {
-                if ((g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) || (g_modeOpcode == MODE_OPCODE_SYMBOL) || (g_modeOpcode == MODE_OPCODE_ADDRESS)) {
-                    XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
+                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefToRelative), riType);
 
-                    if (g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) {
-                        riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-                    } else if (g_modeOpcode == MODE_OPCODE_SYMBOL) {
-                        riType = XInfoDB::RI_TYPE_SYMBOL;
-                    } else if (g_modeOpcode == MODE_OPCODE_ADDRESS) {
-                        riType = XInfoDB::RI_TYPE_ADDRESS;
-                    }
-
-                    if (getXInfoDB()) {
-                        QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefTo), riType);
-
-                        if (sReplace != "") {
-                            QString sOrigin = QString("0x%1").arg(QString::number(result.nXrefTo, 16));
-                            result.sString = result.sString.replace(sOrigin, sReplace);
-                        }
-                    }
+                if (sReplace != "") {
+                    QString sOrigin = QString("0x%1").arg(QString::number(result.nXrefToRelative, 16));
+                    result.sString = result.sString.replace(sOrigin, sReplace);
                 }
             }
 
-            cs_free(pInsn, nNumberOfOpcodes);
-        } else {
-            result.sMnemonic = tr("Invalid opcode");
-            result.nSize = 1;
-        }
-    } else {
-        result.nSize = 1;
-    }
+            if (result.bMemory) {
+                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefToMemory), riType);
 
-    if (g_bIsUppercase) {
-        result.sMnemonic = result.sMnemonic.toUpper();
-        result.sString = result.sString.toUpper();
+                if (sReplace != "") {
+                    QString sOrigin = QString("0x%1").arg(QString::number(result.nXrefToMemory, 16));
+                    result.sString = result.sString.replace(sOrigin, sReplace);
+                }
+            }
+        }
     }
 
     return result;
@@ -293,11 +233,13 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset)
 
         qint64 _nCurrentOffset = 0;
 
+        XCapstone::DISASM_OPTIONS disasmOptions = {};
+
         // TODO nOffset<nOldOffset
         while (nSize > 0) {
             qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-            DISASM_RESULT disasmResult = _disasm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, MODE_ADDRESS);
+            XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, disasmOptions);
 
             if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                 if (_nOffset == nOffset) {
@@ -675,7 +617,7 @@ void XDisasmView::updateData()
                     }
                 }
 
-                record.disasmResult = _disasm(baBuffer.data(), nBufferSize, record.nAddress, getAddressMode());
+                record.disasmResult = _disasm(baBuffer.data(), nBufferSize, record.nAddress);
 
                 nBufferSize = record.disasmResult.nSize;
 
@@ -697,7 +639,7 @@ void XDisasmView::updateData()
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
                 if (g_listRecords.at(i).disasmResult.bRelative) {
-                    XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefTo;
+                    XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefToRelative;
                     XADDR nCurrentAddress = g_listRecords.at(i).nAddress;
 
                     qint32 nStart = 0;
@@ -870,9 +812,12 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
-        QAction actionGoXref("XREF", this);
-        actionGoXref.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
-        connect(&actionGoXref, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
+        QAction actionGoXrefRelative("", this);
+//        actionGoXrefRelative.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
+        connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
+
+        QAction actionGoXrefMemory("", this);
+        connect(&actionGoXrefMemory, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
 
         QAction actionDumpToFile(tr("Dump to file"), this);
         actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
@@ -910,6 +855,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
         connect(&actionCopyAsHex, SIGNAL(triggered()), this, SLOT(_copyHexSlot()));
 
+        QAction actionCopyAsOpcode(tr("Opcode"), this);
+        actionCopyAsOpcode.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE));
+        connect(&actionCopyAsOpcode, SIGNAL(triggered()), this, SLOT(_copyOpcodeSlot()));
+
         QAction actionCopyCursorOffset(tr("Offset"), this);
         actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
         connect(&actionCopyCursorOffset, SIGNAL(triggered()), this, SLOT(_copyOffsetSlot()));
@@ -946,10 +895,16 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionOffset);
 
-        if (record.disasmResult.bRelative) {
+        if (record.disasmResult.bRelative || record.disasmResult.bMemory) {
             menuGoTo.addSeparator();
-            actionGoXref.setProperty("ADDRESS", record.disasmResult.nXrefTo);
-            menuGoTo.addAction(&actionGoXref);
+
+            actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
+            actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
+            menuGoTo.addAction(&actionGoXrefRelative);
+
+            actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
+            actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
+            menuGoTo.addAction(&actionGoXrefMemory);
         }
 
         contextMenu.addMenu(&menuGoTo);
@@ -974,6 +929,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addAction(&actionDumpToFile);
             contextMenu.addAction(&actionSignature);
             menuCopy.addAction(&actionCopyAsHex);
+            menuCopy.addAction(&actionCopyAsOpcode);
 
             menuHex.addAction(&actionHexSignature);
 
@@ -1104,6 +1060,7 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!shortCuts[SC_SELECTALL]) shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
         if (!shortCuts[SC_COPYASHEX]) shortCuts[SC_COPYASHEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX), this, SLOT(_copyHexSlot()));
+        if (!shortCuts[SC_COPYASOPCODE]) shortCuts[SC_COPYASOPCODE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE), this, SLOT(_copyOpcodeSlot()));
         if (!shortCuts[SC_COPYCURSORADDRESS])
             shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
         if (!shortCuts[SC_COPYCURSOROFFSET])
@@ -1182,7 +1139,7 @@ qint64 XDisasmView::getRecordSize(qint64 nOffset)
 
     QByteArray baData = read_array(nOffset, 15);  // TODO const
 
-    DISASM_RESULT disasmResult = _disasm(baData.data(), baData.size(), 0, MODE_ADDRESS);
+    XCapstone::DISASM_RESULT disasmResult = _disasm(baData.data(), baData.size(), 0);
 
     nResult = disasmResult.nSize;
 
@@ -1234,4 +1191,15 @@ void XDisasmView::_hexSlot()
     if (g_options.bMenu_Hex) {
         emit showOffsetHex(getStateOffset());
     }
+}
+
+void XDisasmView::_copyOpcodeSlot()
+{
+    STATE state = getState();
+
+    XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionOffset);
+
+    QString sOpcodeString = QString("%1 %2").arg(record.disasmResult.sMnemonic, record.disasmResult.sString);
+
+    QApplication::clipboard()->setText(sOpcodeString);
 }

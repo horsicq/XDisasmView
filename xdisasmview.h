@@ -41,9 +41,11 @@ class XDisasmView : public XDeviceTableEditView {
         SC_GOTOADDRESS,
         SC_GOTOOFFSET,
         SC_GOTOENTRYPOINT,
+        SC_GOTOXREF,
         SC_DUMPTOFILE,
         SC_SELECTALL,
         SC_COPYASHEX,
+        SC_COPYASOPCODE,
         SC_COPYCURSOROFFSET,
         SC_COPYCURSORADDRESS,
         SC_FIND_STRING,
@@ -98,17 +100,6 @@ private:
         ARRAY_DOWN
     };
 
-    struct DISASM_RESULT {
-        bool bIsValid;
-        XADDR nAddress;
-        qint32 nSize;
-        QString sMnemonic;
-        QString sString;
-        bool bRelative;
-        XADDR nXrefTo;
-        MODE mode;
-    };
-
     struct RECORD {
         QString sAddress;
         //        QString sOffset;
@@ -116,7 +107,7 @@ private:
         QString sCommemt;
         qint64 nOffset;
         XADDR nAddress;
-        DISASM_RESULT disasmResult;
+        XCapstone::DISASM_RESULT disasmResult;
         bool bIsReplaced;
         ARRAY array;
         qint32 nArrayLevel;
@@ -139,7 +130,7 @@ private:
         MODE_OPCODE_ADDRESS,
     };
 
-    DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nAddress, MODE mode);  // TODO move to XDisasm !!!
+    XCapstone::DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nAddress);  // TODO move to XDisasm !!!
     qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
     MENU_STATE getMenuState();
 
@@ -182,6 +173,7 @@ protected slots:
     void _goToXrefSlot();
     void _signatureSlot();
     void _hexSlot();
+    void _copyOpcodeSlot();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size

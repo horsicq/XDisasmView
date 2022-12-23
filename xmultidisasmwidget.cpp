@@ -97,6 +97,10 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     g_pDevice = pDevice;
     g_options = options;
 
+    if (pDevice) {
+        XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType);
+    }
+
     if (pXInfoDB) {
         if (pXInfoDB->getSymbols()->count() == 0) {
             DialogXInfoDBTransferProcess dialogTransfer(this);
@@ -170,7 +174,7 @@ void XMultiDisasmWidget::reloadFileType()
 {
     const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
 
-    XBinary::FT fileType = g_options.fileType;
+    XBinary::FT fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
     XDisasmView::OPTIONS options = {};
     options.nInitAddress = g_options.nInitAddress;
@@ -239,3 +243,11 @@ void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked)
 {
     ui->scrollAreaDisasm->setReadonly(bChecked);
 }
+
+void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
+{
+    Q_UNUSED(nIndex)
+
+    reloadFileType();
+}
+
