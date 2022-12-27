@@ -172,42 +172,44 @@ void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-    const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
+    if (g_pDevice) {
+        const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
 
-    XBinary::FT fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
+        XBinary::FT fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
-    XDisasmView::OPTIONS options = {};
-    options.nInitAddress = g_options.nInitAddress;
-    options.nEntryPointAddress = XFormats::getEntryPointAddress(fileType, g_pDevice);
-    options.bMenu_Hex = g_options.bMenu_Hex;
+        XDisasmView::OPTIONS options = {};
+        options.nInitAddress = g_options.nInitAddress;
+        options.nEntryPointAddress = XFormats::getEntryPointAddress(fileType, g_pDevice);
+        options.bMenu_Hex = g_options.bMenu_Hex;
 
-    if (fileType == XBinary::FT_REGION) {
-        options.memoryMapRegion = XFormats::getMemoryMap(fileType, g_pDevice, true, g_options.nStartAddress);
-    } else {
-        options.memoryMapRegion = XFormats::getMemoryMap(fileType, g_pDevice);
-    }
-
-    if (g_options.sArch != "") {
-        options.memoryMapRegion.sArch = g_options.sArch;
-    }
-
-    ui->scrollAreaDisasm->setData(g_pDevice, options);
-
-    XBinary::DM disasmMode = ui->scrollAreaDisasm->getMode();
-
-    qint32 nCount = ui->comboBoxMode->count();
-
-    for (qint32 i = 0; i < nCount; i++) {
-        if (ui->comboBoxMode->itemData(i).toInt() == (int)disasmMode) {
-            ui->comboBoxMode->setCurrentIndex(i);
-
-            break;
+        if (fileType == XBinary::FT_REGION) {
+            options.memoryMapRegion = XFormats::getMemoryMap(fileType, g_pDevice, true, g_options.nStartAddress);
+        } else {
+            options.memoryMapRegion = XFormats::getMemoryMap(fileType, g_pDevice);
         }
+
+        if (g_options.sArch != "") {
+            options.memoryMapRegion.sArch = g_options.sArch;
+        }
+
+        ui->scrollAreaDisasm->setData(g_pDevice, options);
+
+        XBinary::DM disasmMode = ui->scrollAreaDisasm->getMode();
+
+        qint32 nCount = ui->comboBoxMode->count();
+
+        for (qint32 i = 0; i < nCount; i++) {
+            if (ui->comboBoxMode->itemData(i).toInt() == (int)disasmMode) {
+                ui->comboBoxMode->setCurrentIndex(i);
+
+                break;
+            }
+        }
+
+        adjustMode();
+
+        ui->comboBoxMode->blockSignals(bBlocked1);
     }
-
-    adjustMode();
-
-    ui->comboBoxMode->blockSignals(bBlocked1);
 }
 
 void XMultiDisasmWidget::adjustMode()
