@@ -252,4 +252,3 @@ void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
 
     reloadFileType();
 }
-

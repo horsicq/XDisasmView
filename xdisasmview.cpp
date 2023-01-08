@@ -813,7 +813,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
         QAction actionGoXrefRelative("", this);
-//        actionGoXrefRelative.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
+        //        actionGoXrefRelative.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
         connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
 
         QAction actionGoXrefMemory("", this);
