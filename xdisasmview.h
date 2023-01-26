@@ -44,7 +44,7 @@ class XDisasmView : public XDeviceTableEditView {
         SC_GOTOXREF,
         SC_DUMPTOFILE,
         SC_SELECTALL,
-        SC_COPYASHEX,
+        SC_COPYASDATA,
         SC_COPYASOPCODE,
         SC_COPYCURSOROFFSET,
         SC_COPYCURSORADDRESS,

@@ -851,9 +851,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
         connect(&actionSelectAll, SIGNAL(triggered()), this, SLOT(_selectAllSlot()));
 
-        QAction actionCopyAsHex(tr("Hex"), this);
-        actionCopyAsHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX));
-        connect(&actionCopyAsHex, SIGNAL(triggered()), this, SLOT(_copyHexSlot()));
+        QAction actionCopyAsData(tr("Data"), this);
+        actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
+        connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
 
         QAction actionCopyAsOpcode(tr("Opcode"), this);
         actionCopyAsOpcode.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE));
@@ -913,7 +913,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuCopy.addAction(&actionCopyCursorOffset);
 
         if (menuState.bSize) {
-            menuCopy.addAction(&actionCopyAsHex);
+            menuCopy.addAction(&actionCopyAsData);
         }
 
         contextMenu.addMenu(&menuCopy);
@@ -928,7 +928,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         if (menuState.bSize) {
             contextMenu.addAction(&actionDumpToFile);
             contextMenu.addAction(&actionSignature);
-            menuCopy.addAction(&actionCopyAsHex);
+            menuCopy.addAction(&actionCopyAsData);
             menuCopy.addAction(&actionCopyAsOpcode);
 
             menuHex.addAction(&actionHexSignature);
@@ -1059,7 +1059,7 @@ void XDisasmView::registerShortcuts(bool bState)
             shortCuts[SC_GOTOENTRYPOINT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT), this, SLOT(_goToEntryPointSlot()));
         if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!shortCuts[SC_SELECTALL]) shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
-        if (!shortCuts[SC_COPYASHEX]) shortCuts[SC_COPYASHEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_HEX), this, SLOT(_copyHexSlot()));
+        if (!shortCuts[SC_COPYASDATA]) shortCuts[SC_COPYASDATA] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA), this, SLOT(_copyDataSlot()));
         if (!shortCuts[SC_COPYASOPCODE]) shortCuts[SC_COPYASOPCODE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE), this, SLOT(_copyOpcodeSlot()));
         if (!shortCuts[SC_COPYCURSORADDRESS])
             shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
