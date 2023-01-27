@@ -99,10 +99,12 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
 
     if (pDevice) {
         XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType);
+    } else {
+        ui->scrollAreaDisasm->setDevice(nullptr);
     }
 
     if (pXInfoDB) {
-        if (pXInfoDB->getSymbols()->count() == 0) {
+        if (!(pXInfoDB->isSymbolsPresent())) {
             DialogXInfoDBTransferProcess dialogTransfer(this);
 
             dialogTransfer.importData(pXInfoDB, pXInfoDB->getDevice(), pXInfoDB->getFileType());

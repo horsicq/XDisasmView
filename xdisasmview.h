@@ -44,10 +44,9 @@ class XDisasmView : public XDeviceTableEditView {
         SC_GOTOXREF,
         SC_DUMPTOFILE,
         SC_SELECTALL,
-        SC_COPYASDATA,
-        SC_COPYASOPCODE,
-        SC_COPYCURSOROFFSET,
-        SC_COPYCURSORADDRESS,
+        SC_COPYDATA,
+        SC_COPYADDRESS,
+        SC_COPYOFFSET,
         SC_FIND_STRING,
         SC_FIND_SIGNATURE,
         SC_FIND_VALUE,
@@ -87,8 +86,7 @@ public:
 private:
     enum COLUMN {
         COLUMN_ARROWS = 0,
-        COLUMN_ADDRESS,
-        //        COLUMN_OFFSET,
+        COLUMN_LOCATION,
         COLUMN_BYTES,
         COLUMN_OPCODE,
         COLUMN_COMMENT
@@ -101,12 +99,12 @@ private:
     };
 
     struct RECORD {
-        QString sAddress;
-        //        QString sOffset;
-        QString sHEX;
-        QString sCommemt;
-        qint64 nOffset;
-        XADDR nAddress;
+        QString sLocation;
+        QString sBytes; // TODO labels
+        QString sComment;
+        qint64 nOffset; // mb VirtualAddress or FileOffset
+        XADDR nVirtualAddress;
+        qint64 nFileOffset;
         XCapstone::DISASM_RESULT disasmResult;
         bool bIsReplaced;
         ARRAY array;
@@ -130,7 +128,8 @@ private:
         MODE_OPCODE_ADDRESS,
     };
 
-    XCapstone::DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nAddress);  // TODO move to XDisasm !!!
+    XCapstone::DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nVirtualAddress);  // TODO move to XDisasm !!!
+    QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
     qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
     MENU_STATE getMenuState();
 
@@ -150,6 +149,7 @@ private:
 
 private:
     RECORD _getRecordByOffset(QList<RECORD> *pListRecord, qint64 nOffset);
+    RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -173,7 +173,6 @@ protected slots:
     void _goToXrefSlot();
     void _signatureSlot();
     void _hexSlot();
-    void _copyOpcodeSlot();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
@@ -196,6 +195,7 @@ private:
     bool g_bIsUppercase;
     bool g_bIsHighlight;
     MODE_OPCODE g_modeOpcode;
+    QTextOption _qTextOptions;
 };
 
 #endif  // XDISASMVIEW_H

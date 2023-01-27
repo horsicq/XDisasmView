@@ -32,7 +32,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_options = OPTIONS();
 
     g_nAddressWidth = 8;
-    g_nOpcodeSize = 16;
+    g_nOpcodeSize = 16; // TODO Check
     g_nThisBase = 0;
     g_bIsAddressColon = false;
     g_bIsUppercase = false;
@@ -53,6 +53,8 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     setTextFont(getMonoFont());
 
     setAddressMode(MODE_ADDRESS);
+
+    _qTextOptions.setWrapMode(QTextOption::NoWrap);
 }
 
 XDisasmView::~XDisasmView()
@@ -154,12 +156,19 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
-XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nAddress)
+XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nVirtualAddress)
 {
     XCapstone::DISASM_OPTIONS disasmOptions = {};
     disasmOptions.bIsUppercase = g_bIsUppercase;
 
-    XCapstone::DISASM_RESULT result = XCapstone::disasm_ex(g_handle, g_disasmMode, pData, nDataSize, nAddress, disasmOptions);
+    XCapstone::DISASM_RESULT result = XCapstone::disasm_ex(g_handle, g_disasmMode, pData, nDataSize, nVirtualAddress, disasmOptions);
+
+    return result;
+}
+
+QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
+{
+    QString sResult = disasmResult.sString;
 
     if (getXInfoDB()) {
         if ((g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) || (g_modeOpcode == MODE_OPCODE_SYMBOL) || (g_modeOpcode == MODE_OPCODE_ADDRESS)) {
@@ -173,27 +182,27 @@ XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XAD
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
-            if (result.bRelative) {
-                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefToRelative), riType);
+            if (disasmResult.bRelative) {
+                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToRelative), riType);
 
                 if (sReplace != "") {
-                    QString sOrigin = QString("0x%1").arg(QString::number(result.nXrefToRelative, 16));
-                    result.sString = result.sString.replace(sOrigin, sReplace);
+                    QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToRelative, 16));
+                    sResult = disasmResult.sString.replace(sOrigin, sReplace);
                 }
             }
 
-            if (result.bMemory) {
-                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(result.nXrefToMemory), riType);
+            if (disasmResult.bMemory) {
+                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToMemory), riType);
 
                 if (sReplace != "") {
-                    QString sOrigin = QString("0x%1").arg(QString::number(result.nXrefToMemory, 16));
-                    result.sString = result.sString.replace(sOrigin, sReplace);
+                    QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToMemory, 16));
+                    sResult = disasmResult.sString.replace(sOrigin, sReplace);
                 }
             }
         }
     }
 
-    return result;
+    return sResult;
 }
 
 qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset)
@@ -322,7 +331,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     if (pTextOption->bHighlight) {
         drawDisasmText(pPainter, rectText, sText);
     } else {
-        pPainter->drawText(rectText, sText);
+        pPainter->drawText(rectText, sText, _qTextOptions);
     }
 
     if (bSave) {
@@ -357,7 +366,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         }
 
         pPainter->setPen(opcodeColor.colText);
-        pPainter->drawText(_rect, sMnemonic);
+        pPainter->drawText(_rect, sMnemonic, _qTextOptions);
 
         pPainter->restore();
 
@@ -365,7 +374,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             QRect _rect = rect;
             _rect.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
-            pPainter->drawText(_rect, sString);
+            pPainter->drawText(_rect, sString, _qTextOptions);
         }
     } else {
         QString sOpcode = sMnemonic;
@@ -374,7 +383,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             sOpcode += QString(" %1").arg(sString);
         }
         // TODO
-        pPainter->drawText(rect, sOpcode);
+        pPainter->drawText(rect, sOpcode, _qTextOptions);
     }
 }
 
@@ -506,6 +515,23 @@ XDisasmView::RECORD XDisasmView::_getRecordByOffset(QList<RECORD> *pListRecord, 
     return result;
 }
 
+XDisasmView::RECORD XDisasmView::_getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress)
+{
+    RECORD result = {};
+
+    qint32 nNumberOfRecords = pListRecord->count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if (pListRecord->at(i).nVirtualAddress == nVirtualAddress) {
+            result = pListRecord->at(i);
+
+            break;
+        }
+    }
+
+    return result;
+}
+
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
     OS osResult = {};
@@ -516,7 +542,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
             qint64 nBlockOffset = g_listRecords.at(cursorPosition.nRow).nOffset;
             qint64 nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
 
-            if (cursorPosition.nColumn == COLUMN_ADDRESS) {
+            if (cursorPosition.nColumn == COLUMN_LOCATION) {
                 osResult.nOffset = nBlockOffset;
                 osResult.nSize = nBlockSize;
             }
@@ -584,24 +610,26 @@ void XDisasmView::updateData()
                 }
 
                 RECORD record = {};
+                // TODO
                 record.nOffset = nCurrentOffset;
-                record.nAddress = XBinary::offsetToAddress(getMemoryMap(), nCurrentOffset);
+                record.nFileOffset = nCurrentOffset; // TODO if analys
+                record.nVirtualAddress = XBinary::offsetToAddress(getMemoryMap(), nCurrentOffset);
 
                 XADDR _nCurrent = 0;
 
                 if (getAddressMode() == MODE_THIS) {
-                    _nCurrent = record.nAddress;
+                    _nCurrent = record.nVirtualAddress;
 
                     qint64 nDelta = (qint64)_nCurrent - (qint64)g_nThisBase;
 
-                    record.sAddress = XBinary::thisToString(nDelta);
+                    record.sLocation = XBinary::thisToString(nDelta);
                 } else {
                     if (getAddressMode() == MODE_ADDRESS) {
-                        _nCurrent = record.nAddress;
+                        _nCurrent = record.nVirtualAddress;
                     } else if (getAddressMode() == MODE_OFFSET) {
-                        _nCurrent = record.nOffset;
+                        _nCurrent = record.nFileOffset;
                     } else if (getAddressMode() == MODE_RELADDRESS) {
-                        _nCurrent = XBinary::offsetToRelAddress(getMemoryMap(), nCurrentOffset);
+                        _nCurrent = XBinary::addressToRelAddress(getMemoryMap(), record.nVirtualAddress);
                     }
 
                     //                record.sOffset=XBinary::valueToHexColon(mode,nCurrentOffset);
@@ -611,20 +639,28 @@ void XDisasmView::updateData()
                     }
 
                     if (g_bIsAddressColon) {
-                        record.sAddress = XBinary::valueToHexColon(mode, _nCurrent);
+                        record.sLocation = XBinary::valueToHexColon(mode, _nCurrent);
                     } else {
-                        record.sAddress = XBinary::valueToHex(mode, _nCurrent);
+                        record.sLocation = XBinary::valueToHex(mode, _nCurrent);
+                    }
+
+                    if (getAddressMode() == MODE_RELADDRESS) {
+                        QString sPrefix = XBinary::getLoadSectionNameByOffset(getMemoryMap(), nCurrentOffset);;
+
+                        if (sPrefix != "") {
+                            record.sLocation = QString("%1: %2").arg(sPrefix, record.sLocation);
+                        }
                     }
                 }
 
-                record.disasmResult = _disasm(baBuffer.data(), nBufferSize, record.nAddress);
+                record.disasmResult = _disasm(baBuffer.data(), nBufferSize, record.nVirtualAddress);
 
                 nBufferSize = record.disasmResult.nSize;
 
                 baBuffer.resize(nBufferSize);
-                record.sHEX = baBuffer.toHex().data();
+                record.sBytes = baBuffer.toHex().data();
 
-                record.bIsReplaced = isReplaced(record.nOffset, nBufferSize);
+                record.bIsReplaced = isReplaced(record.nFileOffset, nBufferSize);
 
                 g_listRecords.append(record);
 
@@ -640,7 +676,7 @@ void XDisasmView::updateData()
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
                 if (g_listRecords.at(i).disasmResult.bRelative) {
                     XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefToRelative;
-                    XADDR nCurrentAddress = g_listRecords.at(i).nAddress;
+                    XADDR nCurrentAddress = g_listRecords.at(i).nVirtualAddress;
 
                     qint32 nStart = 0;
                     qint32 nEnd = nNumberOfRecords - 1;
@@ -654,7 +690,7 @@ void XDisasmView::updateData()
                         for (qint32 j = i; j >= nStart; j--) {
                             nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                            if ((nXrefTo >= g_listRecords.at(j).nAddress) && (nXrefTo < (g_listRecords.at(j).nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                                 nStart = j;
                                 g_listRecords[i].nArraySize = nEnd - nStart;
                                 g_listRecords[i].bIsEnd = true;
@@ -672,7 +708,7 @@ void XDisasmView::updateData()
                         for (qint32 j = i; j <= nEnd; j++) {
                             nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                            if ((nXrefTo >= g_listRecords.at(j).nAddress) && (nXrefTo < (g_listRecords.at(j).nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                                 nEnd = j;
                                 g_listRecords[i].nArraySize = nEnd - nStart;
                                 g_listRecords[i].bIsEnd = true;
@@ -759,16 +795,16 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
     if (nRow < nNumberOfRows) {
         qint64 nOffset = g_listRecords.at(nRow).nOffset;
-        XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
 
         TEXT_OPTION textOption = {};
         textOption.bSelected = isOffsetSelected(nOffset);
 
         textOption.bCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
-        textOption.bIsReplaced = ((g_listRecords.at(nRow).bIsReplaced) && (nColumn == COLUMN_ADDRESS));
+        textOption.bIsReplaced = ((g_listRecords.at(nRow).bIsReplaced) && (nColumn == COLUMN_LOCATION));
 
         if (getXInfoDB()) {
 #ifdef USE_XPROCESS
+            XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
             XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
 
             textOption.bCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP) && (nColumn == COLUMN_ADDRESS));
@@ -777,22 +813,22 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         if (nColumn == COLUMN_ARROWS) {
             // TODO
-        } else if (nColumn == COLUMN_ADDRESS) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sAddress, &textOption);
+        } else if (nColumn == COLUMN_LOCATION) {
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);
         }
         //        else if(nColumn==COLUMN_OFFSET)
         //        {
         //            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOffset,&textOption);
         //        }
         else if (nColumn == COLUMN_BYTES) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sHEX, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
         } else if (nColumn == COLUMN_OPCODE) {
-            QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, g_listRecords.at(nRow).disasmResult.sString);
+            QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
 
             textOption.bHighlight = true;
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, sOpcode, &textOption);
         } else if (nColumn == COLUMN_COMMENT) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sCommemt, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sComment, &textOption);
         }
     }
 }
@@ -813,7 +849,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
         QAction actionGoXrefRelative("", this);
-        //        actionGoXrefRelative.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_XREF));
         connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
 
         QAction actionGoXrefMemory("", this);
@@ -855,10 +890,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
         connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
 
-        QAction actionCopyAsOpcode(tr("Opcode"), this);
-        actionCopyAsOpcode.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE));
-        connect(&actionCopyAsOpcode, SIGNAL(triggered()), this, SLOT(_copyOpcodeSlot()));
-
         QAction actionCopyCursorOffset(tr("Offset"), this);
         actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
         connect(&actionCopyCursorOffset, SIGNAL(triggered()), this, SLOT(_copyOffsetSlot()));
@@ -866,6 +897,18 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionCopyCursorAddress(tr("Address"), this);
         actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
         connect(&actionCopyCursorAddress, SIGNAL(triggered()), this, SLOT(_copyAddressSlot()));
+
+        QAction actionCopyLocation("", this);
+        connect(&actionCopyLocation, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+
+        QAction actionCopyBytes("", this);
+        connect(&actionCopyBytes, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+
+        QAction actionCopyOpcode("", this);
+        connect(&actionCopyOpcode, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+
+        QAction actionCopyComment("", this);
+        connect(&actionCopyComment, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
 
         QAction actionHex(tr("Hex"), this);
         actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
@@ -898,13 +941,17 @@ void XDisasmView::contextMenu(const QPoint &pos)
         if (record.disasmResult.bRelative || record.disasmResult.bMemory) {
             menuGoTo.addSeparator();
 
-            actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
-            actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
-            menuGoTo.addAction(&actionGoXrefRelative);
+            if (record.disasmResult.bRelative) {
+                actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
+                actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
+                menuGoTo.addAction(&actionGoXrefRelative);
+            }
 
-            actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
-            actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
-            menuGoTo.addAction(&actionGoXrefMemory);
+            if (record.disasmResult.bMemory) {
+                actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
+                actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
+                menuGoTo.addAction(&actionGoXrefMemory);
+            }
         }
 
         contextMenu.addMenu(&menuGoTo);
@@ -914,6 +961,42 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         if (menuState.bSize) {
             menuCopy.addAction(&actionCopyAsData);
+        }
+
+        RECORD _record = _getRecordByOffset(&g_listRecords, state.nCursorOffset);
+
+        if ((_record.sLocation != "") || (_record.sBytes != "") || (_record.disasmResult.sMnemonic != "") || (_record.sComment != "")) {
+            menuCopy.addSeparator();
+
+            if (_record.sLocation != "") {
+                actionCopyLocation.setText(_record.sLocation);
+                actionCopyLocation.setProperty("VALUE", _record.sLocation);
+                menuCopy.addAction(&actionCopyLocation);
+            }
+
+            if (_record.sBytes != "") {
+                actionCopyBytes.setText(_record.sBytes);
+                actionCopyBytes.setProperty("VALUE", _record.sBytes);
+                menuCopy.addAction(&actionCopyBytes);
+            }
+
+            if (_record.disasmResult.sMnemonic != "") {
+                QString sString = _record.disasmResult.sMnemonic;
+
+                if (_record.disasmResult.sString != "") {
+                    sString.append(QString(" %1").arg(convertOpcodeString(_record.disasmResult)));
+                }
+
+                actionCopyOpcode.setText(sString);
+                actionCopyOpcode.setProperty("VALUE", sString);
+                menuCopy.addAction(&actionCopyOpcode);
+            }
+
+            if (_record.sComment != "") {
+                actionCopyComment.setText(_record.sComment);
+                actionCopyComment.setProperty("VALUE", _record.sComment);
+                menuCopy.addAction(&actionCopyComment);
+            }
         }
 
         contextMenu.addMenu(&menuCopy);
@@ -928,8 +1011,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         if (menuState.bSize) {
             contextMenu.addAction(&actionDumpToFile);
             contextMenu.addAction(&actionSignature);
-            menuCopy.addAction(&actionCopyAsData);
-            menuCopy.addAction(&actionCopyAsOpcode);
 
             menuHex.addAction(&actionHexSignature);
 
@@ -1027,11 +1108,11 @@ void XDisasmView::adjustColumns()
 
     if (XBinary::getWidthModeFromSize(g_options.nInitAddress + getDataSize()) == XBinary::MODE_64) {
         g_nAddressWidth = 16;
-        setColumnWidth(COLUMN_ADDRESS, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
+        setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
         //        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000:00000000").width());
     } else {
         g_nAddressWidth = 8;
-        setColumnWidth(COLUMN_ADDRESS, 2 * getCharWidth() + fm.boundingRect("0000:0000").width());
+        setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("0000:0000").width());
         //        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000:0000").width());
     }
 
@@ -1059,12 +1140,11 @@ void XDisasmView::registerShortcuts(bool bState)
             shortCuts[SC_GOTOENTRYPOINT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT), this, SLOT(_goToEntryPointSlot()));
         if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!shortCuts[SC_SELECTALL]) shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
-        if (!shortCuts[SC_COPYASDATA]) shortCuts[SC_COPYASDATA] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA), this, SLOT(_copyDataSlot()));
-        if (!shortCuts[SC_COPYASOPCODE]) shortCuts[SC_COPYASOPCODE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OPCODE), this, SLOT(_copyOpcodeSlot()));
-        if (!shortCuts[SC_COPYCURSORADDRESS])
-            shortCuts[SC_COPYCURSORADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
-        if (!shortCuts[SC_COPYCURSOROFFSET])
-            shortCuts[SC_COPYCURSOROFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
+        if (!shortCuts[SC_COPYDATA]) shortCuts[SC_COPYDATA] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA), this, SLOT(_copyDataSlot()));
+        if (!shortCuts[SC_COPYADDRESS])
+            shortCuts[SC_COPYADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
+        if (!shortCuts[SC_COPYOFFSET])
+            shortCuts[SC_COPYOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
         if (!shortCuts[SC_FIND_STRING]) shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
         if (!shortCuts[SC_FIND_SIGNATURE])
             shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));
@@ -1087,15 +1167,15 @@ void XDisasmView::registerShortcuts(bool bState)
 
 void XDisasmView::_headerClicked(qint32 nColumn)
 {
-    if (nColumn == COLUMN_ADDRESS) {
+    if (nColumn == COLUMN_LOCATION) {
         if (getAddressMode() == MODE_ADDRESS) {
-            setColumnTitle(COLUMN_ADDRESS, tr("Offset"));
+            setColumnTitle(COLUMN_LOCATION, tr("Offset"));
             setAddressMode(MODE_OFFSET);
         } else if (getAddressMode() == MODE_OFFSET) {
-            setColumnTitle(COLUMN_ADDRESS, tr("Relative address"));
+            setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
             setAddressMode(MODE_RELADDRESS);
         } else if ((getAddressMode() == MODE_RELADDRESS) || (getAddressMode() == MODE_THIS)) {
-            setColumnTitle(COLUMN_ADDRESS, tr("Address"));
+            setColumnTitle(COLUMN_LOCATION, tr("Address"));
             setAddressMode(MODE_ADDRESS);
         }
 
@@ -1121,8 +1201,8 @@ void XDisasmView::_headerClicked(qint32 nColumn)
 
 void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
 {
-    if (nColumn == COLUMN_ADDRESS) {
-        setColumnTitle(COLUMN_ADDRESS, "");
+    if (nColumn == COLUMN_LOCATION) {
+        setColumnTitle(COLUMN_LOCATION, "");
         setAddressMode(MODE_THIS);
 
         if (nRow < g_listRecords.count()) {
@@ -1191,15 +1271,4 @@ void XDisasmView::_hexSlot()
     if (g_options.bMenu_Hex) {
         emit showOffsetHex(getStateOffset());
     }
-}
-
-void XDisasmView::_copyOpcodeSlot()
-{
-    STATE state = getState();
-
-    XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionOffset);
-
-    QString sOpcodeString = QString("%1 %2").arg(record.disasmResult.sMnemonic, record.disasmResult.sString);
-
-    QApplication::clipboard()->setText(sOpcodeString);
 }
