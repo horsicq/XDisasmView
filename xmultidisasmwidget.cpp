@@ -85,6 +85,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
+
+    ui->pushButtonSymbols->setEnabled(false);
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -103,17 +105,22 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
         ui->scrollAreaDisasm->setDevice(nullptr);
     }
 
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
+
     if (pXInfoDB) {
         if (!(pXInfoDB->isSymbolsPresent())) {
-            DialogXInfoDBTransferProcess dialogTransfer(this);
 
-            dialogTransfer.importData(pXInfoDB, pXInfoDB->getDevice(), pXInfoDB->getFileType());
+            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
+                DialogXInfoDBTransferProcess dialogTransfer(this);
 
-            dialogTransfer.showDialogDelay(1000);
+                dialogTransfer.analyzeData(pXInfoDB, pXInfoDB->getDevice(), pXInfoDB->getFileType());
+
+                dialogTransfer.showDialogDelay(1000);
+            }
         }
-    }
 
-    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
+        ui->pushButtonSymbols->setEnabled(pXInfoDB->isSymbolsPresent());
+    }
 
     reloadFileType();
 }
@@ -207,6 +214,8 @@ void XMultiDisasmWidget::reloadFileType()
                 break;
             }
         }
+
+        ui->scrollAreaDisasm->getXInfoDB()->setFileType(fileType);
 
         adjustMode();
 

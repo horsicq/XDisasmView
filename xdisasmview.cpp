@@ -135,6 +135,10 @@ void XDisasmView::setMode(XBinary::DM disasmMode)
 {
     g_disasmMode = disasmMode;
 
+    if (getXInfoDB()) {
+        getXInfoDB()->setDisasmMode(disasmMode);
+    }
+
     _adjustView();
 }
 
@@ -807,7 +811,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
             XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
 
-            textOption.bCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP) && (nColumn == COLUMN_ADDRESS));
+            textOption.bCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP) && (nColumn == COLUMN_LOCATION));
 #endif
         }
 
