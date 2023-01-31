@@ -62,12 +62,14 @@ private:
     void addMode(XBinary::DM disasmMode);
     void reloadFileType();
     void adjustMode();
+    void analyze();
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void on_pushButtonSymbols_clicked();
     void on_checkBoxReadonly_toggled(bool bChecked);
     void on_comboBoxType_currentIndexChanged(int nIndex);
+    void on_pushButtonAnalyze_clicked();
 
 protected:
     virtual void registerShortcuts(bool bState);
@@ -79,6 +81,7 @@ signals:
 private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *g_pDevice;
+    XInfoDB *g_pXInfoDB;
     OPTIONS g_options;
 };
 

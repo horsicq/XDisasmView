@@ -163,9 +163,13 @@ qint64 XDisasmView::getSelectionInitAddress()
 XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nVirtualAddress)
 {
     XCapstone::DISASM_OPTIONS disasmOptions = {};
-    disasmOptions.bIsUppercase = g_bIsUppercase;
 
     XCapstone::DISASM_RESULT result = XCapstone::disasm_ex(g_handle, g_disasmMode, pData, nDataSize, nVirtualAddress, disasmOptions);
+
+    if (g_bIsUppercase) {
+        result.sMnemonic = result.sMnemonic.toUpper();
+        result.sString = result.sString.toUpper();
+    }
 
     return result;
 }

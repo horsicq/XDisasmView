@@ -27,6 +27,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->setupUi(this);
 
     g_pDevice = nullptr;
+    g_pXInfoDB = nullptr;
     g_options = {};
 
     const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
@@ -97,6 +98,7 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB)
 {
     g_pDevice = pDevice;
+    g_pXInfoDB = pXInfoDB;
     g_options = options;
 
     if (pDevice) {
@@ -107,19 +109,13 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
 
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
-    if (pXInfoDB) {
-        if (!(pXInfoDB->isSymbolsPresent())) {
+    if (g_pXInfoDB) {
+        if (!(g_pXInfoDB->isSymbolsPresent())) {
 
             if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
-                DialogXInfoDBTransferProcess dialogTransfer(this);
-
-                dialogTransfer.analyzeData(pXInfoDB, pXInfoDB->getDevice(), pXInfoDB->getFileType());
-
-                dialogTransfer.showDialogDelay(1000);
+                analyze();
             }
         }
-
-        ui->pushButtonSymbols->setEnabled(pXInfoDB->isSymbolsPresent());
     }
 
     reloadFileType();
@@ -231,6 +227,17 @@ void XMultiDisasmWidget::adjustMode()
     ui->scrollAreaDisasm->reload(true);
 }
 
+void XMultiDisasmWidget::analyze()
+{
+    DialogXInfoDBTransferProcess dialogTransfer(this);
+
+    dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+
+    dialogTransfer.showDialogDelay(1000);
+
+    ui->pushButtonSymbols->setEnabled(g_pXInfoDB->isSymbolsPresent());
+}
+
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
 {
     Q_UNUSED(nIndex)
@@ -262,4 +269,9 @@ void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
     Q_UNUSED(nIndex)
 
     reloadFileType();
+}
+
+void XMultiDisasmWidget::on_pushButtonAnalyze_clicked()
+{
+    analyze();
 }
