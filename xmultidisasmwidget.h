@@ -63,6 +63,8 @@ private:
     void reloadFileType();
     void adjustMode();
     void analyze();
+    void clearAnalysis();
+    void adjustAnalysisPanel();
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
@@ -70,6 +72,7 @@ private slots:
     void on_checkBoxReadonly_toggled(bool bChecked);
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_pushButtonAnalyze_clicked();
+    void on_pushButtonClear_clicked();
 
 protected:
     virtual void registerShortcuts(bool bState);

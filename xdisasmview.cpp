@@ -102,15 +102,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
     setMode(disasmMode);
 
     adjustColumns();
-
-    qint64 nTotalLineCount = getDataSize() / g_nBytesProLine;
-
-    if (nTotalLineCount > 1)  // TODO Check
-    {
-        nTotalLineCount--;
-    }
-
-    setTotalLineCount(nTotalLineCount);
+    adjustLineCount();
 
     if (options.nInitAddress != (XADDR)-1) {
         qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
@@ -119,7 +111,7 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
             nOffset = 0;
         }
 
-        _goToOffset(nOffset, false, false, options.bAprox);
+        _goToViewOffset(nOffset, false, false, options.bAprox);
     }
     //    else
     //    {
@@ -158,6 +150,24 @@ qint64 XDisasmView::getSelectionInitAddress()
     }
 
     return nResult;
+}
+
+void XDisasmView::adjustLineCount()
+{
+    qint64 nTotalLineCount = 0;
+
+    if (isAnalyzed()) {
+        nTotalLineCount = getXInfoDB()->getShowRecordsCount();
+    } else {
+        nTotalLineCount = getViewSize() / g_nBytesProLine;
+
+        if (nTotalLineCount > 1)  // TODO Check
+        {
+            nTotalLineCount--;
+        }
+    }
+
+    setTotalLineCount(nTotalLineCount);
 }
 
 XCapstone::DISASM_RESULT XDisasmView::_disasm(char *pData, qint32 nDataSize, XADDR nVirtualAddress)
@@ -236,7 +246,7 @@ qint64 XDisasmView::getDisasmOffset(qint64 nOffset, qint64 nOldOffset)
         }
 
         nStartOffset = qMax(nStartOffset, (qint64)0);
-        nEndOffset = qMin(nEndOffset, getDataSize());
+        nEndOffset = qMin(nEndOffset, getViewSize());
 
         if (nOffset > nOldOffset) {
             nStartOffset = qMax(nStartOffset, nOldOffset);
@@ -295,7 +305,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
     //        result.bOffset=true;
     //    }
 
-    if (state.nSelectionSize) {
+    if (state.nSelectionViewSize) {
         result.bSize = true;
     }
 
@@ -441,6 +451,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
             mapResult.insert("jz", colorJCC);
             mapResult.insert("jnz", colorJCC);
             mapResult.insert("ja", colorJCC);
+            mapResult.insert("jc", colorJCC);
         } else if (syntax == XBinary::SYNTAX_ATT) {
             {
                 mapResult.insert("callw", colorCALL);
@@ -471,6 +482,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
             mapResult.insert("jz", colorJCC);
             mapResult.insert("jnz", colorJCC);
             mapResult.insert("ja", colorJCC);
+            mapResult.insert("jc", colorJCC);
         }
     } else if ((XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM) || (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM64)) {
         OPCODECOLOR colorBL = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);
@@ -543,7 +555,7 @@ XDisasmView::RECORD XDisasmView::_getRecordByVirtualAddress(QList<RECORD> *pList
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
     OS osResult = {};
-    osResult.nOffset = -1;
+    osResult.nViewOffset = -1;
 
     if ((cursorPosition.bIsValid) && (cursorPosition.ptype == PT_CELL)) {
         if (cursorPosition.nRow < g_listRecords.count()) {
@@ -551,7 +563,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
             qint64 nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
 
             if (cursorPosition.nColumn == COLUMN_LOCATION) {
-                osResult.nOffset = nBlockOffset;
+                osResult.nViewOffset = nBlockOffset;
                 osResult.nSize = nBlockSize;
             }
             //            else if(cursorPosition.nColumn==COLUMN_OFFSET)
@@ -561,18 +573,18 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
             //            }
             else if (cursorPosition.nColumn == COLUMN_BYTES) {
                 // TODO
-                osResult.nOffset = nBlockOffset;
+                osResult.nViewOffset = nBlockOffset;
                 osResult.nSize = nBlockSize;
             } else if (cursorPosition.nColumn == COLUMN_OPCODE) {
-                osResult.nOffset = nBlockOffset;
+                osResult.nViewOffset = nBlockOffset;
                 osResult.nSize = nBlockSize;
             } else if (cursorPosition.nColumn == COLUMN_COMMENT) {
-                osResult.nOffset = nBlockOffset;
+                osResult.nViewOffset = nBlockOffset;
                 osResult.nSize = nBlockSize;
             }
         } else {
-            if (!isOffsetValid(osResult.nOffset)) {
-                osResult.nOffset = getDataSize();  // TODO Check
+            if (!isViewOffsetValid(osResult.nViewOffset)) {
+                osResult.nViewOffset = getViewSize();  // TODO Check
                 osResult.nSize = 0;
             }
         }
@@ -595,15 +607,15 @@ void XDisasmView::updateData()
 
         XBinary::MODE mode = XBinary::getWidthModeFromByteSize(g_nAddressWidth);
 
-        qint64 nBlockOffset = getViewStart() * g_nBytesProLine;  // mb TODO remove BytesProLine!
+        qint64 nBlockOffset = getViewOffsetStart() * g_nBytesProLine;  // mb TODO remove BytesProLine!
 
         qint32 nNumberLinesProPage = getLinesProPage();
 
         qint64 nCurrentOffset = nBlockOffset;
 
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
-            if (nCurrentOffset < getDataSize()) {
-                qint32 nBufferSize = qMin(g_nOpcodeSize, qint32(getDataSize() - nCurrentOffset));
+            if (nCurrentOffset < getViewSize()) {
+                qint32 nBufferSize = qMin(g_nOpcodeSize, qint32(getViewSize() - nCurrentOffset));
 
                 //                qDebug("DELTA: %d BS: %d",qint32(getDataSize()-nCurrentOffset),nBufferSize);
 
@@ -799,13 +811,13 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 {
     qint32 nNumberOfRows = g_listRecords.count();
 
-    qint64 nCursorOffset = getState().nCursorOffset;
+    qint64 nCursorOffset = getState().nCursorViewOffset;
 
     if (nRow < nNumberOfRows) {
         qint64 nOffset = g_listRecords.at(nRow).nOffset;
 
         TEXT_OPTION textOption = {};
-        textOption.bSelected = isOffsetSelected(nOffset);
+        textOption.bSelected = isViewOffsetSelected(nOffset);
 
         textOption.bCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsReplaced = ((g_listRecords.at(nRow).bIsReplaced) && (nColumn == COLUMN_LOCATION));
@@ -944,7 +956,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         // TODO go to address
         STATE state = getState();
 
-        XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionOffset);
+        XDisasmView::RECORD record = _getRecordByOffset(&g_listRecords, state.nSelectionViewOffset);
 
         if (record.disasmResult.bRelative || record.disasmResult.bMemory) {
             menuGoTo.addSeparator();
@@ -971,7 +983,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             menuCopy.addAction(&actionCopyAsData);
         }
 
-        RECORD _record = _getRecordByOffset(&g_listRecords, state.nCursorOffset);
+        RECORD _record = _getRecordByOffset(&g_listRecords, state.nCursorViewOffset);
 
         if ((_record.sLocation != "") || (_record.sBytes != "") || (_record.disasmResult.sMnemonic != "") || (_record.sComment != "")) {
             menuCopy.addSeparator();
@@ -1058,46 +1070,50 @@ void XDisasmView::keyPressEvent(QKeyEvent *pEvent)
     XAbstractTableView::keyPressEvent(pEvent);
 }
 
-qint64 XDisasmView::getScrollValue()
+qint64 XDisasmView::getCurrentLineFromScroll()
 {
     qint64 nResult = 0;
 
-    qint32 nValue = verticalScrollBar()->value();
-
-    qint64 nMaxValue = getMaxScrollValue() * g_nBytesProLine;
-
-    if (getDataSize() > nMaxValue) {
-        if (nValue == getMaxScrollValue()) {
-            nResult = getDataSize() - g_nBytesProLine;
-        } else {
-            nResult = ((double)nValue / (double)getMaxScrollValue()) * getDataSize();
-        }
+    if (isAnalyzed()) {
+        nResult = verticalScrollBar()->value();
     } else {
-        nResult = (qint64)nValue * g_nBytesProLine;
-    }
+        qint32 nValue = verticalScrollBar()->value();
 
-    qint64 _nResult = getDisasmOffset(nResult, getViewStart());
+        qint64 nMaxValue = getMaxScrollValue() * g_nBytesProLine;
 
-    if (_nResult != nResult) {
-        nResult = _nResult;
+        if (getViewSize() > nMaxValue) {
+            if (nValue == getMaxScrollValue()) {
+                nResult = getViewSize() - g_nBytesProLine;
+            } else {
+                nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
+            }
+        } else {
+            nResult = (qint64)nValue * g_nBytesProLine;
+        }
 
-        setScrollValue(nResult);
+        qint64 _nResult = getDisasmOffset(nResult, getViewOffsetStart());
+
+        if (_nResult != nResult) {
+            nResult = _nResult;
+
+            setCurrentViewOffsetToScroll(nResult);
+        }
     }
 
     return nResult;
 }
 
-void XDisasmView::setScrollValue(qint64 nOffset)
+void XDisasmView::setCurrentViewOffsetToScroll(qint64 nOffset)
 {
-    setViewStart(nOffset);
+    setViewOffsetStart(nOffset);
 
     qint32 nValue = 0;
 
-    if (getDataSize() > (getMaxScrollValue() * g_nBytesProLine)) {
-        if (nOffset == getDataSize() - g_nBytesProLine) {
+    if (getViewSize() > (getMaxScrollValue() * g_nBytesProLine)) {
+        if (nOffset == getViewSize() - g_nBytesProLine) {
             nValue = getMaxScrollValue();
         } else {
-            nValue = ((double)(nOffset) / ((double)getDataSize())) * (double)getMaxScrollValue();
+            nValue = ((double)(nOffset) / ((double)getViewSize())) * (double)getMaxScrollValue();
         }
     } else {
         nValue = (nOffset) / g_nBytesProLine;
@@ -1114,7 +1130,7 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
-    if (XBinary::getWidthModeFromSize(g_options.nInitAddress + getDataSize()) == XBinary::MODE_64) {
+    if (XBinary::getWidthModeFromSize(g_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
         g_nAddressWidth = 16;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
         //        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000:00000000").width());
@@ -1234,7 +1250,7 @@ qint64 XDisasmView::getRecordSize(qint64 nOffset)
     return nResult;
 }
 
-qint64 XDisasmView::getFixOffset(qint64 nOffset)
+qint64 XDisasmView::getFixViewOffset(qint64 nOffset)
 {
     qint64 nResult = getDisasmOffset(nOffset, -1);
 
@@ -1267,7 +1283,7 @@ void XDisasmView::_signatureSlot()
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(getDevice(), state.nSelectionOffset, getMemoryMap(), g_handle);
+    dmds.setData(getDevice(), state.nSelectionViewOffset, getMemoryMap(), g_handle);
 
     dmds.setGlobal(getShortcuts(), getGlobalOptions());
 

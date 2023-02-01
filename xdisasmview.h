@@ -159,14 +159,15 @@ protected:
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
-    virtual qint64 getScrollValue();
-    virtual void setScrollValue(qint64 nOffset);
+    virtual qint64 getCurrentLineFromScroll();
+    virtual void setCurrentViewOffsetToScroll(qint64 nOffset);
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
     virtual qint64 getRecordSize(qint64 nOffset);
-    virtual qint64 getFixOffset(qint64 nOffset);
+    virtual qint64 getFixViewOffset(qint64 nOffset);
+    virtual void adjustLineCount();
 
 protected slots:
     void _goToEntryPointSlot();
