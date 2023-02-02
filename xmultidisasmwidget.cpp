@@ -78,7 +78,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 
     connect(ui->scrollAreaDisasm, SIGNAL(showOffsetHex(qint64)), this, SIGNAL(showOffsetHex(qint64)));
     connect(ui->scrollAreaDisasm, SIGNAL(errorMessage(QString)), this, SLOT(errorMessageSlot(QString)));
-    //    connect(ui->scrollAreaDisasm,SIGNAL(cursorChanged(qint64)),this,SLOT(cursorChanged(qint64)));
+    //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewOffsetChanged(qint64)),this,SLOT(cursorChanged(qint64)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
     connect(ui->scrollAreaDisasm, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
 
@@ -87,11 +87,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
 
-    ui->pushButtonSymbols->setEnabled(false);
-
-#ifndef QT_SQL_LIB
-    ui->groupBoxAnalysis->hide();
-#endif
+    adjustAnalysisPanel();
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -114,13 +110,15 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
     if (g_pXInfoDB) {
-        if (!(g_pXInfoDB->isSymbolsPresent())) {
+        if (!(g_pXInfoDB->isAnalyzed())) {
 
             if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
                 analyze();
             }
         }
     }
+
+    adjustAnalysisPanel();
 
     reloadFileType();
 }
@@ -215,7 +213,9 @@ void XMultiDisasmWidget::reloadFileType()
             }
         }
 
-        ui->scrollAreaDisasm->getXInfoDB()->setFileType(fileType);
+        if (ui->scrollAreaDisasm->getXInfoDB()) {
+            ui->scrollAreaDisasm->getXInfoDB()->setFileType(fileType);
+        }
 
         adjustMode();
 
@@ -259,13 +259,21 @@ void XMultiDisasmWidget::clearAnalysis()
 
 void XMultiDisasmWidget::adjustAnalysisPanel()
 {
+#ifdef QT_SQL_LIB
     if (g_pXInfoDB) {
+        ui->groupBoxAnalysis->show();
+
         bool bIsAnalyses = g_pXInfoDB->isAnalyzed();
 
         ui->pushButtonAnalyze->setEnabled(!bIsAnalyses);
         ui->pushButtonSymbols->setEnabled(bIsAnalyses);
         ui->pushButtonClear->setEnabled(bIsAnalyses);
+    } else {
+        ui->groupBoxAnalysis->hide();
     }
+#else
+    ui->groupBoxAnalysis->hide();
+#endif
 }
 
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)

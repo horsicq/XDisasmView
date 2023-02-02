@@ -102,7 +102,7 @@ private:
         QString sLocation;
         QString sBytes; // TODO labels
         QString sComment;
-        qint64 nOffset; // mb VirtualAddress or FileOffset
+        qint64 nViewOffset; // VirtualAddress if file analyzed or FileOffset if not
         XADDR nVirtualAddress;
         qint64 nFileOffset;
         XCapstone::DISASM_RESULT disasmResult;
@@ -128,9 +128,9 @@ private:
         MODE_OPCODE_ADDRESS,
     };
 
-    XCapstone::DISASM_RESULT _disasm(char *pData, qint32 nDataSize, XADDR nVirtualAddress);  // TODO move to XDisasm !!!
+    XCapstone::DISASM_RESULT _disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize);
     QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
-    qint64 getDisasmOffset(qint64 nOffset, qint64 nOldOffset);
+    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);
     MENU_STATE getMenuState();
 
     struct TEXT_OPTION {
@@ -148,7 +148,7 @@ private:
     OPCODECOLOR getOpcodeColor(XOptions::ID id);
 
 private:
-    RECORD _getRecordByOffset(QList<RECORD> *pListRecord, qint64 nOffset);
+    RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
 
 protected:
@@ -160,14 +160,15 @@ protected:
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
     virtual qint64 getCurrentLineFromScroll();
-    virtual void setCurrentViewOffsetToScroll(qint64 nOffset);
+    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset);
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
-    virtual qint64 getRecordSize(qint64 nOffset);
-    virtual qint64 getFixViewOffset(qint64 nOffset);
+    virtual qint64 getRecordSize(qint64 nViewOffset);
+    virtual qint64 getFixViewOffset(qint64 nViewOffset);
     virtual void adjustLineCount();
+    virtual void adjustViewSize();
 
 protected slots:
     void _goToEntryPointSlot();
@@ -197,6 +198,7 @@ private:
     bool g_bIsHighlight;
     MODE_OPCODE g_modeOpcode;
     QTextOption _qTextOptions;
+    XCapstone::DISASM_OPTIONS g_disasmOptions;
 };
 
 #endif  // XDISASMVIEW_H
