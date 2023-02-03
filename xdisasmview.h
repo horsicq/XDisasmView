@@ -82,6 +82,8 @@ public:
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
     qint64 getSelectionInitAddress();
+    DEVICESTATE getDeviceState(bool bGlobalOffset = false);
+    virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
 
 private:
     enum COLUMN {
@@ -100,9 +102,9 @@ private:
 
     struct RECORD {
         QString sLocation;
-        QString sBytes; // TODO labels
+        QString sBytes; // mb TODO labels
         QString sComment;
-        qint64 nViewOffset; // VirtualAddress if file analyzed or FileOffset if not
+        qint64 nViewOffset; // Line if file analyzed or FileOffset if not
         XADDR nVirtualAddress;
         qint64 nFileOffset;
         XCapstone::DISASM_RESULT disasmResult;

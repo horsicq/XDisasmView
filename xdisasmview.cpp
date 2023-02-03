@@ -154,6 +154,53 @@ qint64 XDisasmView::getSelectionInitAddress()
     return nResult;
 }
 
+XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
+{
+    DEVICESTATE result = {};
+
+    if (isAnalyzed()) {
+        // TODO
+        STATE state = getState();
+
+        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByNumber(state.nCursorViewOffset);
+        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByNumber(state.nSelectionViewOffset);
+        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByNumber(state.nSelectionViewSize);
+
+        if (showRecordCursor.nOffset != -1 ) {
+            result.nCursorOffset = showRecordCursor.nOffset;
+        }
+
+        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
+        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize;
+
+        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
+            result.nSelectionOffset = showRecordStartSelection.nOffset;
+            result.nSelectionSize = showRecordEndSelection.nOffset + showRecordEndSelection.nSize;
+        }
+
+        result = XDeviceTableView::getDeviceState(bGlobalOffset);
+    } else {
+        result = XDeviceTableView::getDeviceState(bGlobalOffset);
+    }
+
+    return result;
+}
+
+qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
+{
+    qint64 nResult = 0;
+
+    if (isAnalyzed()) {
+        // TODO
+
+        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+    } else {
+        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+    }
+
+    return nResult;
+}
+
 void XDisasmView::adjustLineCount()
 {
     qint64 nTotalLineCount = 0;
@@ -316,14 +363,14 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
 {
     MENU_STATE result = {};
 
-    STATE state = getState();
+    DEVICESTATE state = getDeviceState();
 
     //    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
     //    {
     //        result.bOffset=true;
     //    }
 
-    if (state.nSelectionViewSize) {
+    if (state.nSelectionSize) {
         result.bSize = true;
     }
 
@@ -578,7 +625,13 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
     if ((cursorPosition.bIsValid) && (cursorPosition.ptype == PT_CELL)) {
         if (cursorPosition.nRow < g_listRecords.count()) {
             qint64 nBlockOffset = g_listRecords.at(cursorPosition.nRow).nViewOffset;
-            qint64 nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            qint64 nBlockSize = 0;
+
+            if (isAnalyzed()) {
+                nBlockSize = 1;
+            } else {
+                nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            }
 
             if (cursorPosition.nColumn == COLUMN_LOCATION) {
                 osResult.nViewOffset = nBlockOffset;
@@ -626,9 +679,7 @@ void XDisasmView::updateData()
         XBinary::MODE mode = XBinary::getWidthModeFromByteSize(g_nAddressWidth);
 
         qint64 nBlockViewOffset = getViewOffsetStart();
-
         qint32 nNumberLinesProPage = getLinesProPage();
-
         qint64 nCurrentViewOffset = nBlockViewOffset;
 
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
@@ -1347,6 +1398,6 @@ void XDisasmView::_signatureSlot()
 void XDisasmView::_hexSlot()
 {
     if (g_options.bMenu_Hex) {
-        emit showOffsetHex(getStateOffset());
+        emit showOffsetHex(getDeviceState().nCursorOffset);
     }
 }
