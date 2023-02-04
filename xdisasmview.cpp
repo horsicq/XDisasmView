@@ -95,6 +95,8 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
 {
     g_options = options;
 
+    g_listRecords.clear();
+
     setDevice(pDevice);
     setMemoryMap(g_options.memoryMapRegion);
 
@@ -107,18 +109,15 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
     adjustViewSize();
 
     if (options.nInitAddress != (XADDR)-1) {
-        qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
+//        qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
 
-        if (nOffset == -1) {
-            nOffset = 0;
-        }
+//        if (nOffset == -1) {
+//            nOffset = 0;
+//        }
 
-        _goToViewOffset(nOffset, false, false, options.bAprox);
+//        _goToViewOffset(nOffset, false, false, options.bAprox);
+        goToAddress(options.nInitAddress, false, options.bAprox);
     }
-    //    else
-    //    {
-    //        setScrollValue(0);
-    //    }
 
     if (bReload) {
         reload(true);
@@ -162,23 +161,45 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
         // TODO
         STATE state = getState();
 
-        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByNumber(state.nCursorViewOffset);
-        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByNumber(state.nSelectionViewOffset);
-        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByNumber(state.nSelectionViewSize);
+        if (state.nSelectionViewSize == 0) {
+            state.nSelectionViewSize = 1;
+        }
+
+        qint64 nShowOffset = getViewOffsetStart();
+
+        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
+        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
+        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
+        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
 
         if (showRecordCursor.nOffset != -1 ) {
             result.nCursorOffset = showRecordCursor.nOffset;
         }
 
         XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
-        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize;
+        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
 
         if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
             result.nSelectionOffset = showRecordStartSelection.nOffset;
-            result.nSelectionSize = showRecordEndSelection.nOffset + showRecordEndSelection.nSize;
+            result.nSelectionSize = nSelectionSize;
         }
 
-        result = XDeviceTableView::getDeviceState(bGlobalOffset);
+        if (showRecordShowStart.nOffset == -1) {
+            result.nShowOffset = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
+        } else {
+            result.nShowOffset = showRecordShowStart.nOffset;
+        }
+
+        if (bGlobalOffset) {
+            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
+
+            if (pSubDevice) {
+                qint64 nInitOffset = pSubDevice->getInitOffset();
+                result.nSelectionOffset += nInitOffset;
+                result.nCursorOffset += nInitOffset;
+                result.nShowOffset += nInitOffset;
+            }
+        }
     } else {
         result = XDeviceTableView::getDeviceState(bGlobalOffset);
     }
@@ -186,14 +207,45 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
     return result;
 }
 
+void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
+{
+    if (isAnalyzed()) {
+        if (bGlobalOffset) {
+            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
+
+            if (pSubDevice) {
+                qint64 nInitOffset = pSubDevice->getInitOffset();
+                deviceState.nCursorOffset -= nInitOffset;
+                deviceState.nSelectionOffset -= nInitOffset;
+                deviceState.nShowOffset -= nInitOffset;
+            }
+        }
+
+        qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset);
+        qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset + deviceState.nSelectionSize) - nSelectionStart;
+        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
+        qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowOffset);
+
+        _goToViewOffset(nShowStart);
+        _initSelection(nSelectionStart, nSelectionSize);
+        _setSelection(nSelectionStart, nSelectionSize);
+        setCursorViewOffset(nCursor);
+
+        adjust();
+        viewport()->update();
+    } else {
+        XDeviceTableView::setDeviceState(deviceState, bGlobalOffset);
+    }
+}
+
 qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
 {
     qint64 nResult = 0;
 
     if (isAnalyzed()) {
-        // TODO
+        qint64 _nOffset = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
 
-        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffset);
     } else {
         nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
     }
@@ -222,9 +274,7 @@ void XDisasmView::adjustLineCount()
 void XDisasmView::adjustViewSize()
 {
     if (isAnalyzed()) {
-        if (getMemoryMap()) {
-            setViewSize(getXInfoDB()->getShowRecordsCount());
-        }
+        setViewSize(getXInfoDB()->getShowRecordsCount());
     } else {
         if (getDevice()) {
             setViewSize(getDevice()->size());
@@ -695,8 +745,8 @@ void XDisasmView::updateData()
                 QByteArray baBuffer;
 
                 if (isAnalyzed()) {
-                    record.nVirtualAddress =  getXInfoDB()->getShowRecordByNumber(record.nViewOffset).nAddress;
-                    record.nFileOffset = getXInfoDB()->getShowRecordOffset(record.nVirtualAddress);
+                    record.nVirtualAddress =  getXInfoDB()->getShowRecordByLine(record.nViewOffset).nAddress;
+                    record.nFileOffset = getXInfoDB()->getShowRecordOffsetByAddress(record.nVirtualAddress);
 
                     record.disasmResult = _disasm(record.nVirtualAddress, nullptr, 0);
 
@@ -765,6 +815,7 @@ void XDisasmView::updateData()
 
                     if (getAddressMode() == MODE_RELADDRESS) {
                         QString sPrefix;
+                        QString sSymbol;
 
                         if (record.nFileOffset != -1) {
                             sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), record.nFileOffset);
@@ -772,8 +823,18 @@ void XDisasmView::updateData()
                             sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), record.nVirtualAddress);
                         }
 
+                        if (record.nVirtualAddress != -1) {
+                            if (isAnalyzed()) {
+                                sSymbol = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
+                            }
+                        }
+
                         if (sPrefix != "") {
-                            record.sLocation = QString("%1: %2").arg(sPrefix, record.sLocation);
+                            record.sLocation = QString("%1:%2").arg(sPrefix, record.sLocation);
+                        }
+
+                        if (sSymbol != "") {
+                            record.sLocation = QString("%1.%2").arg(record.sLocation, sSymbol);
                         }
                     }
                 }
@@ -1034,7 +1095,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
         connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
 
-        MENU_STATE menuState = getMenuState();
+        MENU_STATE mstate = getMenuState();
 
         QMenu contextMenu(this);
         QMenu menuGoTo(tr("Go to"), this);
@@ -1075,7 +1136,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuCopy.addAction(&actionCopyCursorAddress);
         menuCopy.addAction(&actionCopyCursorOffset);
 
-        if (menuState.bSize) {
+        if (mstate.bSize) {
             menuCopy.addAction(&actionCopyAsData);
         }
 
@@ -1124,7 +1185,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         contextMenu.addMenu(&menuFind);
 
-        if (menuState.bSize) {
+        if (mstate.bSize) {
             contextMenu.addAction(&actionDumpToFile);
             contextMenu.addAction(&actionSignature);
 
@@ -1133,7 +1194,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addMenu(&menuHex);
         }
 
-        if (menuState.bHex) {
+        if (mstate.bHex) {
             menuFollowIn.addAction(&actionHex);
 
             contextMenu.addMenu(&menuFollowIn);
@@ -1141,7 +1202,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         menuEdit.setEnabled(!isReadonly());
 
-        if (menuState.bSize) {
+        if (mstate.bSize) {
             menuEdit.addAction(&actionEditHex);
 
             contextMenu.addMenu(&menuEdit);
@@ -1384,11 +1445,11 @@ void XDisasmView::_goToXrefSlot()
 
 void XDisasmView::_signatureSlot()
 {
-    STATE state = getState();
+    DEVICESTATE state = getDeviceState();
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(getDevice(), state.nSelectionViewOffset, getMemoryMap(), g_handle);
+    dmds.setData(getDevice(), state.nSelectionOffset, getMemoryMap(), g_handle);
 
     dmds.setGlobal(getShortcuts(), getGlobalOptions());
 

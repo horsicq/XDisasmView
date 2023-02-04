@@ -83,6 +83,7 @@ public:
     XBinary::DM getMode();
     qint64 getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
+    void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
 
 private:
