@@ -56,7 +56,7 @@ public:
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
-    void setEdited(bool bState);
+    void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
 
 private:
     void addMode(XBinary::DM disasmMode);
@@ -78,7 +78,7 @@ protected:
     virtual void registerShortcuts(bool bState);
 
 signals:
-    void dataChanged();
+    void dataChanged(qint64 nDeviceOffset, qint64 nDeviceSize);
     void showOffsetHex(qint64 nOffset);
 
 private:

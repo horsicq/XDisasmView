@@ -85,6 +85,7 @@ public:
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
+    virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
 
 private:
     enum COLUMN {
@@ -107,7 +108,7 @@ private:
         QString sComment;
         qint64 nViewOffset; // Line if file analyzed or FileOffset if not
         XADDR nVirtualAddress;
-        qint64 nFileOffset;
+        qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
         bool bIsReplaced;
         ARRAY array;

@@ -80,7 +80,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     connect(ui->scrollAreaDisasm, SIGNAL(errorMessage(QString)), this, SLOT(errorMessageSlot(QString)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewOffsetChanged(qint64)),this,SLOT(cursorChanged(qint64)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
-    connect(ui->scrollAreaDisasm, SIGNAL(dataChanged()), this, SIGNAL(dataChanged()));
+    connect(ui->scrollAreaDisasm, SIGNAL(dataChanged(qint64, qint64)), this, SIGNAL(dataChanged(qint64, qint64)));
 
     ui->comboBoxMode->blockSignals(bBlocked1);
 
@@ -167,9 +167,9 @@ void XMultiDisasmWidget::setReadonlyVisible(bool bState)
     }
 }
 
-void XMultiDisasmWidget::setEdited(bool bState)
+void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
 {
-    ui->scrollAreaDisasm->setEdited();
+    ui->scrollAreaDisasm->setEdited(nDeviceOffset, nDeviceSize);
 
     //    emit changed();
 }

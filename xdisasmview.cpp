@@ -253,6 +253,24 @@ qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
     return nResult;
 }
 
+qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset)
+{
+    qint64 nResult = 0;
+
+    if (isAnalyzed()) {
+        qint64 _nOffsetStart = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+        qint64 _nOffsetEnd = XDeviceTableView::deviceOffsetToViewOffset(nOffset + nSize, bGlobalOffset);
+
+        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffsetEnd) - getXInfoDB()->getShowRecordLineByOffset(_nOffsetStart);
+
+        nResult = nResult +1;
+    } else {
+        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
+    }
+
+    return nResult;
+}
+
 void XDisasmView::adjustLineCount()
 {
     qint64 nTotalLineCount = 0;
@@ -742,27 +760,31 @@ void XDisasmView::updateData()
 
                 qint32 nBufferSize = 0;
 
-                QByteArray baBuffer;
+                QByteArray baBuffer; // mb TODO fix buffer
 
                 if (isAnalyzed()) {
                     record.nVirtualAddress =  getXInfoDB()->getShowRecordByLine(record.nViewOffset).nAddress;
-                    record.nFileOffset = getXInfoDB()->getShowRecordOffsetByAddress(record.nVirtualAddress);
+                    record.nDeviceOffset = getXInfoDB()->getShowRecordOffsetByAddress(record.nVirtualAddress);
 
                     record.disasmResult = _disasm(record.nVirtualAddress, nullptr, 0);
 
                     nViewSize = 1;
 
-                    if (record.nFileOffset != -1) {
+                    if (record.nDeviceOffset != -1) {
                         nBufferSize = record.disasmResult.nSize;
-                        baBuffer = read_array(record.nFileOffset, qMin(nBufferSize, g_nOpcodeSize));
+                        baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
+
+                        if((record.disasmResult.sMnemonic == "db") && (record.disasmResult.sString == "")) {
+                            record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size());
+                        }
                     }
                 } else {
-                    record.nFileOffset = nCurrentViewOffset;
+                    record.nDeviceOffset = nCurrentViewOffset;
                     record.nVirtualAddress = XBinary::offsetToAddress(getMemoryMap(), nCurrentViewOffset);
 
-                    nBufferSize = qMin(g_nOpcodeSize, qint32(getViewSize() - record.nFileOffset));
+                    nBufferSize = qMin(g_nOpcodeSize, qint32(getViewSize() - record.nDeviceOffset));
 
-                    baBuffer = read_array(record.nFileOffset, nBufferSize);
+                    baBuffer = read_array(record.nDeviceOffset, nBufferSize);
                     nBufferSize = baBuffer.size();
 
                     if (nBufferSize == 0) {
@@ -781,7 +803,7 @@ void XDisasmView::updateData()
                     break;
                 }
 
-                record.bIsReplaced = isReplaced(record.nFileOffset, nBufferSize);
+                record.bIsReplaced = isReplaced(record.nDeviceOffset, nBufferSize);
                 record.sBytes = baBuffer.toHex().data();
 
                 XADDR _nCurrent = 0;
@@ -796,7 +818,7 @@ void XDisasmView::updateData()
                     if (getAddressMode() == MODE_ADDRESS) {
                         _nCurrent = record.nVirtualAddress;
                     } else if (getAddressMode() == MODE_OFFSET) {
-                        _nCurrent = record.nFileOffset;
+                        _nCurrent = record.nDeviceOffset;
                     } else if (getAddressMode() == MODE_RELADDRESS) {
                         _nCurrent = XBinary::addressToRelAddress(getMemoryMap(), record.nVirtualAddress);
                     }
@@ -817,8 +839,8 @@ void XDisasmView::updateData()
                         QString sPrefix;
                         QString sSymbol;
 
-                        if (record.nFileOffset != -1) {
-                            sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), record.nFileOffset);
+                        if (record.nDeviceOffset != -1) {
+                            sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), record.nDeviceOffset);
                         } else if (record.nVirtualAddress != -1) {
                             sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), record.nVirtualAddress);
                         }
