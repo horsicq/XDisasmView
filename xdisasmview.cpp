@@ -335,7 +335,7 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
-            if (disasmResult.bRelative) {
+            if (disasmResult.relType) {
                 QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToRelative), riType);
 
                 if (sReplace != "") {
@@ -344,7 +344,7 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
                 }
             }
 
-            if (disasmResult.bMemory) {
+            if (disasmResult.memType) {
                 QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToMemory), riType);
 
                 if (sReplace != "") {
@@ -538,8 +538,19 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
     }
 }
 
-void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd)
+void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
 {
+    pPainter->save();
+
+    QPen pen;
+
+    //blackPen.setWidth(10);
+    if (bIsSelected) {
+        pen.setColor(Qt::red);
+    }
+
+    pPainter->setPen(pen);
+
     QPolygonF arrowHead;
     qreal arrowSize = 8;
 
@@ -550,11 +561,34 @@ void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF poin
     QPointF arrowP1 = line.p1() + QPointF(sin(angle + M_PI / 3) * arrowSize, cos(angle + M_PI / 3) * arrowSize);
     QPointF arrowP2 = line.p1() + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize, cos(angle + M_PI - M_PI / 3) * arrowSize);
 
-    arrowHead.clear();
     arrowHead << line.p1() << arrowP1 << arrowP2;
 
-    pPainter->drawLine(pointStart, pointEnd);
     pPainter->drawPolygon(arrowHead);
+
+    pPainter->restore();
+
+    drawLine(pPainter, pointStart, pointEnd, bIsSelected, bIsCond);
+}
+
+void XDisasmView::drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
+{
+    pPainter->save();
+
+    QPen pen;
+
+    //blackPen.setWidth(10);
+    if (bIsSelected) {
+        pen.setColor(Qt::red);
+    }
+
+    if (bIsCond) {
+        pen.setStyle(Qt::DotLine);
+    }
+
+    pPainter->setPen(pen);
+    pPainter->drawLine(pointStart, pointEnd);
+
+    pPainter->restore();
 }
 
 QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
@@ -738,12 +772,6 @@ void XDisasmView::updateData()
     //    g_listArrows.clear();
 
     if (getDevice()) {
-        if (getXInfoDB()) {
-            QList<XBinary::MEMORY_REPLACE> listMR = getXInfoDB()->getMemoryReplaces(getMemoryMap()->nModuleAddress, getMemoryMap()->nImageSize);
-
-            setMemoryReplaces(listMR);
-        }
-
         XBinary::MODE mode = XBinary::getWidthModeFromByteSize(g_nAddressWidth);
 
         qint64 nBlockViewOffset = getViewOffsetStart();
@@ -873,7 +901,7 @@ void XDisasmView::updateData()
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if (g_listRecords.at(i).disasmResult.bRelative) {
+                if (g_listRecords.at(i).disasmResult.relType) {
                     XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefToRelative;
                     XADDR nCurrentAddress = g_listRecords.at(i).nVirtualAddress;
 
@@ -941,8 +969,12 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                // TODO DashLine
-                if (g_listRecords.at(i).disasmResult.bRelative) {
+
+                if (g_listRecords.at(i).disasmResult.relType != XCapstone::RELTYPE_NONE) {
+
+                    bool bIsSelected = isViewOffsetSelected(g_listRecords.at(i).nViewOffset);
+                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMPCOND);
+
                     QPointF point1;
                     point1.setX(nLeft + nWidth);
                     point1.setY(nTop + ((i + 0.5) * getLineHeight()));
@@ -967,18 +999,18 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                         point3.setY(point1.y() + nDelta);
                     }
 
-                    pPainter->drawLine(point1, point2);
+                    drawLine(pPainter, point1, point2, bIsSelected, bIsCond);
 
                     if (g_listRecords.at(i).bIsEnd) {
-                        pPainter->drawLine(point2, point3);
+                        drawLine(pPainter, point2, point3, bIsSelected, bIsCond);
 
                         QPointF point4;
                         point4.setX(point1.x());
                         point4.setY(point3.y());
 
-                        drawArrow(pPainter, point3, point4);
+                        drawArrow(pPainter, point3, point4, bIsSelected, bIsCond);
                     } else {
-                        drawArrow(pPainter, point2, point3);
+                        drawArrow(pPainter, point2, point3, bIsSelected, bIsCond);
                     }
                 }
             }
@@ -1137,16 +1169,16 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         XDisasmView::RECORD record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
 
-        if (record.disasmResult.bRelative || record.disasmResult.bMemory) {
+        if (record.disasmResult.relType || record.disasmResult.memType) {
             menuGoTo.addSeparator();
 
-            if (record.disasmResult.bRelative) {
+            if (record.disasmResult.relType) {
                 actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
                 actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
                 menuGoTo.addAction(&actionGoXrefRelative);
             }
 
-            if (record.disasmResult.bMemory) {
+            if (record.disasmResult.memType) {
                 actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
                 actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
                 menuGoTo.addAction(&actionGoXrefMemory);
