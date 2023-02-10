@@ -778,6 +778,12 @@ void XDisasmView::updateData()
         qint32 nNumberLinesProPage = getLinesProPage();
         qint64 nCurrentViewOffset = nBlockViewOffset;
 
+        QList<XInfoDB::SHOWRECORD> listShowRecords;
+
+        if (isAnalyzed()) {
+            listShowRecords = getXInfoDB()->getShowRecords(nBlockViewOffset, nNumberLinesProPage);
+        }
+
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
             if (nCurrentViewOffset < getViewSize()) {
                 qint64 nViewSize = 0;
@@ -791,8 +797,9 @@ void XDisasmView::updateData()
                 QByteArray baBuffer; // mb TODO fix buffer
 
                 if (isAnalyzed()) {
-                    record.nVirtualAddress =  getXInfoDB()->getShowRecordByLine(record.nViewOffset).nAddress;
-                    record.nDeviceOffset = getXInfoDB()->getShowRecordOffsetByAddress(record.nVirtualAddress);
+                    XInfoDB::SHOWRECORD showRecord = listShowRecords.at(i);
+                    record.nVirtualAddress = showRecord.nAddress;
+                    record.nDeviceOffset = showRecord.nOffset;
 
                     record.disasmResult = _disasm(record.nVirtualAddress, nullptr, 0);
 
