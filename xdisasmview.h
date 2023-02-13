@@ -81,7 +81,7 @@ public:
     void setData(QIODevice *pDevice, OPTIONS options, bool bReload = true);
     void setMode(XBinary::DM disasmMode);
     XBinary::DM getMode();
-    qint64 getSelectionInitAddress();
+    XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);

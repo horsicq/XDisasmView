@@ -140,9 +140,9 @@ XBinary::DM XDisasmView::getMode()
     return g_disasmMode;
 }
 
-qint64 XDisasmView::getSelectionInitAddress()
+XADDR XDisasmView::getSelectionInitAddress()
 {
-    qint64 nResult = -1;
+    XADDR nResult = -1;
 
     qint64 nOffset = getSelectionInitOffset();
 
@@ -194,7 +194,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
             XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
 
             if (pSubDevice) {
-                qint64 nInitOffset = pSubDevice->getInitOffset();
+                quint64 nInitOffset = pSubDevice->getInitOffset();
                 result.nSelectionOffset += nInitOffset;
                 result.nCursorOffset += nInitOffset;
                 result.nShowOffset += nInitOffset;
@@ -214,7 +214,7 @@ void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
             XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
 
             if (pSubDevice) {
-                qint64 nInitOffset = pSubDevice->getInitOffset();
+                quint64 nInitOffset = pSubDevice->getInitOffset();
                 deviceState.nCursorOffset -= nInitOffset;
                 deviceState.nSelectionOffset -= nInitOffset;
                 deviceState.nShowOffset -= nInitOffset;
@@ -838,7 +838,10 @@ void XDisasmView::updateData()
                     break;
                 }
 
-                record.bIsReplaced = isReplaced(record.nDeviceOffset, nBufferSize);
+                if (getXInfoDB()) {
+                    record.bIsReplaced = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress ); // mb TODO region
+                }
+
                 record.sBytes = baBuffer.toHex().data();
 
                 XADDR _nCurrent = 0;
