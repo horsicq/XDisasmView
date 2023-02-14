@@ -460,7 +460,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
     bool bSave = false;
 
-    if ((pTextOption->bCursor) || (pTextOption->bCurrentIP)) {
+    if (pTextOption->bCursor) {
         bSave = true;
     }
 
@@ -468,13 +468,13 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
         pPainter->save();
     }
 
-    if ((pTextOption->bSelected) && (!pTextOption->bCursor) && (!pTextOption->bCurrentIP)) {
+    if ((pTextOption->bSelected) && (!pTextOption->bCursor)) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::Highlight));
     }
 
     if (pTextOption->bIsReplaced) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, QColor(Qt::red));
-    } else if ((pTextOption->bCursor) || (pTextOption->bCurrentIP)) {
+    } else if (pTextOption->bCursor) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::WindowText));
         pPainter->setPen(viewport()->palette().color(QPalette::Base));
     }
@@ -782,6 +782,7 @@ void XDisasmView::updateData()
 
         if (isAnalyzed()) {
             listShowRecords = getXInfoDB()->getShowRecords(nBlockViewOffset, nNumberLinesProPage);
+            nNumberLinesProPage = qMin(nNumberLinesProPage, listShowRecords.count());
         }
 
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
@@ -839,7 +840,9 @@ void XDisasmView::updateData()
                 }
 
                 if (getXInfoDB()) {
-                    record.bIsReplaced = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress ); // mb TODO region
+                #ifdef USE_XPROCESS
+                    record.bIsReplaced = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress); // mb TODO region
+                #endif
                 }
 
                 record.sBytes = baBuffer.toHex().data();
@@ -974,6 +977,14 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 {
     Q_UNUSED(nHeight)
 
+    qint32 nArrowDelta = 0;
+
+    if (getXInfoDB()) {
+        if (getXInfoDB()->isDebugger()) {
+            nArrowDelta = getCharWidth() + 2 * getSideDelta();
+        }
+    }
+
     if (nColumn == COLUMN_ARROWS) {
         qint32 nNumberOfRecords = g_listRecords.count();
 
@@ -983,14 +994,14 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                 if (g_listRecords.at(i).disasmResult.relType != XCapstone::RELTYPE_NONE) {
 
                     bool bIsSelected = isViewOffsetSelected(g_listRecords.at(i).nViewOffset);
-                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMPCOND);
+                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_COND);
 
                     QPointF point1;
-                    point1.setX(nLeft + nWidth);
+                    point1.setX(nLeft + nWidth - nArrowDelta);
                     point1.setY(nTop + ((i + 0.5) * getLineHeight()));
 
                     QPointF point2;
-                    point2.setX((nLeft + nWidth) - getCharWidth() * (g_listRecords.at(i).nArrayLevel));
+                    point2.setX((nLeft + nWidth - nArrowDelta) - getCharWidth() * (g_listRecords.at(i).nArrayLevel));
                     point2.setY(point1.y());
 
                     QPointF point3;
@@ -1037,22 +1048,53 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
     if (nRow < nNumberOfRows) {
         qint64 nOffset = g_listRecords.at(nRow).nViewOffset;
 
+        bool bIsDebugger = false;
+        bool bIsCurrentIP = false;
+        bool bIsBreakpoint = false;
+
+        if (getXInfoDB()) {
+            if (nColumn == COLUMN_ARROWS) {
+            #ifdef USE_XPROCESS
+                bIsDebugger = getXInfoDB()->isDebugger();
+                XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
+                XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
+
+                bIsCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP));
+                bIsBreakpoint = getXInfoDB()->isBreakPointPresent(nAddress);
+            #endif
+            }
+        }
+
         TEXT_OPTION textOption = {};
         textOption.bSelected = isViewOffsetSelected(nOffset);
 
         textOption.bCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsReplaced = ((g_listRecords.at(nRow).bIsReplaced) && (nColumn == COLUMN_LOCATION));
 
-        if (getXInfoDB()) {
-#ifdef USE_XPROCESS
-            XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
-            XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
-
-            textOption.bCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP) && (nColumn == COLUMN_LOCATION));
-#endif
-        }
-
         if (nColumn == COLUMN_ARROWS) {
+            if (bIsDebugger) {
+                qint32 _nLeft = nLeft + nWidth - getCharWidth() - getSideDelta();
+                qint32 _nWidth = getCharWidth();
+                qint32 _nHeight = _nWidth;
+                qint32 _nTop = nTop + 2;
+
+                pPainter->save();
+
+                if (bIsBreakpoint) {
+                    pPainter->setBrush(Qt::red);
+                    pPainter->setPen(Qt::red);
+                } else if (bIsCurrentIP) {
+                    pPainter->setBrush(Qt::green); // TODO consts
+                    pPainter->setPen(Qt::green);
+                } else {
+                    pPainter->setBrush(Qt::gray); // TODO consts
+                    pPainter->setPen(Qt::gray);
+                }
+
+                pPainter->drawEllipse(QRect(_nLeft, _nTop, _nWidth, _nHeight));
+
+                pPainter->restore();
+            }
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);

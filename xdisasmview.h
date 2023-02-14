@@ -139,7 +139,7 @@ private:
 
     struct TEXT_OPTION {
         bool bSelected;
-        bool bCurrentIP;
+//        bool bCurrentIP;
         bool bCursor;
         bool bIsReplaced;
         bool bHighlight;
