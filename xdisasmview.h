@@ -174,7 +174,7 @@ protected:
     virtual qint64 getRecordSize(qint64 nViewOffset);
     virtual qint64 getFixViewOffset(qint64 nViewOffset);
     virtual void adjustLineCount();
-    virtual void adjustViewSize();
+    virtual void adjustViewSize(); // TODO remove
 
 protected slots:
     void _goToEntryPointSlot();
