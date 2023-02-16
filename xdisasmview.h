@@ -110,7 +110,8 @@ private:
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
-        bool bIsReplaced;
+        bool bIsBreakpoint;
+        bool bIsCurrentIP;
         ARRAY array;
         qint32 nArrayLevel;
         qint32 nMaxLevel;
@@ -138,10 +139,10 @@ private:
     MENU_STATE getMenuState();
 
     struct TEXT_OPTION {
-        bool bSelected;
-//        bool bCurrentIP;
-        bool bCursor;
-        bool bIsReplaced;
+        bool bIsSelected;
+        bool bIsCurrentIP;
+//        bool bIsCursor;
+        bool bIsBreakpoint;
         bool bHighlight;
     };
 
