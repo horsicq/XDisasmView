@@ -83,6 +83,32 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="toolButtonVisitedPrev">
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>&lt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="toolButtonVisitedNext">
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QGroupBox" name="groupBoxAnalysis">
        <property name="title">
         <string>Analysis</string>

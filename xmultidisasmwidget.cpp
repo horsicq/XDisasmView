@@ -81,6 +81,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewOffsetChanged(qint64)),this,SLOT(cursorChanged(qint64)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
     connect(ui->scrollAreaDisasm, SIGNAL(dataChanged(qint64, qint64)), this, SIGNAL(dataChanged(qint64, qint64)));
+    connect(ui->scrollAreaDisasm, SIGNAL(visitedStateChanged()), this, SLOT(adjustVisitedState()));
 
     ui->comboBoxMode->blockSignals(bBlocked1);
 
@@ -88,6 +89,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->checkBoxReadonly->setChecked(true);
 
     adjustAnalysisPanel();
+
+    adjustVisitedState();
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -121,6 +124,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     }
 
     adjustAnalysisPanel();
+    adjustVisitedState();
 
     reloadFileType();
 }
@@ -329,4 +333,20 @@ void XMultiDisasmWidget::on_pushButtonClear_clicked()
 {
     clearAnalysis();
     adjustAnalysisPanel();
+}
+
+void XMultiDisasmWidget::adjustVisitedState()
+{
+    ui->toolButtonVisitedPrev->setEnabled(ui->scrollAreaDisasm->isPrevVisitedAvailable());
+    ui->toolButtonVisitedNext->setEnabled(ui->scrollAreaDisasm->isNextVisitedAvailable());
+}
+
+void XMultiDisasmWidget::on_toolButtonVisitedPrev_clicked()
+{
+    ui->scrollAreaDisasm->goToPrevVisited();
+}
+
+void XMultiDisasmWidget::on_toolButtonVisitedNext_clicked()
+{
+    ui->scrollAreaDisasm->goToNextVisited();
 }

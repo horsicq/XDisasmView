@@ -171,10 +171,10 @@ protected:
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
-    virtual qint64 getRecordSize(qint64 nViewOffset);
     virtual qint64 getFixViewOffset(qint64 nViewOffset);
     virtual void adjustLineCount();
     virtual void adjustViewSize(); // TODO remove
+    virtual qint64 getViewSizeByOffset(qint64 nViewOffset);
 
 protected slots:
     void _goToEntryPointSlot();

@@ -73,6 +73,9 @@ private slots:
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_pushButtonAnalyze_clicked();
     void on_pushButtonClear_clicked();
+    void adjustVisitedState();
+    void on_toolButtonVisitedPrev_clicked();
+    void on_toolButtonVisitedNext_clicked();
 
 protected:
     virtual void registerShortcuts(bool bState);

@@ -116,7 +116,10 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
 //        }
 
 //        _goToViewOffset(nOffset, false, false, options.bAprox);
-        goToAddress(options.nInitAddress, false, options.bAprox);
+        goToAddress(options.nInitAddress, false, options.bAprox, false);
+//        addVisited(options.nInitAddress);
+    } else {
+//        addVisited(0);
     }
 
     if (bReload) {
@@ -298,6 +301,23 @@ void XDisasmView::adjustViewSize()
             setViewSize(getDevice()->size());
         }
     }
+}
+
+qint64 XDisasmView::getViewSizeByOffset(qint64 nViewOffset)
+{
+    qint64 nResult = 0;
+
+    if (!isAnalyzed()) {
+        QByteArray baData = read_array(nViewOffset, g_nOpcodeSize);
+
+        XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_disasmMode, baData.data(), baData.size(), 0, g_disasmOptions);
+
+        nResult = disasmResult.nSize;
+    } else {
+        nResult = 1;
+    }
+
+    return nResult;
 }
 
 XCapstone::DISASM_RESULT XDisasmView::_disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize)
@@ -1514,22 +1534,6 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
     }
 }
 
-qint64 XDisasmView::getRecordSize(qint64 nViewOffset)
-{
-    // TODO analyzed
-    qint64 nResult = 1;
-
-    if (!isAnalyzed()) {
-        QByteArray baData = read_array(nViewOffset, g_nOpcodeSize);
-
-        XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_disasmMode, baData.data(), baData.size(), 0, g_disasmOptions);
-
-        nResult = disasmResult.nSize;
-    }
-
-    return nResult;
-}
-
 qint64 XDisasmView::getFixViewOffset(qint64 nViewOffset)
 {
     qint64 nResult = 0;
@@ -1545,7 +1549,7 @@ qint64 XDisasmView::getFixViewOffset(qint64 nViewOffset)
 
 void XDisasmView::_goToEntryPointSlot()
 {
-    goToAddress(g_options.nEntryPointAddress);
+    goToAddress(g_options.nEntryPointAddress, false, false, true);
     setFocus();
     viewport()->update();
 }
@@ -1557,7 +1561,7 @@ void XDisasmView::_goToXrefSlot()
     if (pAction) {
         XADDR nAddress = pAction->property("ADDRESS").toULongLong();
 
-        goToAddress(nAddress);
+        goToAddress(nAddress, false, false, true);
         setFocus();
         viewport()->update();
     }
