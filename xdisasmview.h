@@ -175,6 +175,7 @@ protected:
     virtual void adjustLineCount();
     virtual void adjustViewSize(); // TODO remove
     virtual qint64 getViewSizeByOffset(qint64 nViewOffset);
+    virtual qint64 addressToViewOffset(XADDR nAddress);
 
 protected slots:
     void _goToEntryPointSlot();

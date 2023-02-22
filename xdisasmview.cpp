@@ -320,6 +320,19 @@ qint64 XDisasmView::getViewSizeByOffset(qint64 nViewOffset)
     return nResult;
 }
 
+qint64 XDisasmView::addressToViewOffset(XADDR nAddress)
+{
+    qint64 nResult = 0;
+
+    if (!isAnalyzed()) {
+        nResult = XDeviceTableView::addressToViewOffset(nAddress);
+    } else {
+        nResult = getXInfoDB()->getShowRecordLineByAddress(nAddress);
+    }
+
+    return nResult;
+}
+
 XCapstone::DISASM_RESULT XDisasmView::_disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize)
 {
     XCapstone::DISASM_RESULT result = {};
