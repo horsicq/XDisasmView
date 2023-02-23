@@ -1174,7 +1174,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
         connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
 
-        QAction actionGoToEntryPoint(tr("Entry point"), this);
+        QAction actionGoToEntryPoint(tr("Entry point"), this); // mb TODO address of EntryPoint
         actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
