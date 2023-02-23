@@ -33,7 +33,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_disasmOptions = XCapstone::DISASM_OPTIONS();
 
     g_nAddressWidth = 8;
-    g_nOpcodeSize = 16; // TODO Check
+    g_nOpcodeSize = 16;  // TODO Check
     g_nThisBase = 0;
     g_bIsAddressColon = false;
     g_bIsUppercase = false;
@@ -109,17 +109,17 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
     adjustViewSize();
 
     if (options.nInitAddress != (XADDR)-1) {
-//        qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
+        //        qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
 
-//        if (nOffset == -1) {
-//            nOffset = 0;
-//        }
+        //        if (nOffset == -1) {
+        //            nOffset = 0;
+        //        }
 
-//        _goToViewOffset(nOffset, false, false, options.bAprox);
+        //        _goToViewOffset(nOffset, false, false, options.bAprox);
         goToAddress(options.nInitAddress, false, options.bAprox, false);
-//        addVisited(options.nInitAddress);
+        //        addVisited(options.nInitAddress);
     } else {
-//        addVisited(0);
+        //        addVisited(0);
     }
 
     if (bReload) {
@@ -170,14 +170,14 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 
         qint64 nShowOffset = getViewOffsetStart();
 
-//        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
+        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
         XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
         XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
         XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
 
-//        if (showRecordCursor.nOffset != -1 ) {
-//            result.nCursorOffset = showRecordCursor.nOffset;
-//        }
+        //        if (showRecordCursor.nOffset != -1 ) {
+        //            result.nCursorOffset = showRecordCursor.nOffset;
+        //        }
 
         XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
         qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
@@ -199,7 +199,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
             if (pSubDevice) {
                 quint64 nInitOffset = pSubDevice->getInitOffset();
                 result.nSelectionOffset += nInitOffset;
-//                result.nCursorOffset += nInitOffset;
+                //                result.nCursorOffset += nInitOffset;
                 result.nShowOffset += nInitOffset;
             }
         }
@@ -218,7 +218,7 @@ void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
 
             if (pSubDevice) {
                 quint64 nInitOffset = pSubDevice->getInitOffset();
-//                deviceState.nCursorOffset -= nInitOffset;
+                //                deviceState.nCursorOffset -= nInitOffset;
                 deviceState.nSelectionOffset -= nInitOffset;
                 deviceState.nShowOffset -= nInitOffset;
             }
@@ -226,13 +226,13 @@ void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
 
         qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset);
         qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset + deviceState.nSelectionSize) - nSelectionStart;
-//        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
+        //        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
         qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowOffset);
 
         _goToViewOffset(nShowStart);
 
         _initSetSelection(nSelectionStart, nSelectionSize);
-//        setCursorViewOffset(nCursor);
+        //        setCursorViewOffset(nCursor);
 
         adjust();
         viewport()->update();
@@ -266,7 +266,7 @@ qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlo
 
         nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffsetEnd) - getXInfoDB()->getShowRecordLineByOffset(_nOffsetStart);
 
-        nResult = nResult +1;
+        nResult = nResult + 1;
     } else {
         nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
     }
@@ -432,7 +432,8 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
         while (nSize > 0) {
             qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-            XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+            XCapstone::DISASM_RESULT disasmResult =
+                XCapstone::disasm_ex(g_handle, g_disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
             if ((nViewOffset >= _nOffset) && (nViewOffset < _nOffset + disasmResult.nSize)) {
                 if (_nOffset == nViewOffset) {
@@ -493,9 +494,9 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 
     bool bSave = false;
 
-//    if (pTextOption->bIsCursor) {
-//        bSave = true;
-//    }
+    //    if (pTextOption->bIsCursor) {
+    //        bSave = true;
+    //    }
 
     if (bSave) {
         pPainter->save();
@@ -577,7 +578,7 @@ void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF poin
 
     QPen pen;
 
-    //blackPen.setWidth(10);
+    // blackPen.setWidth(10);
     if (bIsSelected) {
         pen.setColor(Qt::red);
     }
@@ -609,7 +610,7 @@ void XDisasmView::drawLine(QPainter *pPainter, QPointF pointStart, QPointF point
 
     QPen pen;
 
-    //blackPen.setWidth(10);
+    // blackPen.setWidth(10);
     if (bIsSelected) {
         pen.setColor(Qt::red);
     }
@@ -821,9 +822,9 @@ void XDisasmView::updateData()
         XADDR nCurrentIP = 0;
 
         if (getXInfoDB()) {
-        #ifdef USE_XPROCESS
+#ifdef USE_XPROCESS
             nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
-        #endif
+#endif
         }
 
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
@@ -836,7 +837,7 @@ void XDisasmView::updateData()
 
                 qint32 nBufferSize = 0;
 
-                QByteArray baBuffer; // mb TODO fix buffer
+                QByteArray baBuffer;  // mb TODO fix buffer
 
                 if (isAnalyzed()) {
                     XInfoDB::SHOWRECORD showRecord = listShowRecords.at(i);
@@ -847,16 +848,16 @@ void XDisasmView::updateData()
 
                     nViewSize = 1;
 
-//                    if (record.nVirtualAddress == 0x01157ef1) {
-//                        int z = 0;
-//                        z++;
-//                    }
+                    //                    if (record.nVirtualAddress == 0x01157ef1) {
+                    //                        int z = 0;
+                    //                        z++;
+                    //                    }
 
                     if (record.nDeviceOffset != -1) {
                         nBufferSize = record.disasmResult.nSize;
                         baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
-                        if((record.disasmResult.sMnemonic == "db") && (record.disasmResult.sString == "")) {
+                        if ((record.disasmResult.sMnemonic == "db") && (record.disasmResult.sString == "")) {
                             record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size());
                         }
                     }
@@ -886,10 +887,10 @@ void XDisasmView::updateData()
                 }
 
                 if (getXInfoDB()) {
-                #ifdef USE_XPROCESS
+#ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
-                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress); // mb TODO region
-                #endif
+                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress);  // mb TODO region
+#endif
                 }
 
                 record.sBytes = baBuffer.toHex().data();
@@ -977,7 +978,8 @@ void XDisasmView::updateData()
                         for (qint32 j = i; j >= nStart; j--) {
                             nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) &&
+                                (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                                 nStart = j;
                                 g_listRecords[i].nArraySize = nEnd - nStart;
                                 g_listRecords[i].bIsEnd = true;
@@ -995,7 +997,8 @@ void XDisasmView::updateData()
                         for (qint32 j = i; j <= nEnd; j++) {
                             nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                            if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) &&
+                                (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                                 nEnd = j;
                                 g_listRecords[i].nArraySize = nEnd - nStart;
                                 g_listRecords[i].bIsEnd = true;
@@ -1037,9 +1040,7 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-
                 if (g_listRecords.at(i).disasmResult.relType != XCapstone::RELTYPE_NONE) {
-
                     bool bIsSelected = isViewOffsetSelected(g_listRecords.at(i).nViewOffset);
                     bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_COND);
 
@@ -1090,32 +1091,32 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 {
     qint32 nNumberOfRows = g_listRecords.count();
 
-//    qint64 nCursorOffset = getState().nCursorViewOffset;
+    //    qint64 nCursorOffset = getState().nCursorViewOffset;
 
     if (nRow < nNumberOfRows) {
         qint64 nOffset = g_listRecords.at(nRow).nViewOffset;
 
         bool bIsDebugger = false;
-//        bool bIsCurrentIP = false;
-//        bool bIsBreakpoint = false;
+        //        bool bIsCurrentIP = false;
+        //        bool bIsBreakpoint = false;
 
         if (getXInfoDB()) {
             if (nColumn == COLUMN_ARROWS) {
-            #ifdef USE_XPROCESS
+#ifdef USE_XPROCESS
                 bIsDebugger = getXInfoDB()->isDebugger();
-//                XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
-//                XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
+                //                XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
+                //                XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
 
-//                bIsCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP));
-//                bIsBreakpoint = getXInfoDB()->isBreakPointPresent(nAddress);
-            #endif
+                //                bIsCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP));
+                //                bIsBreakpoint = getXInfoDB()->isBreakPointPresent(nAddress);
+#endif
             }
         }
 
         TEXT_OPTION textOption = {};
         textOption.bIsSelected = isViewOffsetSelected(nOffset);
         textOption.bIsCurrentIP = ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION));
-//        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
+        //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsBreakpoint = ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION));
 
         if (nColumn == COLUMN_ARROWS) {
@@ -1131,10 +1132,10 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
                     pPainter->setBrush(Qt::red);
                     pPainter->setPen(Qt::red);
                 } else if (g_listRecords.at(nRow).bIsCurrentIP) {
-                    pPainter->setBrush(Qt::green); // TODO consts
+                    pPainter->setBrush(Qt::green);  // TODO consts
                     pPainter->setPen(Qt::green);
                 } else {
-                    pPainter->setBrush(Qt::gray); // TODO consts
+                    pPainter->setBrush(Qt::gray);  // TODO consts
                     pPainter->setPen(Qt::gray);
                 }
 
@@ -1174,7 +1175,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
         connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
 
-        QAction actionGoToEntryPoint(tr("Entry point"), this); // mb TODO address of EntryPoint
+        QAction actionGoToEntryPoint(tr("Entry point"), this);  // mb TODO address of EntryPoint
         actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
@@ -1475,10 +1476,8 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!shortCuts[SC_SELECTALL]) shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
         if (!shortCuts[SC_COPYDATA]) shortCuts[SC_COPYDATA] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA), this, SLOT(_copyDataSlot()));
-        if (!shortCuts[SC_COPYADDRESS])
-            shortCuts[SC_COPYADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
-        if (!shortCuts[SC_COPYOFFSET])
-            shortCuts[SC_COPYOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
+        if (!shortCuts[SC_COPYADDRESS]) shortCuts[SC_COPYADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
+        if (!shortCuts[SC_COPYOFFSET]) shortCuts[SC_COPYOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
         if (!shortCuts[SC_FIND_STRING]) shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
         if (!shortCuts[SC_FIND_SIGNATURE])
             shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));

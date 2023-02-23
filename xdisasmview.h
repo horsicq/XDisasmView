@@ -104,9 +104,9 @@ private:
 
     struct RECORD {
         QString sLocation;
-        QString sBytes; // mb TODO labels
+        QString sBytes;  // mb TODO labels
         QString sComment;
-        qint64 nViewOffset; // Line if file analyzed or FileOffset if not
+        qint64 nViewOffset;  // Line if file analyzed or FileOffset if not
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
@@ -141,7 +141,7 @@ private:
     struct TEXT_OPTION {
         bool bIsSelected;
         bool bIsCurrentIP;
-//        bool bIsCursor;
+        //        bool bIsCursor;
         bool bIsBreakpoint;
         bool bHighlight;
     };
@@ -173,7 +173,7 @@ protected:
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
     virtual qint64 getFixViewOffset(qint64 nViewOffset);
     virtual void adjustLineCount();
-    virtual void adjustViewSize(); // TODO remove
+    virtual void adjustViewSize();  // TODO remove
     virtual qint64 getViewSizeByOffset(qint64 nViewOffset);
     virtual qint64 addressToViewOffset(XADDR nAddress);
 

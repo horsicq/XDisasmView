@@ -115,12 +115,12 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     if (g_pXInfoDB) {
         g_pXInfoDB->setAnalyzed(g_pXInfoDB->isSymbolsPresent());
 
-//        if (!(g_pXInfoDB->isAnalyzed())) {
+        //        if (!(g_pXInfoDB->isAnalyzed())) {
 
-//            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
-//                analyze();
-//            }
-//        }
+        //            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
+        //                analyze();
+        //            }
+        //        }
     }
 
     adjustAnalysisPanel();
