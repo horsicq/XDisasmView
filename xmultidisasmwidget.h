@@ -51,12 +51,14 @@ public:
     void setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB = nullptr);
     void setDevice(QIODevice *pDevice);
     void setBackupDevice(QIODevice *pDevice);
-    void goToAddress(XADDR nAddress);
-    void goToOffset(qint64 nOffset);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
+
+public slots:
+    void goToAddress(XADDR nAddress);
+    void goToOffset(qint64 nOffset);
 
 private:
     void addMode(XBinary::DM disasmMode);

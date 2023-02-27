@@ -308,6 +308,7 @@ void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
 
     dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(), true);
 
+    XOptions::_adjustStayOnTop(&dialogSymbols, true);
     dialogSymbols.exec();
 }
 
