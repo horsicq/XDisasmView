@@ -55,8 +55,6 @@ public:
     void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
-
-public slots:
     void goToAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
 
@@ -78,6 +76,7 @@ private slots:
     void adjustVisitedState();
     void on_toolButtonVisitedPrev_clicked();
     void on_toolButtonVisitedNext_clicked();
+    void goToAddressSlot(XADDR nAddress, qint64 nSize);
 
 protected:
     virtual void registerShortcuts(bool bState);
