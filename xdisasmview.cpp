@@ -537,6 +537,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         _sMnenonic = sMnemonic;
     }
     // TODO registers !!!
+    // TODO nop complete line
     if (g_bIsHighlight && g_mapOpcodeColorMap.contains(_sMnenonic)) {
         OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
 
