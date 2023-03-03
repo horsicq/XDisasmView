@@ -1535,6 +1535,8 @@ void XDisasmView::_headerClicked(qint32 nColumn)
 
         adjust(true);
     }
+
+    XAbstractTableView::_headerClicked(nColumn);
 }
 
 void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
