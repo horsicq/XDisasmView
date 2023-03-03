@@ -537,31 +537,35 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         _sMnenonic = sMnemonic;
     }
     // TODO registers !!!
-    // TODO nop complete line
-    if (g_bIsHighlight && g_mapOpcodeColorMap.contains(_sMnenonic)) {
-        OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
 
-        pPainter->save();
+    if (g_bIsHighlight) {
+        QRect _rectMnemonic = rect;
+        _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
-        QRect _rect = rect;
+        if (g_mapOpcodeColorMap.contains(_sMnenonic)) {
+            // TODO nop complete line
+            pPainter->save();
 
-        _rect.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
+            OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
 
-        if (opcodeColor.colBackground.isValid()) {
-            pPainter->fillRect(_rect, QBrush(opcodeColor.colBackground));
+            if (opcodeColor.colBackground.isValid()) {
+                pPainter->fillRect(_rectMnemonic, QBrush(opcodeColor.colBackground));
+            }
+
+            pPainter->setPen(opcodeColor.colText);
+            pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
+
+            pPainter->restore();
+        } else {
+            pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
         }
-
-        pPainter->setPen(opcodeColor.colText);
-        pPainter->drawText(_rect, sMnemonic, _qTextOptions);
-
-        pPainter->restore();
 
         if (sString != "") {
-            QRect _rect = rect;
-            _rect.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
+            QRect _rectString = rect;
+            _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
-            pPainter->drawText(_rect, sString, _qTextOptions);
-        }
+            pPainter->drawText(_rectString, sString, _qTextOptions);
+        }        
     } else {
         QString sOpcode = sMnemonic;
 
