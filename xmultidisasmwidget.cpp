@@ -308,7 +308,7 @@ void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
 
     dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(), true);
 
-    connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR,qint64)), this, SLOT(goToAddressSlot(XADDR,qint64)));
+    connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
     XOptions::_adjustStayOnTop(&dialogSymbols, true);
     dialogSymbols.exec();

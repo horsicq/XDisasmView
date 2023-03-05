@@ -565,7 +565,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
             pPainter->drawText(_rectString, sString, _qTextOptions);
-        }        
+        }
     } else {
         QString sOpcode = sMnemonic;
 

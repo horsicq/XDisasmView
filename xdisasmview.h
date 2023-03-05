@@ -205,7 +205,7 @@ private:
     bool g_bIsHighlight;
     MODE_OPCODE g_modeOpcode;
     QTextOption _qTextOptions;
-    XCapstone::DISASM_OPTIONS g_disasmOptions; // TODO Check remove
+    XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
 };
 
 #endif  // XDISASMVIEW_H
