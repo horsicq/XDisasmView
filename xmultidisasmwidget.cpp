@@ -246,7 +246,7 @@ void XMultiDisasmWidget::analyze()
 
         dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
 
-        dialogTransfer.showDialogDelay(1000);
+        dialogTransfer.showDialogDelay();
 
         ui->scrollAreaDisasm->adjustAfterAnalysis();
 
@@ -263,7 +263,7 @@ void XMultiDisasmWidget::clearAnalysis()
 
         dialogTransfer.clear(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
 
-        dialogTransfer.showDialogDelay(1000);
+        dialogTransfer.showDialogDelay();
 
         ui->scrollAreaDisasm->adjustAfterAnalysis();
 
