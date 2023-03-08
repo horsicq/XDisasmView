@@ -823,9 +823,9 @@ void XDisasmView::updateData()
             listShowRecords = getXInfoDB()->getShowRecords(nBlockViewOffset, nNumberLinesProPage);
             nNumberLinesProPage = qMin(nNumberLinesProPage, listShowRecords.count());
         }
-
+#ifdef USE_XPROCESS
         XADDR nCurrentIP = 0;
-
+#endif
         if (getXInfoDB()) {
 #ifdef USE_XPROCESS
             nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
@@ -849,7 +849,26 @@ void XDisasmView::updateData()
                     record.nVirtualAddress = showRecord.nAddress;
                     record.nDeviceOffset = showRecord.nOffset;
 
-                    record.disasmResult = _disasm(record.nVirtualAddress, nullptr, 0);
+                    record.disasmResult.bIsValid = (showRecord.nSize != 0);
+                    record.disasmResult.nAddress = showRecord.nAddress;
+                    record.disasmResult.nSize = showRecord.nSize;
+                    record.disasmResult.sMnemonic = showRecord.sRecText1;
+                    record.disasmResult.sString = showRecord.sRecText2;
+
+                    if (g_bIsUppercase) {
+                        record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+                        record.disasmResult.sString = record.disasmResult.sString.toUpper();
+                    }
+
+                    XInfoDB::RELRECORD relRecord = getXInfoDB()->getRelRecordByAddress(record.nVirtualAddress);
+
+                    record.disasmResult.relType = relRecord.relType;
+                    record.disasmResult.nXrefToRelative = relRecord.nXrefToRelative;
+                    record.disasmResult.memType = relRecord.memType;
+                    record.disasmResult.nXrefToMemory = relRecord.nXrefToMemory;
+                    record.disasmResult.nMemorySize = relRecord.nMemorySize;
+
+                    record.bHasReferences = getXInfoDB()->isAddressHasReferences(record.nVirtualAddress);
 
                     nViewSize = 1;
 
@@ -1180,7 +1199,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
         connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
 
-        QAction actionGoToEntryPoint(tr("Entry point"), this);  // mb TODO address of EntryPoint
+        QString sEntryPointText = QString("%1(%2)").arg(tr("Entry point"), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
+
+        QAction actionGoToEntryPoint(sEntryPointText, this);
         actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
         connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
 
@@ -1254,6 +1275,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
         actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
         connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
 
+        QAction actionReferences(tr("References"), this);
+
+        // TODO XREFS
+
         MENU_STATE mstate = getMenuState();
 
         QMenu contextMenu(this);
@@ -1288,6 +1313,12 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
                 menuGoTo.addAction(&actionGoXrefMemory);
             }
+        }
+
+        if (record.bHasReferences) {
+            actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
+            connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
+            menuGoTo.addAction(&actionReferences);
         }
 
         contextMenu.addMenu(&menuGoTo);
@@ -1604,4 +1635,9 @@ void XDisasmView::_hexSlot()
     if (g_options.bMenu_Hex) {
         emit showOffsetHex(getDeviceState(true).nSelectionOffset);
     }
+}
+
+void XDisasmView::_references()
+{
+    qDebug("void XDisasmView::_references()");
 }

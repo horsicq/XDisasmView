@@ -117,6 +117,7 @@ private:
         qint32 nMaxLevel;
         qint32 nArraySize;
         bool bIsEnd;
+        bool bHasReferences;
         // TODO jmp/jcc
     };
 
@@ -182,6 +183,7 @@ protected slots:
     void _goToXrefSlot();
     void _signatureSlot();
     void _hexSlot();
+    void _references();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
