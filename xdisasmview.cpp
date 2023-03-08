@@ -848,6 +848,7 @@ void XDisasmView::updateData()
                     XInfoDB::SHOWRECORD showRecord = listShowRecords.at(i);
                     record.nVirtualAddress = showRecord.nAddress;
                     record.nDeviceOffset = showRecord.nOffset;
+                    record.bHasRefFrom = showRecord.nRefFrom;
 
                     record.disasmResult.bIsValid = (showRecord.nSize != 0);
                     record.disasmResult.nAddress = showRecord.nAddress;
@@ -860,15 +861,15 @@ void XDisasmView::updateData()
                         record.disasmResult.sString = record.disasmResult.sString.toUpper();
                     }
 
-                    XInfoDB::RELRECORD relRecord = getXInfoDB()->getRelRecordByAddress(record.nVirtualAddress);
+                    if (showRecord.nRefTo) {
+                        XInfoDB::RELRECORD relRecord = getXInfoDB()->getRelRecordByAddress(record.nVirtualAddress);
 
-                    record.disasmResult.relType = relRecord.relType;
-                    record.disasmResult.nXrefToRelative = relRecord.nXrefToRelative;
-                    record.disasmResult.memType = relRecord.memType;
-                    record.disasmResult.nXrefToMemory = relRecord.nXrefToMemory;
-                    record.disasmResult.nMemorySize = relRecord.nMemorySize;
-
-                    record.bHasReferences = getXInfoDB()->isAddressHasReferences(record.nVirtualAddress);
+                        record.disasmResult.relType = relRecord.relType;
+                        record.disasmResult.nXrefToRelative = relRecord.nXrefToRelative;
+                        record.disasmResult.memType = relRecord.memType;
+                        record.disasmResult.nXrefToMemory = relRecord.nXrefToMemory;
+                        record.disasmResult.nMemorySize = relRecord.nMemorySize;
+                    }
 
                     nViewSize = 1;
 
@@ -1315,7 +1316,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             }
         }
 
-        if (record.bHasReferences) {
+        if (record.bHasRefFrom) {
             actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
             connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
             menuGoTo.addAction(&actionReferences);

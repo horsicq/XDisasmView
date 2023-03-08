@@ -117,7 +117,7 @@ private:
         qint32 nMaxLevel;
         qint32 nArraySize;
         bool bIsEnd;
-        bool bHasReferences;
+        bool bHasRefFrom;
         // TODO jmp/jcc
     };
 
