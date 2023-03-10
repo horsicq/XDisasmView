@@ -1114,6 +1114,12 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
 void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
 {
+    if (getXInfoDB()) {
+        if (getXInfoDB()->isAnalyzeInProgress()) {
+            return;
+        }
+    }
+
     qint32 nNumberOfRows = g_listRecords.count();
 
     //    qint64 nCursorOffset = getState().nCursorViewOffset;
