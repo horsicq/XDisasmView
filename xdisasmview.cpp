@@ -539,11 +539,17 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
     // TODO registers !!!
 
     if (g_bIsHighlight) {
+        bool bNOP = false;
+
+        if (_sMnenonic == "nop") {
+            bNOP = true;
+        }
+
         QRect _rectMnemonic = rect;
         _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
         if (g_mapOpcodeColorMap.contains(_sMnenonic)) {
-            // TODO nop complete line
+
             pPainter->save();
 
             OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
@@ -555,7 +561,10 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             pPainter->setPen(opcodeColor.colText);
             pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
 
-            pPainter->restore();
+            if (!bNOP) {
+                pPainter->restore();
+            }
+
         } else {
             pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
         }
@@ -565,6 +574,14 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
             pPainter->drawText(_rectString, sString, _qTextOptions);
+
+            if (_sMnenonic == "nop") {
+                pPainter->restore();
+            }
+        }
+
+        if (bNOP) {
+            pPainter->restore();
         }
     } else {
         QString sOpcode = sMnemonic;
@@ -1324,6 +1341,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         if (record.bHasRefFrom) {
             actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
+            actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
             connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
             menuGoTo.addAction(&actionReferences);
         }
@@ -1646,5 +1664,31 @@ void XDisasmView::_hexSlot()
 
 void XDisasmView::_references()
 {
-    qDebug("void XDisasmView::_references()");
+    QAction *pAction = qobject_cast<QAction *>(sender());
+
+    if (pAction) {
+        XADDR nAddress = pAction->property("ADDRESS").toULongLong();
+
+//        showSymbols(XSymbolsWidget::MODE_REFERENCES, nAddress);
+    }
+}
+
+void XDisasmView::goToAddressSlot(XADDR nAddress, qint64 nSize)
+{
+    Q_UNUSED(nSize)
+
+    goToAddress(nAddress, true, true, true);
+    reload(true);
+}
+
+void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
+{
+    DialogXSymbols dialogSymbols(this);
+
+    dialogSymbols.setData(getXInfoDB(), mode, varValue, true);
+
+    connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
+
+    XOptions::_adjustStayOnTop(&dialogSymbols, true);
+    dialogSymbols.exec();
 }

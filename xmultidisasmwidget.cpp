@@ -304,14 +304,7 @@ void XMultiDisasmWidget::registerShortcuts(bool bState)
 
 void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
 {
-    DialogXSymbols dialogSymbols(this);
-
-    dialogSymbols.setXInfoDB(ui->scrollAreaDisasm->getXInfoDB(), true);
-
-    connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
-
-    XOptions::_adjustStayOnTop(&dialogSymbols, true);
-    dialogSymbols.exec();
+    ui->scrollAreaDisasm->showSymbols(XSymbolsWidget::MODE_ALL, 0);
 }
 
 void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked)
@@ -352,12 +345,4 @@ void XMultiDisasmWidget::on_toolButtonVisitedPrev_clicked()
 void XMultiDisasmWidget::on_toolButtonVisitedNext_clicked()
 {
     ui->scrollAreaDisasm->goToNextVisited();
-}
-
-void XMultiDisasmWidget::goToAddressSlot(XADDR nAddress, qint64 nSize)
-{
-    Q_UNUSED(nSize)
-
-    ui->scrollAreaDisasm->goToAddress(nAddress, true, true, true);
-    ui->scrollAreaDisasm->reload(true);
 }

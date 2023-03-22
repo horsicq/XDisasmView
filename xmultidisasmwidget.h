@@ -24,7 +24,6 @@
 #include <QComboBox>
 
 #include "dialogxinfodbtransferprocess.h"
-#include "dialogxsymbols.h"
 #include "xdisasmview.h"
 #include "xformats.h"
 
@@ -76,7 +75,6 @@ private slots:
     void adjustVisitedState();
     void on_toolButtonVisitedPrev_clicked();
     void on_toolButtonVisitedNext_clicked();
-    void goToAddressSlot(XADDR nAddress, qint64 nSize);
 
 protected:
     virtual void registerShortcuts(bool bState);

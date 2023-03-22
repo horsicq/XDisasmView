@@ -27,6 +27,7 @@
 #include "dialogmultidisasmsignature.h"
 #include "xcapstone.h"
 #include "xdevicetableeditview.h"
+#include "dialogxsymbols.h"
 
 // TODO AbstractQuery
 // Load symbols Save db
@@ -86,6 +87,7 @@ public:
     void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
+    void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
 
 private:
     enum COLUMN {
@@ -184,6 +186,7 @@ protected slots:
     void _signatureSlot();
     void _hexSlot();
     void _references();
+    void goToAddressSlot(XADDR nAddress, qint64 nSize);
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size

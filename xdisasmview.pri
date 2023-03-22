@@ -74,6 +74,11 @@ FORMS += \
     include($$PWD/../XSymbolsWidget/xsymbolswidget.pri)
 }
 
+!contains(XCONFIG, xdecompiler) {
+    XCONFIG += xdecompiler
+    include($$PWD/../XDecompiler/xdecompiler.pri)
+}
+
 DISTFILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
