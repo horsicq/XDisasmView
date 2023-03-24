@@ -198,7 +198,7 @@ private:
     XBinary::DM g_disasmMode;
     csh g_handle;
 
-    QShortcut *shortCuts[__SC_SIZE];
+    QShortcut *g_shortCuts[__SC_SIZE];
 
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
