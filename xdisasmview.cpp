@@ -1669,7 +1669,7 @@ void XDisasmView::_references()
     if (pAction) {
         XADDR nAddress = pAction->property("ADDRESS").toULongLong();
 
-//        showSymbols(XSymbolsWidget::MODE_REFERENCES, nAddress);
+        showReferences(nAddress);
     }
 }
 
@@ -1691,4 +1691,16 @@ void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
 
     XOptions::_adjustStayOnTop(&dialogSymbols, true);
     dialogSymbols.exec();
+}
+
+void XDisasmView::showReferences(XADDR nAddress)
+{
+    DialogXDisasmReferences dialogReferences(this);
+
+//    dialogReferences.setData(getXInfoDB(), nAddress);
+
+    connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
+
+    XOptions::_adjustStayOnTop(&dialogReferences, true);
+    dialogReferences.exec();
 }

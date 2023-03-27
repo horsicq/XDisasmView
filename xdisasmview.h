@@ -28,6 +28,7 @@
 #include "xcapstone.h"
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"
+#include "dialogxdisasmreferences.h"
 
 // TODO AbstractQuery
 // Load symbols Save db
@@ -88,6 +89,7 @@ public:
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
     void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
+    void showReferences(XADDR nAddress);
 
 private:
     enum COLUMN {
