@@ -261,7 +261,7 @@ void XMultiDisasmWidget::clearAnalysis()
 
         DialogXInfoDBTransferProcess dialogTransfer(this);
 
-        dialogTransfer.clear(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+        dialogTransfer.clear(g_pXInfoDB);
 
         dialogTransfer.showDialogDelay();
 
