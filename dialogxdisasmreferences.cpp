@@ -21,9 +21,7 @@
 #include "dialogxdisasmreferences.h"
 #include "ui_dialogxdisasmreferences.h"
 
-DialogXDisasmReferences::DialogXDisasmReferences(QWidget *pParent) :
-    XShortcutsDialog(pParent),
-    ui(new Ui::DialogXDisasmReferences)
+DialogXDisasmReferences::DialogXDisasmReferences(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogXDisasmReferences)
 {
     ui->setupUi(this);
 }

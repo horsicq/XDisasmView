@@ -549,7 +549,6 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
         _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
         if (g_mapOpcodeColorMap.contains(_sMnenonic)) {
-
             pPainter->save();
 
             OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
@@ -1530,16 +1529,19 @@ void XDisasmView::adjustColumns()
 void XDisasmView::registerShortcuts(bool bState)
 {
     if (bState) {
-        if (!g_shortCuts[SC_GOTOADDRESS]) g_shortCuts[SC_GOTOADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS), this, SLOT(_goToAddressSlot()));
+        if (!g_shortCuts[SC_GOTOADDRESS])
+            g_shortCuts[SC_GOTOADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS), this, SLOT(_goToAddressSlot()));
         if (!g_shortCuts[SC_GOTOOFFSET]) g_shortCuts[SC_GOTOOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET), this, SLOT(_goToOffsetSlot()));
         if (!g_shortCuts[SC_GOTOENTRYPOINT])
             g_shortCuts[SC_GOTOENTRYPOINT] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT), this, SLOT(_goToEntryPointSlot()));
         if (!g_shortCuts[SC_DUMPTOFILE]) g_shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
         if (!g_shortCuts[SC_SELECTALL]) g_shortCuts[SC_SELECTALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL), this, SLOT(_selectAllSlot()));
         if (!g_shortCuts[SC_COPYDATA]) g_shortCuts[SC_COPYDATA] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA), this, SLOT(_copyDataSlot()));
-        if (!g_shortCuts[SC_COPYADDRESS]) g_shortCuts[SC_COPYADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
+        if (!g_shortCuts[SC_COPYADDRESS])
+            g_shortCuts[SC_COPYADDRESS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS), this, SLOT(_copyAddressSlot()));
         if (!g_shortCuts[SC_COPYOFFSET]) g_shortCuts[SC_COPYOFFSET] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET), this, SLOT(_copyOffsetSlot()));
-        if (!g_shortCuts[SC_FIND_STRING]) g_shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
+        if (!g_shortCuts[SC_FIND_STRING])
+            g_shortCuts[SC_FIND_STRING] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING), this, SLOT(_findStringSlot()));
         if (!g_shortCuts[SC_FIND_SIGNATURE])
             g_shortCuts[SC_FIND_SIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE), this, SLOT(_findSignatureSlot()));
         if (!g_shortCuts[SC_FIND_VALUE]) g_shortCuts[SC_FIND_VALUE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE), this, SLOT(_findValueSlot()));
@@ -1697,7 +1699,7 @@ void XDisasmView::showReferences(XADDR nAddress)
 {
     DialogXDisasmReferences dialogReferences(this);
 
-//    dialogReferences.setData(getXInfoDB(), nAddress);
+    //    dialogReferences.setData(getXInfoDB(), nAddress);
 
     connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 

@@ -28,8 +28,7 @@ namespace Ui {
 class DialogXDisasmReferences;
 }
 
-class DialogXDisasmReferences : public XShortcutsDialog
-{
+class DialogXDisasmReferences : public XShortcutsDialog {
     Q_OBJECT
 
 public:
@@ -43,4 +42,4 @@ private:
     Ui::DialogXDisasmReferences *ui;
 };
 
-#endif // DIALOGXDISASMREFERENCES_H
+#endif  // DIALOGXDISASMREFERENCES_H
