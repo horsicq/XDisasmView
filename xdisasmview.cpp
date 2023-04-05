@@ -1157,9 +1157,9 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         TEXT_OPTION textOption = {};
 
-//        if (nColumn == COLUMN_BYTES) {
+        //        if (nColumn == COLUMN_BYTES) {
 
-//        }
+        //        }
 
         textOption.bIsSelected = isViewOffsetSelected(nOffset);
 
