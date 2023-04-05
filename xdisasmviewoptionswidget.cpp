@@ -69,27 +69,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_HIGHLIGHT, true);
     pOptions->addID(XOptions::ID_DISASM_UPPERCASE, false);
 
-    setDefaultColorValues(pOptions);
-}
-
-void XDisasmViewOptionsWidget::setDefaultColorValues(XOptions *pOptions)
-{
-    // Colors
-    // X86
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JMP, QString("%1|%2").arg(QColor(Qt::darkBlue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
-    // ARM
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    // TODO more
+    DialogXDisasmViewColors::setDefaultColorValues(pOptions);
 }
 
 void XDisasmViewOptionsWidget::reload()

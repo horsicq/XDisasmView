@@ -50,6 +50,7 @@ public:
 
     void setOptions(XOptions *pOptions);
     void save();
+    static void setDefaultColorValues(XOptions *pOptions);
 
 private slots:
     void on_pushButtonCancel_clicked();

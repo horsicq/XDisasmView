@@ -183,7 +183,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
         qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
 
         if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
-            result.nSelectionOffset = showRecordStartSelection.nOffset;
+            result.nSelectionLocation = showRecordStartSelection.nOffset;
             result.nSelectionSize = nSelectionSize;
         }
 
@@ -197,8 +197,8 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
             XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
 
             if (pSubDevice) {
-                quint64 nInitOffset = pSubDevice->getInitOffset();
-                result.nSelectionOffset += nInitOffset;
+                quint64 nInitOffset = pSubDevice->getInitLocation();
+                result.nSelectionLocation += nInitOffset;
                 //                result.nCursorOffset += nInitOffset;
                 result.nShowOffset += nInitOffset;
             }
@@ -217,15 +217,15 @@ void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
             XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
 
             if (pSubDevice) {
-                quint64 nInitOffset = pSubDevice->getInitOffset();
+                quint64 nInitOffset = pSubDevice->getInitLocation();
                 //                deviceState.nCursorOffset -= nInitOffset;
-                deviceState.nSelectionOffset -= nInitOffset;
+                deviceState.nSelectionLocation -= nInitOffset;
                 deviceState.nShowOffset -= nInitOffset;
             }
         }
 
-        qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset);
-        qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionOffset + deviceState.nSelectionSize) - nSelectionStart;
+        qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation);
+        qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation + deviceState.nSelectionSize) - nSelectionStart;
         //        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
         qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowOffset);
 
@@ -503,7 +503,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 
     if (pTextOption->bIsSelected) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::Highlight));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, XAbstractTableView::getColorSelected(viewport()));
     }
 
     if (pTextOption->bIsBreakpoint) {
@@ -563,7 +563,6 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             if (!bNOP) {
                 pPainter->restore();
             }
-
         } else {
             pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
         }
@@ -573,10 +572,6 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, QString sText)
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
             pPainter->drawText(_rectString, sString, _qTextOptions);
-
-            if (_sMnenonic == "nop") {
-                pPainter->restore();
-            }
         }
 
         if (bNOP) {
@@ -930,7 +925,7 @@ void XDisasmView::updateData()
                 if (getXInfoDB()) {
 #ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
-                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress);  // mb TODO region
+                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress);  // mb TODO region Address + Size
 #endif
                 }
 
@@ -1161,7 +1156,13 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         }
 
         TEXT_OPTION textOption = {};
+
+//        if (nColumn == COLUMN_BYTES) {
+
+//        }
+
         textOption.bIsSelected = isViewOffsetSelected(nOffset);
+
         textOption.bIsCurrentIP = ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION));
         //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsBreakpoint = ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION));
@@ -1650,7 +1651,7 @@ void XDisasmView::_signatureSlot()
 
     DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(getDevice(), state.nSelectionOffset, getMemoryMap(), g_handle);
+    dmds.setData(getDevice(), state.nSelectionLocation, getMemoryMap(), g_handle);
 
     dmds.setGlobal(getShortcuts(), getGlobalOptions());
 
@@ -1660,7 +1661,7 @@ void XDisasmView::_signatureSlot()
 void XDisasmView::_hexSlot()
 {
     if (g_options.bMenu_Hex) {
-        emit showOffsetHex(getDeviceState(true).nSelectionOffset);
+        emit showOffsetHex(getDeviceState(true).nSelectionLocation);
     }
 }
 
