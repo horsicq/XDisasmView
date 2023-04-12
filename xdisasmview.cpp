@@ -503,7 +503,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 
     if (pTextOption->bIsSelected) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, XAbstractTableView::getColorSelected(viewport()));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColorSelected());
     }
 
     if (pTextOption->bIsBreakpoint) {

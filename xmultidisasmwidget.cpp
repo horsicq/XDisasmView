@@ -113,7 +113,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
     if (g_pXInfoDB) {
-        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isSymbolsPresent()); // TODO Check ShowRecords
+        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());
 
         //        if (!(g_pXInfoDB->isAnalyzed())) {
 
