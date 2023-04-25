@@ -213,6 +213,7 @@ private:
     MODE_OPCODE g_modeOpcode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
+    bool g_bHtest;
 };
 
 #endif  // XDISASMVIEW_H
