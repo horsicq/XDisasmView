@@ -107,8 +107,8 @@ void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool
     setMode(disasmMode);
 
     adjustColumns();
-    adjustLineCount();
-    adjustViewSize();
+
+    adjustScrollCount();
 
     if (options.nInitAddress != (XADDR)-1) {
         //        qint64 nOffset = XBinary::addressToOffset(getMemoryMap(), options.nInitAddress);
@@ -170,7 +170,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
             state.nSelectionViewSize = 1;
         }
 
-        qint64 nShowOffset = getViewOffsetStart();
+        qint64 nShowOffset = getViewOffsetStart(); // TODO convert
 
         //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
         XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
@@ -207,6 +207,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
         }
     } else {
         result = XDeviceTableView::getDeviceState(bGlobalOffset);
+        // TODO convert
     }
 
     return result;
@@ -247,12 +248,19 @@ qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
 {
     qint64 nResult = 0;
 
-    if (isAnalyzed()) {
-        qint64 _nOffset = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+//    if (isAnalyzed()) {
+//        qint64 _nOffset = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
 
-        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffset);
-    } else {
-        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+//        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffset);
+//    } else {
+//        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+//    }
+    qint64 _nOffset = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+
+    VIEWSTRUCT viewStruct = _getViewStructByOffset(_nOffset);
+
+    if (viewStruct.nSize) {
+        nResult = viewStruct.nViewOffset + (nOffset - viewStruct.nOffset);
     }
 
     return nResult;
@@ -262,51 +270,71 @@ qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlo
 {
     qint64 nResult = 0;
 
-    if (isAnalyzed()) {
-        qint64 _nOffsetStart = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
-        qint64 _nOffsetEnd = XDeviceTableView::deviceOffsetToViewOffset(nOffset + nSize, bGlobalOffset);
+//    if (isAnalyzed()) {
+//        qint64 _nOffsetStart = XDeviceTableView::deviceOffsetToViewOffset(nOffset, bGlobalOffset);
+//        qint64 _nOffsetEnd = XDeviceTableView::deviceOffsetToViewOffset(nOffset + nSize, bGlobalOffset);
 
-        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffsetEnd) - getXInfoDB()->getShowRecordLineByOffset(_nOffsetStart);
+//        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffsetEnd) - getXInfoDB()->getShowRecordLineByOffset(_nOffsetStart);
 
-        nResult = nResult + 1;
-    } else {
-        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
-    }
+//        nResult = nResult + 1;
+//    } else {
+//        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
+//    }
+
+    nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
 
     return nResult;
 }
 
-void XDisasmView::adjustLineCount()
+void XDisasmView::adjustScrollCount()
 {
-    qint64 nTotalLineCount = 0;
+//    qint64 nTotalLineCount = 0;
 
-    if (isAnalyzed()) {
-        nTotalLineCount = getXInfoDB()->getShowRecordsCount();
-    } else {
-        nTotalLineCount = getViewSize() / g_nBytesProLine;
+//    if (isAnalyzed()) {
+//        nTotalLineCount = getXInfoDB()->getShowRecordsCount();
+//    } else {
+//        nTotalLineCount = getViewSize() / g_nBytesProLine;
 
-        if (nTotalLineCount > 1)  // TODO Check
-        {
-            nTotalLineCount--;
-        }
+//        if (nTotalLineCount > 1)  // TODO Check
+//        {
+//            nTotalLineCount--;
+//        }
+//    }
+
+//    setTotalLineCount(nTotalLineCount);
+
+    g_listViewStruct.clear();
+    // TODO XInfoDB
+
+    qint32 nNumberOfRecords = getMemoryMap()->listRecords.count();
+
+    qint64 nScrollStart = 0;
+    qint64 nViewOffset = 0;
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        VIEWSTRUCT record = {};
+        record.nAddress = getMemoryMap()->listRecords.at(i).nAddress;
+        record.nOffset = getMemoryMap()->listRecords.at(i).nOffset;
+        record.nSize = getMemoryMap()->listRecords.at(i).nSize;
+        record.nScrollStart = nScrollStart;
+        record.nViewOffset = nViewOffset;
+        record.nScrollCount = record.nSize;
+
+        // TODO XInfoDB
+        nScrollStart += record.nScrollCount;
+        nViewOffset += record.nSize;
+
+        g_listViewStruct.append(record);
     }
 
-    setTotalLineCount(nTotalLineCount);
+    setViewSize(nViewOffset);
+
+    setTotalScrollCount(nScrollStart);
 }
 
-void XDisasmView::adjustViewSize()
+qint64 XDisasmView::getViewSizeByViewOffset(qint64 nViewOffset)
 {
-    if (isAnalyzed()) {
-        setViewSize(getXInfoDB()->getShowRecordsCount());
-    } else {
-        if (getDevice()) {
-            setViewSize(getDevice()->size());
-        }
-    }
-}
-
-qint64 XDisasmView::getViewSizeByOffset(qint64 nViewOffset)
-{
+    // TODO
     qint64 nResult = 0;
 
     if (!isAnalyzed()) {
@@ -326,10 +354,15 @@ qint64 XDisasmView::addressToViewOffset(XADDR nAddress)
 {
     qint64 nResult = 0;
 
-    if (!isAnalyzed()) {
-        nResult = XDeviceTableView::addressToViewOffset(nAddress);
-    } else {
-        nResult = getXInfoDB()->getShowRecordLineByAddress(nAddress);
+//    if (!isAnalyzed()) {
+//        nResult = XDeviceTableView::addressToViewOffset(nAddress);
+//    } else {
+//        nResult = getXInfoDB()->getShowRecordLineByAddress(nAddress);
+//    }
+    VIEWSTRUCT viewStruct = _getViewStructByAddress(nAddress);
+
+    if (viewStruct.nSize) {
+        nResult = viewStruct.nViewOffset + (nAddress - viewStruct.nAddress);
     }
 
     return nResult;
@@ -784,6 +817,88 @@ XDisasmView::RECORD XDisasmView::_getRecordByVirtualAddress(QList<RECORD> *pList
     return result;
 }
 
+XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByOffset(qint64 nOffset)
+{
+    VIEWSTRUCT result = {};
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nOffset <= nOffset) && (nOffset < (g_listViewStruct.at(i).nOffset + g_listViewStruct.at(i).nSize))) {
+            result = g_listViewStruct.at(i);
+            break;
+        }
+    }
+
+    return result;
+}
+
+XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByAddress(XADDR nAddress)
+{
+    VIEWSTRUCT result = {};
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nAddress <= nAddress) && (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
+            result = g_listViewStruct.at(i);
+            break;
+        }
+    }
+
+    return result;
+}
+
+XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByScroll(qint64 nValue)
+{
+    VIEWSTRUCT result = {};
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nScrollStart <= nValue) && (nValue < (g_listViewStruct.at(i).nScrollStart + g_listViewStruct.at(i).nScrollCount))) {
+            result = g_listViewStruct.at(i);
+            break;
+        }
+    }
+
+    return result;
+}
+
+XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByViewOffset(qint64 nViewOffset)
+{
+    VIEWSTRUCT result = {};
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nViewOffset <= nViewOffset) && (nViewOffset < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) {
+            result = g_listViewStruct.at(i);
+            break;
+        }
+    }
+
+    return result;
+}
+
+qint64 XDisasmView::_getOffsetByViewOffset(qint64 nViewOffset)
+{
+    qint64 nResult = -1;
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nViewOffset <= nViewOffset) && (nViewOffset < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) {
+            if (g_listViewStruct.at(i).nOffset != -1) {
+                nResult = g_listViewStruct.at(i).nOffset + (nViewOffset - g_listViewStruct.at(i).nViewOffset);
+            }
+            break;
+        }
+    }
+
+    return nResult;
+}
+
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
     OS osResult = {};
@@ -839,14 +954,14 @@ void XDisasmView::updateData()
     if (getDevice()) {
         XBinary::MODE mode = XBinary::getWidthModeFromByteSize(g_nAddressWidth);
 
-        qint64 nBlockViewOffset = getViewOffsetStart();
+        qint64 nViewOffsetStart = getViewOffsetStart();
         qint32 nNumberLinesProPage = getLinesProPage();
-        qint64 nCurrentViewOffset = nBlockViewOffset;
+        qint64 nCurrentViewOffset = nViewOffsetStart;
 
         QList<XInfoDB::SHOWRECORD> listShowRecords;
 
         if (isAnalyzed()) {
-            listShowRecords = getXInfoDB()->getShowRecords(nBlockViewOffset, nNumberLinesProPage);
+            listShowRecords = getXInfoDB()->getShowRecords(nViewOffsetStart, nNumberLinesProPage);
             nNumberLinesProPage = qMin(nNumberLinesProPage, listShowRecords.count());
         }
 #ifdef USE_XPROCESS
@@ -913,24 +1028,45 @@ void XDisasmView::updateData()
                         }
                     }
                 } else {
-                    record.nDeviceOffset = nCurrentViewOffset;
-                    record.nVirtualAddress = XBinary::offsetToAddress(getMemoryMap(), nCurrentViewOffset);
 
-                    nBufferSize = qMin(g_nOpcodeSize, qint32(getViewSize() - record.nDeviceOffset));
+                    VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nCurrentViewOffset);
 
-                    baBuffer = read_array(record.nDeviceOffset, nBufferSize);
-                    nBufferSize = baBuffer.size();
+                    if (viewStruct.nSize) {
+                        if (viewStruct.nOffset != -1) {
+                            record.nDeviceOffset = viewStruct.nOffset + (nCurrentViewOffset - viewStruct.nViewOffset);
+                        } else {
+                            record.nDeviceOffset = -1;
+                        }
 
-                    if (nBufferSize == 0) {
-                        break;
+                        if (viewStruct.nAddress != -1) {
+                            record.nVirtualAddress = viewStruct.nAddress + (nCurrentViewOffset - viewStruct.nViewOffset);
+                        } else {
+                            record.nVirtualAddress = -1;
+                        }
+
+                        if (record.nDeviceOffset != -1) {
+                            nBufferSize = qMin(g_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
+
+                            baBuffer = read_array(record.nDeviceOffset, nBufferSize);
+                            nBufferSize = baBuffer.size();
+
+                            if (nBufferSize == 0) {
+                                break;
+                            }
+
+                            record.disasmResult = _disasm(record.nVirtualAddress, baBuffer.data(), baBuffer.size());
+
+                            nBufferSize = record.disasmResult.nSize;
+                            baBuffer.resize(nBufferSize);
+
+                            nViewSize = nBufferSize;
+                        } else {
+                            nViewSize = 1;
+                            // TODO
+                        }
+                    } else {
+                        nViewSize = 0;
                     }
-
-                    record.disasmResult = _disasm(record.nVirtualAddress, baBuffer.data(), baBuffer.size());
-
-                    nBufferSize = record.disasmResult.nSize;
-                    baBuffer.resize(nBufferSize);
-
-                    nViewSize = nBufferSize;
                 }
 
                 if (nViewSize == 0) {
@@ -1070,7 +1206,7 @@ void XDisasmView::updateData()
             }
         }
 
-        setCurrentBlock(nBlockViewOffset, (nCurrentViewOffset - nBlockViewOffset));
+        setCurrentBlock(nViewOffsetStart, (nCurrentViewOffset - nViewOffsetStart));
     }
 }
 
@@ -1457,34 +1593,55 @@ void XDisasmView::keyPressEvent(QKeyEvent *pEvent)
     XAbstractTableView::keyPressEvent(pEvent);
 }
 
-qint64 XDisasmView::getCurrentLineFromScroll()
+qint64 XDisasmView::getCurrentViewOffsetFromScroll()
 {
     qint64 nResult = 0;
 
-    if (isAnalyzed()) {
-        nResult = verticalScrollBar()->value();
-    } else {
-        qint32 nValue = verticalScrollBar()->value();
+//    if (isAnalyzed()) {
+//        nResult = verticalScrollBar()->value();
+//    } else {
+//        qint32 nValue = verticalScrollBar()->value();
 
-        qint64 nMaxValue = getMaxScrollValue() * g_nBytesProLine;
+//        qint64 nMaxValue = getMaxScrollValue() * g_nBytesProLine;
 
-        if (getViewSize() > nMaxValue) {
-            if (nValue == getMaxScrollValue()) {
-                nResult = getViewSize() - g_nBytesProLine;
-            } else {
-                nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
-            }
+//        if (getViewSize() > nMaxValue) {
+//            if (nValue == getMaxScrollValue()) {
+//                nResult = getViewSize() - g_nBytesProLine;
+//            } else {
+//                nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
+//            }
+//        } else {
+//            nResult = (qint64)nValue * g_nBytesProLine;
+//        }
+
+//        qint64 _nResult = getDisasmViewOffset(nResult, getViewOffsetStart());
+
+//        if (_nResult != nResult) {
+//            nResult = _nResult;
+
+//            setCurrentViewOffsetToScroll(nResult);
+//        }
+//    }
+    qint32 nValue = verticalScrollBar()->value();
+
+    qint64 nMaxValue = getMaxScrollValue();
+
+    if (getTotalScrollCount() > nMaxValue) { // TODO a flag for large files
+        if (nValue == getMaxScrollValue()) {
+            nResult = getViewSize() - g_nBytesProLine;
         } else {
-            nResult = (qint64)nValue * g_nBytesProLine;
+            nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
         }
+    } else {
+        nResult = (qint64)nValue * g_nBytesProLine;
+    }
 
-        qint64 _nResult = getDisasmViewOffset(nResult, getViewOffsetStart());
+    qint64 _nResult = getDisasmViewOffset(nResult, getViewOffsetStart()); // TODO Convert
 
-        if (_nResult != nResult) {
-            nResult = _nResult;
+    if (_nResult != nResult) {
+        nResult = _nResult;
 
-            setCurrentViewOffsetToScroll(nResult);
-        }
+        setCurrentViewOffsetToScroll(nResult);
     }
 
     return nResult;
@@ -1492,7 +1649,7 @@ qint64 XDisasmView::getCurrentLineFromScroll()
 
 void XDisasmView::setCurrentViewOffsetToScroll(qint64 nViewOffset)
 {
-    setViewOffsetStart(nViewOffset);
+    setViewOffsetStart(nViewOffset); // TODO Check
 
     qint32 nValue = 0;
 

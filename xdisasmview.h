@@ -66,6 +66,15 @@ class XDisasmView : public XDeviceTableEditView {
         QColor colBackground;
     };
 
+    struct VIEWSTRUCT {
+        qint64 nScrollStart;
+        qint64 nScrollCount;
+        qint64 nViewOffset;
+        XADDR nAddress;
+        qint64 nOffset;
+        qint64 nSize;
+    };
+
 public:
     struct OPTIONS {
         XADDR nInitAddress;
@@ -140,7 +149,7 @@ private:
 
     XCapstone::DISASM_RESULT _disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize);
     QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
-    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);
+    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset); // TODO rename
     MENU_STATE getMenuState();
 
     struct TEXT_OPTION {
@@ -161,6 +170,11 @@ private:
 private:
     RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
+    VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
+    VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
+    VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
+    VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
+    qint64 _getOffsetByViewOffset(qint64 nViewOffset);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -170,16 +184,15 @@ protected:
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
-    virtual qint64 getCurrentLineFromScroll();
-    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset);
+    virtual qint64 getCurrentViewOffsetFromScroll(); // TODO rewrite
+    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset); // TODO rewrite
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
-    virtual qint64 getFixViewOffset(qint64 nViewOffset);
-    virtual void adjustLineCount();
-    virtual void adjustViewSize();  // TODO remove
-    virtual qint64 getViewSizeByOffset(qint64 nViewOffset);
+    virtual qint64 getFixViewOffset(qint64 nViewOffset); // TODO rewrite
+    virtual void adjustScrollCount();
+    virtual qint64 getViewSizeByViewOffset(qint64 nViewOffset); // TODO rewrite
     virtual qint64 addressToViewOffset(XADDR nAddress);
 
 protected slots:
@@ -213,7 +226,8 @@ private:
     MODE_OPCODE g_modeOpcode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
-    bool g_bHtest;
+    bool g_bHtest; // TODO remove
+    QList<VIEWSTRUCT> g_listViewStruct;
 };
 
 #endif  // XDISASMVIEW_H
