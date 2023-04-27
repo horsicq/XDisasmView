@@ -80,6 +80,7 @@ public:
         XADDR nInitAddress;
         XADDR nEntryPointAddress;  // TODO move to xdb
         XBinary::_MEMORY_MAP memoryMapRegion;
+        XBinary::DM disasmMode;
         bool bAprox;
         bool bMenu_Hex;
     };
@@ -90,8 +91,8 @@ public:
     void _adjustView();
     void adjustView();
     void setData(QIODevice *pDevice, OPTIONS options, bool bReload = true);
-    void setMode(XBinary::DM disasmMode);
-    XBinary::DM getMode();
+    OPTIONS getOptions();
+    XBinary::DM getDisasmMode();
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
@@ -99,6 +100,7 @@ public:
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
     void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
     void showReferences(XADDR nAddress);
+    bool isAnalyzed(); // TODO remove
 
 private:
     enum COLUMN {
@@ -119,7 +121,7 @@ private:
         QString sLocation;
         QString sBytes;  // mb TODO labels
         QString sComment;
-        qint64 nViewOffset;  // Line if file analyzed or FileOffset if not
+        qint64 nViewOffset;  // Line
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
@@ -175,6 +177,7 @@ private:
     VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);
+    qint64 _getViewOffsetByAddress(XADDR nAddress);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);
@@ -184,8 +187,8 @@ protected:
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
-    virtual qint64 getCurrentViewOffsetFromScroll(); // TODO rewrite
-    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset); // TODO rewrite
+    virtual qint64 getCurrentViewOffsetFromScroll();
+    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset);
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
@@ -210,7 +213,6 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-    XBinary::DM g_disasmMode;
     csh g_handle;
 
     QShortcut *g_shortCuts[__SC_SIZE];
@@ -219,7 +221,8 @@ private:
     qint32 g_nOpcodeSize;
     QMap<QString, OPCODECOLOR> g_mapOpcodeColorMap;
     XBinary::SYNTAX g_syntax;
-    XADDR g_nThisBase;
+    XADDR g_nThisBaseVirtualAddress;
+    qint64 g_nThisBaseDeviceOffset;
     bool g_bIsAddressColon;
     bool g_bIsUppercase;
     bool g_bIsHighlight;
