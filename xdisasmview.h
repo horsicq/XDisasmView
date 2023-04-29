@@ -100,7 +100,7 @@ public:
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
     void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
     void showReferences(XADDR nAddress);
-    bool isAnalyzed(); // TODO remove
+    bool isAnalyzed();  // TODO remove
 
 private:
     enum COLUMN {
@@ -151,7 +151,7 @@ private:
 
     XCapstone::DISASM_RESULT _disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize);
     QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
-    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset); // TODO rename
+    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
     MENU_STATE getMenuState();
 
     struct TEXT_OPTION {
@@ -193,9 +193,9 @@ protected:
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
-    virtual qint64 getFixViewOffset(qint64 nViewOffset); // TODO rewrite
+    virtual qint64 getFixViewOffset(qint64 nViewOffset);  // TODO rewrite
     virtual void adjustScrollCount();
-    virtual qint64 getViewSizeByViewOffset(qint64 nViewOffset); // TODO rewrite
+    virtual qint64 getViewSizeByViewOffset(qint64 nViewOffset);  // TODO rewrite
     virtual qint64 addressToViewOffset(XADDR nAddress);
 
 protected slots:
@@ -229,7 +229,7 @@ private:
     MODE_OPCODE g_modeOpcode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
-    bool g_bHtest; // TODO remove
+    bool g_bHtest;                              // TODO remove
     QList<VIEWSTRUCT> g_listViewStruct;
 };
 
