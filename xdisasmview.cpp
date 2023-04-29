@@ -1706,7 +1706,7 @@ void XDisasmView::setCurrentViewOffsetToScroll(qint64 nViewOffset)
 
     verticalScrollBar()->setValue(nValue);
 
-    adjust(true);  // TODO mb Remove
+//    adjust(true);  // TODO mb Remove
 }
 
 void XDisasmView::adjustColumns()
