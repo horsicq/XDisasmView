@@ -1889,14 +1889,6 @@ void XDisasmView::_references()
     }
 }
 
-void XDisasmView::goToAddressSlot(XADDR nAddress, qint64 nSize)
-{
-    Q_UNUSED(nSize)
-
-    goToAddress(nAddress, true, true, true);
-    reload(true);
-}
-
 void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
 {
     DialogXSymbols dialogSymbols(this);

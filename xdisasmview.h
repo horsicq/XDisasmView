@@ -204,7 +204,6 @@ protected slots:
     void _signatureSlot();
     void _hexSlot();
     void _references();
-    void goToAddressSlot(XADDR nAddress, qint64 nSize);
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
