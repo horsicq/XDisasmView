@@ -419,12 +419,12 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
         bool bSuccess = false;
 
         VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nViewOffset);
-        VIEWSTRUCT viewStructOld = _getViewStructByViewOffset(nOldViewOffset);
+//        VIEWSTRUCT viewStructOld = _getViewStructByViewOffset(nOldViewOffset);
 
         XADDR nAddress = 0;
-        XADDR nAddressOld = 0;
+//        XADDR nAddressOld = 0;
         qint64 nOffset = 0;
-        qint64 nOffsetOld = 0;
+//        qint64 nOffsetOld = 0;
 
         if (viewStruct.nAddress != -1) {
             nAddress = viewStruct.nAddress + (nViewOffset - viewStruct.nViewOffset);
@@ -434,13 +434,13 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             nOffset = viewStruct.nOffset + (nViewOffset - viewStruct.nViewOffset);
         }
 
-        if (viewStructOld.nAddress != -1) {
-            nAddressOld = viewStructOld.nAddress + (nOldViewOffset - viewStructOld.nViewOffset);
-        }
+//        if (viewStructOld.nAddress != -1) {
+//            nAddressOld = viewStructOld.nAddress + (nOldViewOffset - viewStructOld.nViewOffset);
+//        }
 
-        if (viewStructOld.nOffset != -1) {
-            nOffsetOld = viewStructOld.nOffset + (nOldViewOffset - viewStructOld.nViewOffset);
-        }
+//        if (viewStructOld.nOffset != -1) {
+//            nOffsetOld = viewStructOld.nOffset + (nOldViewOffset - viewStructOld.nViewOffset);
+//        }
 
         if (!bSuccess) {
             if (getXInfoDB()) {
@@ -449,7 +449,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 if (nAddress != -1) {
                     showRecord = getXInfoDB()->getShowRecordByAddress(nAddress, true);
                 }
-                // TODO offset
+                // TODO offset !!!
 
                 if (showRecord.bValid) {
                     if (nViewOffset > nOldViewOffset) {
@@ -467,7 +467,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             }
         }
 
-        if ((!bSuccess) && (nOffset != -1) && (nOffsetOld != -1)) {
+        if ((!bSuccess) && (nOffset != -1)) {
             qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
             qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
 
@@ -485,12 +485,8 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 }
             }
 
-            nStartOffset = qMax(nStartOffset, (qint64)0);
-            nEndOffset = qMin(nEndOffset, getViewSize());
-
-            if (nOffset > nOffsetOld) {
-                nStartOffset = qMax(nStartOffset, nOldViewOffset);
-            }
+            nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
+            nEndOffset = qMin(nEndOffset, viewStruct.nOffset + viewStruct.nSize);
 
             qint32 nSize = nEndOffset - nStartOffset;
 
@@ -499,8 +495,8 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             nSize = baData.size();
 
             qint64 _nCurrentOffset = 0;
+            qint64 _nResult = 0;
 
-            // TODO nOffset<nOldOffset
             while (nSize > 0) {
                 qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
@@ -509,18 +505,15 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
 
                 if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                     if (_nOffset == nOffset) {
-                        nResult = _nOffset;
+                        _nResult = _nOffset;
                     } else {
-                        if (nOffsetOld != -1) {
-                            if (nOffset > nOffsetOld) {
-                                nResult = _nOffset + disasmResult.nSize;
-                            } else {
-                                nResult = _nOffset;
-                            }
+                        if (nViewOffset > nOldViewOffset) {
+                            _nResult = _nOffset + disasmResult.nSize;
                         } else {
-                            nResult = _nOffset;
+                            _nResult = _nOffset;
                         }
                     }
+                    nResult = viewStruct.nViewOffset + (_nResult - viewStruct.nOffset);
 
                     break;
                 }
@@ -528,9 +521,72 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 _nCurrentOffset += disasmResult.nSize;
                 nSize -= disasmResult.nSize;
             }
-
-            bSuccess = true;
         }
+
+//        if ((!bSuccess) && (nOffset != -1)) {
+//            qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
+//            qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
+
+//            if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
+//            {
+//                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+//            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM64) {
+//                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+//            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_X86) {
+//                QByteArray _baData = read_array(nStartOffset, 2);
+
+//                if (*((quint16 *)_baData.data()) == 0)  // 0000
+//                {
+//                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+//                }
+//            }
+
+//            nStartOffset = qMax(nStartOffset, (qint64)0);
+//            nEndOffset = qMin(nEndOffset, getViewSize());
+
+////            if (nOffset > nOffsetOld) {
+////                nStartOffset = qMax(nStartOffset, nOldViewOffset);
+////            }
+
+//            qint32 nSize = nEndOffset - nStartOffset;
+
+//            QByteArray baData = read_array(nStartOffset, nSize);
+
+//            nSize = baData.size();
+
+//            qint64 _nCurrentOffset = 0;
+
+//            // TODO nOffset<nOldOffset
+//            while (nSize > 0) {
+//                qint64 _nOffset = nStartOffset + _nCurrentOffset;
+
+//                XCapstone::DISASM_RESULT disasmResult =
+//                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+
+//                if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
+//                    if (_nOffset == nOffset) {
+//                        nResult = _nOffset;
+//                    } else {
+////                        if (nOffsetOld != -1) {
+////                            if (nOffset > nOffsetOld) {
+////                                nResult = _nOffset + disasmResult.nSize;
+////                            } else {
+////                                nResult = _nOffset;
+////                            }
+////                        } else {
+////                            nResult = _nOffset;
+////                        }
+//                    }
+
+//                    break;
+//                }
+
+//                _nCurrentOffset += disasmResult.nSize;
+//                nSize -= disasmResult.nSize;
+//            }
+
+//            bSuccess = true;
+//        }
     }
 
     return nResult;
@@ -558,7 +614,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
     return result;
 }
 
-void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, QString sText, TEXT_OPTION *pTextOption)
+void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption)
 {
     QRect rectText;
 

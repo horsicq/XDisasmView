@@ -61,9 +61,10 @@ private:
     void addMode(XBinary::DM disasmMode);
     void reloadFileType();
     void adjustMode();
+    void getSymbols();
     void analyze();
     void clearAnalysis();
-    void adjustAnalysisPanel();
+    void adjustButtons();
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);

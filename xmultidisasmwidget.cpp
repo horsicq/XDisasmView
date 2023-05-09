@@ -88,7 +88,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
 
-    adjustAnalysisPanel();
+    adjustButtons();
 
     adjustVisitedState();
 }
@@ -113,7 +113,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
     if (g_pXInfoDB) {
-        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());
+        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent()); // TODO Check mb remove
 
         //        if (!(g_pXInfoDB->isAnalyzed())) {
 
@@ -123,7 +123,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
         //        }
     }
 
-    adjustAnalysisPanel();
+    adjustButtons();
     adjustVisitedState();
 
     reloadFileType();
@@ -221,6 +221,7 @@ void XMultiDisasmWidget::reloadFileType()
 
         if (ui->scrollAreaDisasm->getXInfoDB()) {
             ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+            getSymbols();
         }
 
         ui->scrollAreaDisasm->setData(g_pDevice, options);
@@ -240,6 +241,18 @@ void XMultiDisasmWidget::adjustMode()
 
     if (ui->scrollAreaDisasm->getXInfoDB()) {
         ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+    }
+}
+
+void XMultiDisasmWidget::getSymbols()
+{
+    if (g_pXInfoDB) {
+        DialogXInfoDBTransferProcess dialogTransfer(this);
+
+        dialogTransfer.symbols(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+
+        dialogTransfer.showDialogDelay();
+        // TODO mn reload
     }
 }
 
@@ -277,22 +290,25 @@ void XMultiDisasmWidget::clearAnalysis()
     }
 }
 
-void XMultiDisasmWidget::adjustAnalysisPanel()
+void XMultiDisasmWidget::adjustButtons()
 {
 #ifdef QT_SQL_LIB
     if (g_pXInfoDB) {
         ui->groupBoxAnalysis->show();
+        ui->pushButtonSymbols->show();
 
         bool bIsAnalyses = g_pXInfoDB->isAnalyzed();
 
         ui->pushButtonAnalyze->setEnabled(!bIsAnalyses);
-        ui->pushButtonSymbols->setEnabled(bIsAnalyses);
         ui->pushButtonClear->setEnabled(bIsAnalyses);
+        ui->pushButtonSymbols->setEnabled(g_pXInfoDB->isSymbolsPresent());
     } else {
         ui->groupBoxAnalysis->hide();
+        ui->pushButtonSymbols->hide();
     }
 #else
     ui->groupBoxAnalysis->hide();
+    ui->pushButtonSymbols->hide();
 #endif
 }
 
@@ -328,13 +344,13 @@ void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
 void XMultiDisasmWidget::on_pushButtonAnalyze_clicked()
 {
     analyze();
-    adjustAnalysisPanel();
+    adjustButtons();
 }
 
 void XMultiDisasmWidget::on_pushButtonClear_clicked()
 {
     clearAnalysis();
-    adjustAnalysisPanel();
+    adjustButtons();
 }
 
 void XMultiDisasmWidget::adjustVisitedState()
