@@ -216,43 +216,24 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
     DEVICESTATE result = {};
     STATE state = getState();
 
-    result.nSelectionLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
-    result.nSelectionSize = state.nSelectionViewSize; // TODO Check
-    result.nShowLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);;
+    result.nSelectionDeviceOffset = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
+    result.nStartDeviceOffset = viewOffsetToDeviceOffset(getViewOffsetStart(), bGlobalOffset);
+
+    if (result.nSelectionDeviceOffset != -1) {
+        result.nSelectionSize = state.nSelectionViewSize;
+        // TODO if virtual region return 0
+    }
 
     return result;
 }
 
 void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
 {
-    // TODO !!!
-    if (isAnalyzed()) {
-        if (bGlobalOffset) {
-            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
+    _goToViewOffset(deviceOffsetToViewOffset(deviceState.nStartDeviceOffset, bGlobalOffset));
+    _initSetSelection(deviceOffsetToViewOffset(deviceState.nSelectionDeviceOffset, bGlobalOffset), deviceState.nSelectionSize);
 
-            if (pSubDevice) {
-                quint64 nInitOffset = pSubDevice->getInitLocation();
-                //                deviceState.nCursorOffset -= nInitOffset;
-                deviceState.nSelectionLocation -= nInitOffset;
-                deviceState.nShowLocation -= nInitOffset;
-            }
-        }
-
-        qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation);
-        qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation + deviceState.nSelectionSize) - nSelectionStart;
-        //        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
-        qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowLocation);
-
-        _goToViewOffset(nShowStart);
-
-        _initSetSelection(nSelectionStart, nSelectionSize);
-        //        setCursorViewOffset(nCursor);
-
-        adjust();
-        viewport()->update();
-    } else {
-        XDeviceTableView::setDeviceState(deviceState, bGlobalOffset);
-    }
+    adjust();
+    viewport()->update();
 }
 
 qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
@@ -299,15 +280,14 @@ qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlo
 
 qint64 XDisasmView::viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset)
 {
-    qint64 nResult = 0;
+    qint64 nResult = -1;
 
     VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nViewOffset);
 
-    if (viewStruct.nSize) {
+    if (viewStruct.nSize && (viewStruct.nOffset != -1)) {
         nResult = viewStruct.nOffset + (nViewOffset - viewStruct.nViewOffset);
+        nResult = XDeviceTableView::viewOffsetToDeviceOffset(nResult, bGlobalOffset);
     }
-
-    nResult = XDeviceTableView::viewOffsetToDeviceOffset(nResult, bGlobalOffset);
 
     return nResult;
 }
@@ -1044,11 +1024,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
             qint64 nBlockOffset = g_listRecords.at(cursorPosition.nRow).nViewOffset;
             qint64 nBlockSize = 0;
 
-            if (isAnalyzed()) {
-                nBlockSize = 1;  // TODO Virtual
-            } else {
-                nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
-            }
+            nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
 
             if (cursorPosition.nColumn == COLUMN_LOCATION) {
                 osResult.nViewOffset = nBlockOffset;
@@ -1095,10 +1071,10 @@ void XDisasmView::updateData()
 
         QList<XInfoDB::SHOWRECORD> listShowRecords;
 
-        if (isAnalyzed()) {
-            listShowRecords = getXInfoDB()->getShowRecords(nViewOffsetStart, nNumberLinesProPage);
-            nNumberLinesProPage = qMin(nNumberLinesProPage, listShowRecords.count());
-        }
+//        if (isAnalyzed()) {
+//            listShowRecords = getXInfoDB()->getShowRecords(nViewOffsetStart, nNumberLinesProPage);
+//            nNumberLinesProPage = qMin(nNumberLinesProPage, listShowRecords.count());
+//        }
 #ifdef USE_XPROCESS
         XADDR nCurrentIP = 0;
 #endif
@@ -1273,17 +1249,26 @@ void XDisasmView::updateData()
                 } else if (getAddressMode() == MODE_RELADDRESS) {
                     QString sPrefix;
                     QString sSymbol;
+                    XADDR _nCurrent = 0;
 
                     if (record.nDeviceOffset != -1) {
                         sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), record.nDeviceOffset);
+                        _nCurrent = record.nDeviceOffset;
                     } else if (record.nVirtualAddress != -1) {
                         sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), record.nVirtualAddress);
+                        _nCurrent = record.nVirtualAddress;
                     }
 
                     if (record.nVirtualAddress != -1) {
-                        if (isAnalyzed()) {
+                        if (getXInfoDB()) {
                             sSymbol = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
                         }
+                    }
+
+                    if (g_bIsAddressColon) {
+                        record.sLocation = XBinary::valueToHexColon(mode, _nCurrent);
+                    } else {
+                        record.sLocation = XBinary::valueToHex(mode, _nCurrent);
                     }
 
                     if (sPrefix != "") {
@@ -1519,202 +1504,206 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 void XDisasmView::contextMenu(const QPoint &pos)
 {
     if (isContextMenuEnable()) {
-        QAction actionGoToAddress(tr("Address"), this);
-        actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
-        connect(&actionGoToAddress, SIGNAL(triggered()), this, SLOT(_goToAddressSlot()));
-
-        QAction actionGoToOffset(tr("Offset"), this);
-        actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
-        connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
-
-        QString sEntryPointText = QString("%1(%2)").arg(tr("Entry point"), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
-
-        QAction actionGoToEntryPoint(sEntryPointText, this);
-        actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
-        connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
-
-        QAction actionGoXrefRelative("", this);
-        connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
-
-        QAction actionGoXrefMemory("", this);
-        connect(&actionGoXrefMemory, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
-
-        QAction actionDumpToFile(tr("Dump to file"), this);
-        actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
-        connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
-
-        QAction actionHexSignature(tr("Hex signature"), this);
-        actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
-        connect(&actionHexSignature, SIGNAL(triggered()), this, SLOT(_hexSignatureSlot()));
-
-        QAction actionSignature(tr("Signature"), this);
-        actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
-        connect(&actionSignature, SIGNAL(triggered()), this, SLOT(_signatureSlot()));
-
-        QAction actionFindString(tr("String"), this);
-        actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
-        connect(&actionFindString, SIGNAL(triggered()), this, SLOT(_findStringSlot()));
-
-        QAction actionFindSignature(tr("Signature"), this);
-        actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
-        connect(&actionFindSignature, SIGNAL(triggered()), this, SLOT(_findSignatureSlot()));
-
-        QAction actionFindValue(tr("Value"), this);
-        actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
-        connect(&actionFindValue, SIGNAL(triggered()), this, SLOT(_findValueSlot()));
-
-        QAction actionFindNext(tr("Find next"), this);
-        actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
-        connect(&actionFindNext, SIGNAL(triggered()), this, SLOT(_findNextSlot()));
-
-        QAction actionSelectAll(tr("Select all"), this);
-        actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
-        connect(&actionSelectAll, SIGNAL(triggered()), this, SLOT(_selectAllSlot()));
-
-        QAction actionCopyAsData(tr("Data"), this);
-        actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
-        connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
-
-        QAction actionCopyCursorOffset(tr("Offset"), this);
-        actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
-        connect(&actionCopyCursorOffset, SIGNAL(triggered()), this, SLOT(_copyOffsetSlot()));
-
-        QAction actionCopyCursorAddress(tr("Address"), this);
-        actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
-        connect(&actionCopyCursorAddress, SIGNAL(triggered()), this, SLOT(_copyAddressSlot()));
-
-        QAction actionCopyLocation("", this);
-        connect(&actionCopyLocation, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-
-        QAction actionCopyBytes("", this);
-        connect(&actionCopyBytes, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-
-        QAction actionCopyOpcode("", this);
-        connect(&actionCopyOpcode, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-
-        QAction actionCopyComment("", this);
-        connect(&actionCopyComment, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-
-        QAction actionHex(tr("Hex"), this);
-        actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
-        connect(&actionHex, SIGNAL(triggered()), this, SLOT(_hexSlot()));
-
-        QAction actionEditHex(tr("Hex"), this);
-        actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
-        connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
-
-        QAction actionReferences(tr("References"), this);
-
-        // TODO XREFS
-
         MENU_STATE mstate = getMenuState();
+        STATE state = getState();
 
         QMenu contextMenu(this);
         QMenu menuGoTo(tr("Go to"), this);
         QMenu menuFind(tr("Find"), this);
+        QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuHex(tr("Hex"), this);
         QMenu menuSelect(tr("Select"), this);
         QMenu menuCopy(tr("Copy"), this);
         QMenu menuFollowIn(tr("Follow in"), this);
         QMenu menuEdit(tr("Edit"), this);
 
-        menuGoTo.addAction(&actionGoToAddress);
-        menuGoTo.addAction(&actionGoToOffset);
-        menuGoTo.addAction(&actionGoToEntryPoint);
+        QAction actionGoToAddress(tr("Address"), this);
+        QAction actionGoToOffset(tr("Offset"), this);
+        QAction actionGoToEntryPoint("", this);
+        QAction actionGoXrefRelative("", this);
+        QAction actionGoXrefMemory("", this);
+        QAction actionDumpToFile(tr("Dump to file"), this);
+        QAction actionHexSignature(tr("Hex signature"), this);
+        QAction actionSignature(tr("Signature"), this);
+        QAction actionFindString(tr("String"), this);
+        QAction actionFindSignature(tr("Signature"), this);
+        QAction actionFindValue(tr("Value"), this);
+        QAction actionFindNext(tr("Find next"), this);
+        QAction actionSelectAll(tr("Select all"), this);
+        QAction actionCopyAsData(tr("Data"), this);
+        QAction actionCopyCursorOffset(tr("Offset"), this);
+        QAction actionCopyCursorAddress(tr("Address"), this);
+        QAction actionCopyLocation("", this);
+        QAction actionCopyBytes("", this);
+        QAction actionCopyOpcode("", this);
+        QAction actionCopyComment("", this);
+        QAction actionHex(tr("Hex"), this);
+        QAction actionEditHex(tr("Hex"), this);
+        QAction actionReferences(tr("References"), this);
+        QAction actionAnalyzeDisasm(tr("Disasm"), this);
 
-        // TODO go to address
-        STATE state = getState();
-
-        XDisasmView::RECORD record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
-
-        if (record.disasmResult.relType || record.disasmResult.memType) {
-            menuGoTo.addSeparator();
-
-            if (record.disasmResult.relType) {
-                actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
-                actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
-                menuGoTo.addAction(&actionGoXrefRelative);
+        {
+            {
+                actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
+                connect(&actionGoToAddress, SIGNAL(triggered()), this, SLOT(_goToAddressSlot()));
+                menuGoTo.addAction(&actionGoToAddress);
             }
-
-            if (record.disasmResult.memType) {
-                actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
-                actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
-                menuGoTo.addAction(&actionGoXrefMemory);
+            {
+                actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
+                connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
+                menuGoTo.addAction(&actionGoToOffset);
             }
-        }
-
-        if (record.bHasRefFrom) {
-            actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
-            actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
-            connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
-            menuGoTo.addAction(&actionReferences);
-        }
-
-        contextMenu.addMenu(&menuGoTo);
-
-        menuCopy.addAction(&actionCopyCursorAddress);
-        menuCopy.addAction(&actionCopyCursorOffset);
-
-        if (mstate.bSize) {
-            menuCopy.addAction(&actionCopyAsData);
-        }
-
-        RECORD _record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
-
-        if ((_record.sLocation != "") || (_record.sBytes != "") || (_record.disasmResult.sMnemonic != "") || (_record.sComment != "")) {
-            menuCopy.addSeparator();
-
-            if (_record.sLocation != "") {
-                actionCopyLocation.setText(_record.sLocation);
-                actionCopyLocation.setProperty("VALUE", _record.sLocation);
-                menuCopy.addAction(&actionCopyLocation);
+            {
+                QString sEntryPointText = QString("%1(%2)").arg(tr("Entry point"), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
+                actionGoToEntryPoint.setText(sEntryPointText);
+                actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
+                connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
+                menuGoTo.addAction(&actionGoToEntryPoint);
             }
+                    // TODO go to address
+            XDisasmView::RECORD record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
 
-            if (_record.sBytes != "") {
-                actionCopyBytes.setText(_record.sBytes);
-                actionCopyBytes.setProperty("VALUE", _record.sBytes);
-                menuCopy.addAction(&actionCopyBytes);
-            }
+            if (record.disasmResult.relType || record.disasmResult.memType) {
+                menuGoTo.addSeparator();
 
-            if (_record.disasmResult.sMnemonic != "") {
-                QString sString = _record.disasmResult.sMnemonic;
-
-                if (_record.disasmResult.sString != "") {
-                    sString.append(QString(" %1").arg(convertOpcodeString(_record.disasmResult)));
+                if (record.disasmResult.relType) {
+                    actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
+                    actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
+                    connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
+                    menuGoTo.addAction(&actionGoXrefRelative);
                 }
 
-                actionCopyOpcode.setText(sString);
-                actionCopyOpcode.setProperty("VALUE", sString);
-                menuCopy.addAction(&actionCopyOpcode);
+                if (record.disasmResult.memType) {
+                    actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
+                    actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
+                    connect(&actionGoXrefMemory, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
+                    menuGoTo.addAction(&actionGoXrefMemory);
+                }
             }
 
-            if (_record.sComment != "") {
-                actionCopyComment.setText(_record.sComment);
-                actionCopyComment.setProperty("VALUE", _record.sComment);
-                menuCopy.addAction(&actionCopyComment);
+            if (record.bHasRefFrom) {
+                actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
+                actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
+                connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
+                menuGoTo.addAction(&actionReferences);
+            }
+
+            contextMenu.addMenu(&menuGoTo);
+        }
+        {
+            {
+                actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
+                connect(&actionCopyCursorAddress, SIGNAL(triggered()), this, SLOT(_copyAddressSlot()));
+                menuCopy.addAction(&actionCopyCursorAddress);
+            }
+            {
+                actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
+                connect(&actionCopyCursorOffset, SIGNAL(triggered()), this, SLOT(_copyOffsetSlot()));
+                menuCopy.addAction(&actionCopyCursorOffset);
+            }
+
+            if (mstate.bSize) {
+                actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
+                connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
+                menuCopy.addAction(&actionCopyAsData);
+            }
+
+            RECORD _record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
+
+            if ((_record.sLocation != "") || (_record.sBytes != "") || (_record.disasmResult.sMnemonic != "") || (_record.sComment != "")) {
+                menuCopy.addSeparator();
+
+                if (_record.sLocation != "") {
+                    actionCopyLocation.setText(_record.sLocation);
+                    actionCopyLocation.setProperty("VALUE", _record.sLocation);
+                    connect(&actionCopyLocation, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+                    menuCopy.addAction(&actionCopyLocation);
+                }
+
+                if (_record.sBytes != "") {
+                    actionCopyBytes.setText(_record.sBytes);
+                    actionCopyBytes.setProperty("VALUE", _record.sBytes);
+                    connect(&actionCopyBytes, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+                    menuCopy.addAction(&actionCopyBytes);
+                }
+
+                if (_record.disasmResult.sMnemonic != "") {
+                    QString sString = _record.disasmResult.sMnemonic;
+
+                    if (_record.disasmResult.sString != "") {
+                        sString.append(QString(" %1").arg(convertOpcodeString(_record.disasmResult)));
+                    }
+
+                    actionCopyOpcode.setText(sString);
+                    actionCopyOpcode.setProperty("VALUE", sString);
+                    connect(&actionCopyOpcode, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+                    menuCopy.addAction(&actionCopyOpcode);
+                }
+
+                if (_record.sComment != "") {
+                    actionCopyComment.setText(_record.sComment);
+                    actionCopyComment.setProperty("VALUE", _record.sComment);
+                    connect(&actionCopyComment, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
+                    menuCopy.addAction(&actionCopyComment);
+                }
+            }
+
+            contextMenu.addMenu(&menuCopy);
+        }
+        {
+            {
+                actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
+                connect(&actionFindString, SIGNAL(triggered()), this, SLOT(_findStringSlot()));
+                menuFind.addAction(&actionFindString);
+            }
+            {
+                actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
+                connect(&actionFindSignature, SIGNAL(triggered()), this, SLOT(_findSignatureSlot()));
+                menuFind.addAction(&actionFindSignature);
+            }
+            {
+                actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
+                connect(&actionFindValue, SIGNAL(triggered()), this, SLOT(_findValueSlot()));
+                menuFind.addAction(&actionFindValue);
+            }
+            {
+                actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
+                connect(&actionFindNext, SIGNAL(triggered()), this, SLOT(_findNextSlot()));
+                menuFind.addAction(&actionFindNext);
+            }
+
+            contextMenu.addMenu(&menuFind);
+        }
+
+        if (mstate.bSize) {
+            {
+                actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
+                connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
+                contextMenu.addAction(&actionDumpToFile);
+            }
+            {
+                actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
+                connect(&actionSignature, SIGNAL(triggered()), this, SLOT(_signatureSlot()));
+                contextMenu.addAction(&actionSignature);
             }
         }
 
-        contextMenu.addMenu(&menuCopy);
-
-        menuFind.addAction(&actionFindString);
-        menuFind.addAction(&actionFindSignature);
-        menuFind.addAction(&actionFindValue);
-        menuFind.addAction(&actionFindNext);
-
-        contextMenu.addMenu(&menuFind);
-
         if (mstate.bSize) {
-            contextMenu.addAction(&actionDumpToFile);
-            contextMenu.addAction(&actionSignature);
-
-            menuHex.addAction(&actionHexSignature);
+            {
+                actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
+                connect(&actionHexSignature, SIGNAL(triggered()), this, SLOT(_hexSignatureSlot()));
+                menuHex.addAction(&actionHexSignature);
+            }
 
             contextMenu.addMenu(&menuHex);
         }
 
         if (mstate.bHex) {
-            menuFollowIn.addAction(&actionHex);
+            {
+                actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
+                connect(&actionHex, SIGNAL(triggered()), this, SLOT(_hexSlot()));
+                menuFollowIn.addAction(&actionHex);
+            }
 
             contextMenu.addMenu(&menuFollowIn);
         }
@@ -1722,13 +1711,31 @@ void XDisasmView::contextMenu(const QPoint &pos)
         menuEdit.setEnabled(!isReadonly());
 
         if (mstate.bSize) {
-            menuEdit.addAction(&actionEditHex);
+            {
+                actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
+                connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
+                menuEdit.addAction(&actionEditHex);
+            }
 
             contextMenu.addMenu(&menuEdit);
         }
+        {
+            {
+                actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
+                connect(&actionSelectAll, SIGNAL(triggered()), this, SLOT(_selectAllSlot()));
+                menuSelect.addAction(&actionSelectAll); // TODO
+            }
+            contextMenu.addMenu(&menuSelect);
+        }
 
-        menuSelect.addAction(&actionSelectAll);
-        contextMenu.addMenu(&menuSelect);
+        if (mstate.bSize) {
+            {
+                actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
+                connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
+                menuAnalyze.addAction(&actionAnalyzeDisasm);
+            }
+            contextMenu.addMenu(&menuAnalyze);
+        }
 
         // TODO reset select
 
@@ -1852,6 +1859,7 @@ void XDisasmView::registerShortcuts(bool bState)
             g_shortCuts[SC_HEXSIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE), this, SLOT(_hexSignatureSlot()));
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
+        if (!g_shortCuts[SC_ANALYZE_DISASM]) g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {
             if (g_shortCuts[i]) {
@@ -1946,19 +1954,25 @@ void XDisasmView::_signatureSlot()
 {
     DEVICESTATE state = getDeviceState();
 
-    DialogMultiDisasmSignature dmds(this);
+    if (state.nSelectionSize) {
+        DialogMultiDisasmSignature dmds(this);
 
-    dmds.setData(getDevice(), state.nSelectionLocation, getMemoryMap(), g_handle);
+        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getMemoryMap(), g_handle);
 
-    dmds.setGlobal(getShortcuts(), getGlobalOptions());
+        dmds.setGlobal(getShortcuts(), getGlobalOptions());
 
-    dmds.exec();
+        dmds.exec();
+    }
 }
 
 void XDisasmView::_hexSlot()
 {
     if (g_options.bMenu_Hex) {
-        emit showOffsetHex(getDeviceState(true).nSelectionLocation);
+        DEVICESTATE state = getDeviceState();
+
+        if (state.nSelectionDeviceOffset != -1) {
+            emit showOffsetHex(state.nSelectionDeviceOffset);
+        }
     }
 }
 
@@ -1970,6 +1984,23 @@ void XDisasmView::_references()
         XADDR nAddress = pAction->property("ADDRESS").toULongLong();
 
         showReferences(nAddress);
+    }
+}
+
+void XDisasmView::_analyzeDisasm()
+{
+    if (getXInfoDB()) {
+        XDeviceTableView::DEVICESTATE state = getDeviceState();
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::_analyzeDisasm()");
+#endif
+        // TODO
+//        DialogXInfoDBTransferProcess dialogTransfer(this);
+//        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+//        dialogTransfer.showDialogDelay();
+//        adjustAfterAnalysis();
+
+        setDeviceState(state);
     }
 }
 
@@ -1995,9 +2026,4 @@ void XDisasmView::showReferences(XADDR nAddress)
 
     XOptions::_adjustStayOnTop(&dialogReferences, true);
     dialogReferences.exec();
-}
-
-bool XDisasmView::isAnalyzed()
-{
-    return false;
 }

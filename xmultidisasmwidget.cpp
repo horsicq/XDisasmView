@@ -205,7 +205,7 @@ void XMultiDisasmWidget::reloadFileType()
             options.memoryMapRegion.sArch = g_options.sArch;
         }
 
-        ui->scrollAreaDisasm->setData(g_pDevice, options);
+        //ui->scrollAreaDisasm->setData(g_pDevice, options);
 
         XBinary::DM disasmMode = XBinary::getDisasmMode(&options.memoryMapRegion);
 
@@ -297,7 +297,7 @@ void XMultiDisasmWidget::adjustButtons()
         ui->groupBoxAnalysis->show();
         ui->pushButtonSymbols->show();
 
-        bool bIsAnalyses = g_pXInfoDB->isAnalyzed();
+        bool bIsAnalyses = g_pXInfoDB->isAnalyzed(); // TODO rework
 
         ui->pushButtonAnalyze->setEnabled(!bIsAnalyses);
         ui->pushButtonClear->setEnabled(bIsAnalyses);

@@ -23,7 +23,6 @@
 
 #include <QComboBox>
 
-#include "dialogxinfodbtransferprocess.h"
 #include "xdisasmview.h"
 #include "xformats.h"
 

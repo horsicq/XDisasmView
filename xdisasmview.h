@@ -29,6 +29,7 @@
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"
 #include "dialogxdisasmreferences.h"
+#include "dialogxinfodbtransferprocess.h"
 
 // TODO AbstractQuery
 // Load symbols Save db
@@ -57,6 +58,7 @@ class XDisasmView : public XDeviceTableEditView {
         SC_SIGNATURE,
         SC_FOLLOWIN_HEX,
         SC_EDIT_HEX,
+        SC_ANALYZE_DISASM,
         __SC_SIZE,
         // TODO more
     };
@@ -101,7 +103,6 @@ public:
     virtual qint64 viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset = false);
     void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
     void showReferences(XADDR nAddress);
-    bool isAnalyzed();  // TODO remove
 
 private:
     enum COLUMN {
@@ -207,6 +208,7 @@ protected slots:
     void _signatureSlot();
     void _hexSlot();
     void _references();
+    void _analyzeDisasm();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
