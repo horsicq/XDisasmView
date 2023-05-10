@@ -98,6 +98,7 @@ public:
     void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
+    virtual qint64 viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset = false);
     void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
     void showReferences(XADDR nAddress);
     bool isAnalyzed();  // TODO remove
@@ -127,6 +128,7 @@ private:
         XCapstone::DISASM_RESULT disasmResult;
         bool bIsBreakpoint;
         bool bIsCurrentIP;
+        bool bIsAnalysed;
         ARRAY array;
         qint32 nArrayLevel;
         qint32 nMaxLevel;
@@ -160,6 +162,7 @@ private:
         //        bool bIsCursor;
         bool bIsBreakpoint;
         bool bHighlight;
+        bool bIsAnalysed;
     };
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
@@ -174,7 +177,7 @@ private:
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
     VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
     VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
-    VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
+    VIEWSTRUCT _getViewStructByScroll(qint64 nValue); // TODO mb remove
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);
     qint64 _getViewOffsetByAddress(XADDR nAddress);

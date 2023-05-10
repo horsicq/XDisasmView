@@ -156,61 +156,76 @@ XADDR XDisasmView::getSelectionInitAddress()
 
 XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 {
+//    DEVICESTATE result = {};
+
+//    if (isAnalyzed()) {
+//        // TODO
+//        STATE state = getState();
+
+//        if (state.nSelectionViewSize == 0) {
+//            state.nSelectionViewSize = 1;
+//        }
+
+//        qint64 nShowOffset = getViewOffsetStart();  // TODO convert
+
+//        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
+//        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
+//        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
+//        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
+
+//        //        if (showRecordCursor.nOffset != -1 ) {
+//        //            result.nCursorOffset = showRecordCursor.nOffset;
+//        //        }
+
+//        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
+//        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
+
+//        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
+//            result.nSelectionLocation = showRecordStartSelection.nOffset;
+//            result.nSelectionSize = nSelectionSize;
+//        }
+
+//        if (showRecordShowStart.nOffset == -1) {
+//            result.nShowLocation = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
+//        } else {
+//            result.nShowLocation = showRecordShowStart.nOffset;
+//        }
+
+//        if (bGlobalOffset) {
+//            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
+
+//            if (pSubDevice) {
+//                quint64 nInitOffset = pSubDevice->getInitLocation();
+//                result.nSelectionLocation += nInitOffset;
+//                //                result.nCursorOffset += nInitOffset;
+//                result.nShowLocation += nInitOffset;
+//            }
+//        }
+//    } else {
+//        DEVICESTATE result = {};
+//        STATE state = getState();
+
+//        result.nSelectionLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
+//        result.nSelectionSize = state.nSelectionViewSize; // TODO Check
+//        result.nShowLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);;
+
+//        return result;
+//    }
+
+//    return result;
     DEVICESTATE result = {};
+    STATE state = getState();
 
-    if (isAnalyzed()) {
-        // TODO
-        STATE state = getState();
-
-        if (state.nSelectionViewSize == 0) {
-            state.nSelectionViewSize = 1;
-        }
-
-        qint64 nShowOffset = getViewOffsetStart();  // TODO convert
-
-        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
-        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
-        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
-        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
-
-        //        if (showRecordCursor.nOffset != -1 ) {
-        //            result.nCursorOffset = showRecordCursor.nOffset;
-        //        }
-
-        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
-        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
-
-        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
-            result.nSelectionLocation = showRecordStartSelection.nOffset;
-            result.nSelectionSize = nSelectionSize;
-        }
-
-        if (showRecordShowStart.nOffset == -1) {
-            result.nShowOffset = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
-        } else {
-            result.nShowOffset = showRecordShowStart.nOffset;
-        }
-
-        if (bGlobalOffset) {
-            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
-
-            if (pSubDevice) {
-                quint64 nInitOffset = pSubDevice->getInitLocation();
-                result.nSelectionLocation += nInitOffset;
-                //                result.nCursorOffset += nInitOffset;
-                result.nShowOffset += nInitOffset;
-            }
-        }
-    } else {
-        result = XDeviceTableView::getDeviceState(bGlobalOffset);
-        // TODO convert
-    }
+    result.nSelectionLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
+    result.nSelectionSize = state.nSelectionViewSize; // TODO Check
+    result.nShowLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);;
 
     return result;
 }
 
 void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
 {
+    // TODO !!!
     if (isAnalyzed()) {
         if (bGlobalOffset) {
             XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
@@ -219,14 +234,14 @@ void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
                 quint64 nInitOffset = pSubDevice->getInitLocation();
                 //                deviceState.nCursorOffset -= nInitOffset;
                 deviceState.nSelectionLocation -= nInitOffset;
-                deviceState.nShowOffset -= nInitOffset;
+                deviceState.nShowLocation -= nInitOffset;
             }
         }
 
         qint64 nSelectionStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation);
         qint64 nSelectionSize = getXInfoDB()->getShowRecordLineByOffset(deviceState.nSelectionLocation + deviceState.nSelectionSize) - nSelectionStart;
         //        qint64 nCursor = getXInfoDB()->getShowRecordLineByOffset(deviceState.nCursorOffset);
-        qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowOffset);
+        qint64 nShowStart = getXInfoDB()->getShowRecordLineByOffset(deviceState.nShowLocation);
 
         _goToViewOffset(nShowStart);
 
@@ -277,7 +292,22 @@ qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlo
     //        nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
     //    }
 
-    nResult = XDeviceTableView::deviceOffsetToViewOffset(nOffset, nSize);
+    nResult = XDeviceTableView::deviceSizeToViewSize(nOffset, nSize);
+
+    return nResult;
+}
+
+qint64 XDisasmView::viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset)
+{
+    qint64 nResult = 0;
+
+    VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nViewOffset);
+
+    if (viewStruct.nSize) {
+        nResult = viewStruct.nOffset + (nViewOffset - viewStruct.nViewOffset);
+    }
+
+    nResult = XDeviceTableView::viewOffsetToDeviceOffset(nResult, bGlobalOffset);
 
     return nResult;
 }
@@ -416,6 +446,10 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
     qint64 nResult = nViewOffset;
 
     if (nViewOffset != nOldViewOffset) {
+        if (nOldViewOffset == -1) {
+            nOldViewOffset = nViewOffset;
+        }
+
         bool bSuccess = false;
 
         VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nViewOffset);
@@ -634,11 +668,13 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 
     if (pTextOption->bIsSelected) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColorSelected());
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_SELECTED));
     }
 
     if (pTextOption->bIsBreakpoint) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, QColor(Qt::red));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_BREAKPOINT));
+    } else if (pTextOption->bIsAnalysed) {
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_ANALYSED));
     } /*else if (pTextOption->bIsCursor) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::WindowText));
         pPainter->setPen(viewport()->palette().color(QPalette::Base));
@@ -907,7 +943,7 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByOffset(qint64 nOffset)
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nOffset <= nOffset) && (nOffset < (g_listViewStruct.at(i).nOffset + g_listViewStruct.at(i).nSize))) {
+        if ((g_listViewStruct.at(i).nOffset != -1) && (g_listViewStruct.at(i).nOffset <= nOffset) && (nOffset < (g_listViewStruct.at(i).nOffset + g_listViewStruct.at(i).nSize))) {
             result = g_listViewStruct.at(i);
             break;
         }
@@ -923,7 +959,7 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByAddress(XADDR nAddress)
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nAddress <= nAddress) && (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
+        if ((g_listViewStruct.at(i).nAddress != -1) && (g_listViewStruct.at(i).nAddress <= nAddress) && (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
             result = g_listViewStruct.at(i);
             break;
         }
@@ -1105,6 +1141,7 @@ void XDisasmView::updateData()
                         XInfoDB::SHOWRECORD showRecord = getXInfoDB()->getShowRecordByAddress(record.nVirtualAddress);
 
                         if (showRecord.bValid) {
+                            record.bIsAnalysed = true;
                             record.nVirtualAddress = showRecord.nAddress;
                             record.nDeviceOffset = showRecord.nOffset;
                             record.bHasRefFrom = showRecord.nRefFrom;
@@ -1397,12 +1434,6 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
 void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
 {
-    if (getXInfoDB()) {
-        if (getXInfoDB()->isAnalyzeInProgress()) {
-            return;
-        }
-    }
-
     qint32 nNumberOfRows = g_listRecords.count();
 
     //    qint64 nCursorOffset = getState().nCursorViewOffset;
@@ -1438,6 +1469,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         textOption.bIsCurrentIP = ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION));
         //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsBreakpoint = ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION));
+        textOption.bIsAnalysed = ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_BYTES));
 
         if (nColumn == COLUMN_ARROWS) {
             if (bIsDebugger) {
@@ -1885,11 +1917,7 @@ qint64 XDisasmView::getFixViewOffset(qint64 nViewOffset)
 {
     qint64 nResult = 0;
 
-    if (isAnalyzed()) {
-        nResult = nViewOffset;
-    } else {
-        nResult = getDisasmViewOffset(nViewOffset, -1);
-    }
+    nResult = getDisasmViewOffset(nViewOffset, -1);
 
     return nResult;
 }
