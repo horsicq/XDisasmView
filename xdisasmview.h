@@ -59,6 +59,7 @@ class XDisasmView : public XDeviceTableEditView {
         SC_FOLLOWIN_HEX,
         SC_EDIT_HEX,
         SC_ANALYZE_DISASM,
+        SC_ANALYZE_REMOVE,
         __SC_SIZE,
         // TODO more
     };
@@ -141,6 +142,7 @@ private:
 
     struct MENU_STATE {
         //        bool bOffset;
+        bool bPhysicalSize;
         bool bSize;
         bool bHex;
     };
@@ -209,6 +211,7 @@ protected slots:
     void _hexSlot();
     void _references();
     void _analyzeDisasm();
+    void _analyzeRemove();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size

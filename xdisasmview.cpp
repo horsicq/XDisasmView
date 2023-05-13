@@ -610,14 +610,18 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
 {
     MENU_STATE result = {};
 
-    DEVICESTATE state = getDeviceState();
+    DEVICESTATE deviceState = getDeviceState();
+    STATE state = getState();
 
     //    if(state.nCursorOffset!=XBinary::offsetToAddress(&(g_options.memoryMap),state.nCursorOffset))
     //    {
     //        result.bOffset=true;
     //    }
 
-    if (state.nSelectionSize) {
+    if (deviceState.nSelectionSize) {
+        result.bPhysicalSize = true;
+    }
+    if (state.nSelectionViewSize) {
         result.bSize = true;
     }
 
@@ -1541,6 +1545,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionEditHex(tr("Hex"), this);
         QAction actionReferences(tr("References"), this);
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
+        QAction actionAnalyzeRemove(tr("Remove"), this);
 
         {
             {
@@ -1602,7 +1607,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 menuCopy.addAction(&actionCopyCursorOffset);
             }
 
-            if (mstate.bSize) {
+            if (mstate.bPhysicalSize) {
                 actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
                 connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
                 menuCopy.addAction(&actionCopyAsData);
@@ -1675,7 +1680,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addMenu(&menuFind);
         }
 
-        if (mstate.bSize) {
+        if (mstate.bPhysicalSize) {
             {
                 actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
                 connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
@@ -1688,7 +1693,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             }
         }
 
-        if (mstate.bSize) {
+        if (mstate.bPhysicalSize) {
             {
                 actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
                 connect(&actionHexSignature, SIGNAL(triggered()), this, SLOT(_hexSignatureSlot()));
@@ -1710,7 +1715,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         menuEdit.setEnabled(!isReadonly());
 
-        if (mstate.bSize) {
+        if (mstate.bPhysicalSize) {
             {
                 actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
                 connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
@@ -1733,6 +1738,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
                 connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
                 menuAnalyze.addAction(&actionAnalyzeDisasm);
+            }
+            {
+                actionAnalyzeRemove.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE));
+                connect(&actionAnalyzeRemove, SIGNAL(triggered()), this, SLOT(_analyzeRemove()));
+                menuAnalyze.addAction(&actionAnalyzeRemove);
             }
             contextMenu.addMenu(&menuAnalyze);
         }
@@ -1860,6 +1870,7 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
         if (!g_shortCuts[SC_ANALYZE_DISASM]) g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
+        if (!g_shortCuts[SC_ANALYZE_REMOVE]) g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {
             if (g_shortCuts[i]) {
@@ -1990,7 +2001,8 @@ void XDisasmView::_references()
 void XDisasmView::_analyzeDisasm()
 {
     if (getXInfoDB()) {
-        XDeviceTableView::DEVICESTATE state = getDeviceState();
+        STATE state = getState();
+        qint64 nViewStart = getViewOffsetStart();
 #ifdef QT_DEBUG
         qDebug("void XDisasmView::_analyzeDisasm()");
 #endif
@@ -2000,7 +2012,27 @@ void XDisasmView::_analyzeDisasm()
 //        dialogTransfer.showDialogDelay();
 //        adjustAfterAnalysis();
 
-        setDeviceState(state);
+        setState(state);
+        setViewOffsetStart(nViewStart);
+    }
+}
+
+void XDisasmView::_analyzeRemove()
+{
+    if (getXInfoDB()) {
+        STATE state = getState();
+        qint64 nViewStart = getViewOffsetStart();
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::_analyzeRemove()");
+#endif
+        // TODO
+        //        DialogXInfoDBTransferProcess dialogTransfer(this);
+        //        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+        //        dialogTransfer.showDialogDelay();
+        //        adjustAfterAnalysis();
+
+        setState(state);
+        setViewOffsetStart(nViewStart);
     }
 }
 
