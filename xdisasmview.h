@@ -180,7 +180,7 @@ private:
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
     VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
     VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
-    VIEWSTRUCT _getViewStructByScroll(qint64 nValue); // TODO mb remove
+    VIEWSTRUCT _getViewStructByScroll(qint64 nValue);  // TODO mb remove
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);
     qint64 _getViewOffsetByAddress(XADDR nAddress);

@@ -156,63 +156,63 @@ XADDR XDisasmView::getSelectionInitAddress()
 
 XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 {
-//    DEVICESTATE result = {};
+    //    DEVICESTATE result = {};
 
-//    if (isAnalyzed()) {
-//        // TODO
-//        STATE state = getState();
+    //    if (isAnalyzed()) {
+    //        // TODO
+    //        STATE state = getState();
 
-//        if (state.nSelectionViewSize == 0) {
-//            state.nSelectionViewSize = 1;
-//        }
+    //        if (state.nSelectionViewSize == 0) {
+    //            state.nSelectionViewSize = 1;
+    //        }
 
-//        qint64 nShowOffset = getViewOffsetStart();  // TODO convert
+    //        qint64 nShowOffset = getViewOffsetStart();  // TODO convert
 
-//        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
-//        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
-//        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
-//        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
+    //        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewOffset);
+    //        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset);
+    //        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewOffset + state.nSelectionViewSize - 1);
+    //        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
 
-//        //        if (showRecordCursor.nOffset != -1 ) {
-//        //            result.nCursorOffset = showRecordCursor.nOffset;
-//        //        }
+    //        //        if (showRecordCursor.nOffset != -1 ) {
+    //        //            result.nCursorOffset = showRecordCursor.nOffset;
+    //        //        }
 
-//        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
-//        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
+    //        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
+    //        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
 
-//        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
-//            result.nSelectionLocation = showRecordStartSelection.nOffset;
-//            result.nSelectionSize = nSelectionSize;
-//        }
+    //        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
+    //            result.nSelectionLocation = showRecordStartSelection.nOffset;
+    //            result.nSelectionSize = nSelectionSize;
+    //        }
 
-//        if (showRecordShowStart.nOffset == -1) {
-//            result.nShowLocation = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
-//        } else {
-//            result.nShowLocation = showRecordShowStart.nOffset;
-//        }
+    //        if (showRecordShowStart.nOffset == -1) {
+    //            result.nShowLocation = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
+    //        } else {
+    //            result.nShowLocation = showRecordShowStart.nOffset;
+    //        }
 
-//        if (bGlobalOffset) {
-//            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
+    //        if (bGlobalOffset) {
+    //            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
 
-//            if (pSubDevice) {
-//                quint64 nInitOffset = pSubDevice->getInitLocation();
-//                result.nSelectionLocation += nInitOffset;
-//                //                result.nCursorOffset += nInitOffset;
-//                result.nShowLocation += nInitOffset;
-//            }
-//        }
-//    } else {
-//        DEVICESTATE result = {};
-//        STATE state = getState();
+    //            if (pSubDevice) {
+    //                quint64 nInitOffset = pSubDevice->getInitLocation();
+    //                result.nSelectionLocation += nInitOffset;
+    //                //                result.nCursorOffset += nInitOffset;
+    //                result.nShowLocation += nInitOffset;
+    //            }
+    //        }
+    //    } else {
+    //        DEVICESTATE result = {};
+    //        STATE state = getState();
 
-//        result.nSelectionLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
-//        result.nSelectionSize = state.nSelectionViewSize; // TODO Check
-//        result.nShowLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);;
+    //        result.nSelectionLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
+    //        result.nSelectionSize = state.nSelectionViewSize; // TODO Check
+    //        result.nShowLocation = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);;
 
-//        return result;
-//    }
+    //        return result;
+    //    }
 
-//    return result;
+    //    return result;
     DEVICESTATE result = {};
     STATE state = getState();
 
@@ -433,12 +433,12 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
         bool bSuccess = false;
 
         VIEWSTRUCT viewStruct = _getViewStructByViewOffset(nViewOffset);
-//        VIEWSTRUCT viewStructOld = _getViewStructByViewOffset(nOldViewOffset);
+        //        VIEWSTRUCT viewStructOld = _getViewStructByViewOffset(nOldViewOffset);
 
         XADDR nAddress = 0;
-//        XADDR nAddressOld = 0;
+        //        XADDR nAddressOld = 0;
         qint64 nOffset = 0;
-//        qint64 nOffsetOld = 0;
+        //        qint64 nOffsetOld = 0;
 
         if (viewStruct.nAddress != -1) {
             nAddress = viewStruct.nAddress + (nViewOffset - viewStruct.nViewOffset);
@@ -448,13 +448,13 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             nOffset = viewStruct.nOffset + (nViewOffset - viewStruct.nViewOffset);
         }
 
-//        if (viewStructOld.nAddress != -1) {
-//            nAddressOld = viewStructOld.nAddress + (nOldViewOffset - viewStructOld.nViewOffset);
-//        }
+        //        if (viewStructOld.nAddress != -1) {
+        //            nAddressOld = viewStructOld.nAddress + (nOldViewOffset - viewStructOld.nViewOffset);
+        //        }
 
-//        if (viewStructOld.nOffset != -1) {
-//            nOffsetOld = viewStructOld.nOffset + (nOldViewOffset - viewStructOld.nViewOffset);
-//        }
+        //        if (viewStructOld.nOffset != -1) {
+        //            nOffsetOld = viewStructOld.nOffset + (nOldViewOffset - viewStructOld.nViewOffset);
+        //        }
 
         if (!bSuccess) {
             if (getXInfoDB()) {
@@ -537,70 +537,70 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             }
         }
 
-//        if ((!bSuccess) && (nOffset != -1)) {
-//            qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
-//            qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
+        //        if ((!bSuccess) && (nOffset != -1)) {
+        //            qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
+        //            qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
 
-//            if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
-//            {
-//                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-//            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM64) {
-//                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-//            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_X86) {
-//                QByteArray _baData = read_array(nStartOffset, 2);
+        //            if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
+        //            {
+        //                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+        //            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM64) {
+        //                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+        //            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_X86) {
+        //                QByteArray _baData = read_array(nStartOffset, 2);
 
-//                if (*((quint16 *)_baData.data()) == 0)  // 0000
-//                {
-//                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-//                }
-//            }
+        //                if (*((quint16 *)_baData.data()) == 0)  // 0000
+        //                {
+        //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+        //                }
+        //            }
 
-//            nStartOffset = qMax(nStartOffset, (qint64)0);
-//            nEndOffset = qMin(nEndOffset, getViewSize());
+        //            nStartOffset = qMax(nStartOffset, (qint64)0);
+        //            nEndOffset = qMin(nEndOffset, getViewSize());
 
-////            if (nOffset > nOffsetOld) {
-////                nStartOffset = qMax(nStartOffset, nOldViewOffset);
-////            }
+        ////            if (nOffset > nOffsetOld) {
+        ////                nStartOffset = qMax(nStartOffset, nOldViewOffset);
+        ////            }
 
-//            qint32 nSize = nEndOffset - nStartOffset;
+        //            qint32 nSize = nEndOffset - nStartOffset;
 
-//            QByteArray baData = read_array(nStartOffset, nSize);
+        //            QByteArray baData = read_array(nStartOffset, nSize);
 
-//            nSize = baData.size();
+        //            nSize = baData.size();
 
-//            qint64 _nCurrentOffset = 0;
+        //            qint64 _nCurrentOffset = 0;
 
-//            // TODO nOffset<nOldOffset
-//            while (nSize > 0) {
-//                qint64 _nOffset = nStartOffset + _nCurrentOffset;
+        //            // TODO nOffset<nOldOffset
+        //            while (nSize > 0) {
+        //                qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-//                XCapstone::DISASM_RESULT disasmResult =
-//                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+        //                XCapstone::DISASM_RESULT disasmResult =
+        //                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
-//                if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
-//                    if (_nOffset == nOffset) {
-//                        nResult = _nOffset;
-//                    } else {
-////                        if (nOffsetOld != -1) {
-////                            if (nOffset > nOffsetOld) {
-////                                nResult = _nOffset + disasmResult.nSize;
-////                            } else {
-////                                nResult = _nOffset;
-////                            }
-////                        } else {
-////                            nResult = _nOffset;
-////                        }
-//                    }
+        //                if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
+        //                    if (_nOffset == nOffset) {
+        //                        nResult = _nOffset;
+        //                    } else {
+        ////                        if (nOffsetOld != -1) {
+        ////                            if (nOffset > nOffsetOld) {
+        ////                                nResult = _nOffset + disasmResult.nSize;
+        ////                            } else {
+        ////                                nResult = _nOffset;
+        ////                            }
+        ////                        } else {
+        ////                            nResult = _nOffset;
+        ////                        }
+        //                    }
 
-//                    break;
-//                }
+        //                    break;
+        //                }
 
-//                _nCurrentOffset += disasmResult.nSize;
-//                nSize -= disasmResult.nSize;
-//            }
+        //                _nCurrentOffset += disasmResult.nSize;
+        //                nSize -= disasmResult.nSize;
+        //            }
 
-//            bSuccess = true;
-//        }
+        //            bSuccess = true;
+        //        }
     }
 
     return nResult;
@@ -927,7 +927,8 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByOffset(qint64 nOffset)
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nOffset != -1) && (g_listViewStruct.at(i).nOffset <= nOffset) && (nOffset < (g_listViewStruct.at(i).nOffset + g_listViewStruct.at(i).nSize))) {
+        if ((g_listViewStruct.at(i).nOffset != -1) && (g_listViewStruct.at(i).nOffset <= nOffset) &&
+            (nOffset < (g_listViewStruct.at(i).nOffset + g_listViewStruct.at(i).nSize))) {
             result = g_listViewStruct.at(i);
             break;
         }
@@ -943,7 +944,8 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByAddress(XADDR nAddress)
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nAddress != -1) && (g_listViewStruct.at(i).nAddress <= nAddress) && (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
+        if ((g_listViewStruct.at(i).nAddress != -1) && (g_listViewStruct.at(i).nAddress <= nAddress) &&
+            (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
             result = g_listViewStruct.at(i);
             break;
         }
@@ -1565,7 +1567,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
                 menuGoTo.addAction(&actionGoToEntryPoint);
             }
-                    // TODO go to address
+            // TODO go to address
             XDisasmView::RECORD record = _getRecordByViewOffset(&g_listRecords, state.nSelectionViewOffset);
 
             if (record.disasmResult.relType || record.disasmResult.memType) {
@@ -1728,7 +1730,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             {
                 actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
                 connect(&actionSelectAll, SIGNAL(triggered()), this, SLOT(_selectAllSlot()));
-                menuSelect.addAction(&actionSelectAll); // TODO
+                menuSelect.addAction(&actionSelectAll);  // TODO
             }
             contextMenu.addMenu(&menuSelect);
         }
@@ -1869,8 +1871,10 @@ void XDisasmView::registerShortcuts(bool bState)
             g_shortCuts[SC_HEXSIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE), this, SLOT(_hexSignatureSlot()));
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
-        if (!g_shortCuts[SC_ANALYZE_DISASM]) g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
-        if (!g_shortCuts[SC_ANALYZE_REMOVE]) g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
+        if (!g_shortCuts[SC_ANALYZE_DISASM])
+            g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
+        if (!g_shortCuts[SC_ANALYZE_REMOVE])
+            g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {
             if (g_shortCuts[i]) {
@@ -2007,10 +2011,10 @@ void XDisasmView::_analyzeDisasm()
         qDebug("void XDisasmView::_analyzeDisasm()");
 #endif
         // TODO
-//        DialogXInfoDBTransferProcess dialogTransfer(this);
-//        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
-//        dialogTransfer.showDialogDelay();
-//        adjustAfterAnalysis();
+        //        DialogXInfoDBTransferProcess dialogTransfer(this);
+        //        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+        //        dialogTransfer.showDialogDelay();
+        //        adjustAfterAnalysis();
 
         setState(state);
         setViewOffsetStart(nViewStart);
