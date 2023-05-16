@@ -184,6 +184,7 @@ private:
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);
     qint64 _getViewOffsetByAddress(XADDR nAddress);
+    XADDR _getAddressByViewOffset(qint64 nViewOffset);
 
 protected:
     virtual OS cursorPositionToOS(CURSOR_POSITION cursorPosition);

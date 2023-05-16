@@ -1020,6 +1020,24 @@ qint64 XDisasmView::_getViewOffsetByAddress(XADDR nAddress)
     return nResult;
 }
 
+XADDR XDisasmView::_getAddressByViewOffset(qint64 nViewOffset)
+{
+    XADDR nResult = -1;
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if ((g_listViewStruct.at(i).nViewOffset <= nViewOffset) && (nViewOffset < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) {
+            if (g_listViewStruct.at(i).nAddress != -1) {
+                nResult = g_listViewStruct.at(i).nAddress + (nViewOffset - g_listViewStruct.at(i).nViewOffset);
+            }
+            break;
+        }
+    }
+
+    return nResult;
+}
+
 XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
 {
     OS osResult = {};
@@ -2024,19 +2042,32 @@ void XDisasmView::_analyzeDisasm()
 void XDisasmView::_analyzeRemove()
 {
     if (getXInfoDB()) {
-        STATE state = getState();
-        qint64 nViewStart = getViewOffsetStart();
 #ifdef QT_DEBUG
         qDebug("void XDisasmView::_analyzeRemove()");
 #endif
-        // TODO
-        //        DialogXInfoDBTransferProcess dialogTransfer(this);
-        //        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
-        //        dialogTransfer.showDialogDelay();
-        //        adjustAfterAnalysis();
+        STATE state = getState();
 
-        setState(state);
-        setViewOffsetStart(nViewStart);
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);
+
+        if (nAddress != -1) {
+            qint64 nViewStart = getViewOffsetStart();
+
+            DialogXInfoDBTransferProcess dialogTransfer(this);
+
+            XInfoDBTransfer::OPTIONS options = {};
+            options.pDevice = getXInfoDB()->getDevice();
+            options.fileType = getXInfoDB()->getFileType();
+            options.nAddress = nAddress;
+            options.nSize = state.nSelectionViewSize;
+
+            dialogTransfer.setData(getXInfoDB(), XInfoDBTransfer::COMMAND_REMOVE, options);
+
+            dialogTransfer.showDialogDelay();
+            adjustAfterAnalysis();
+
+            setState(state);
+            setViewOffsetStart(nViewStart);
+        }
     }
 }
 

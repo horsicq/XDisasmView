@@ -88,8 +88,6 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
 
-    adjustButtons();
-
     adjustVisitedState();
 }
 
@@ -112,18 +110,17 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
 
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
-    if (g_pXInfoDB) {
-        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());  // TODO Check mb remove
+//    if (g_pXInfoDB) {
+//        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());  // TODO Check mb remove
 
-        //        if (!(g_pXInfoDB->isAnalyzed())) {
+//        //        if (!(g_pXInfoDB->isAnalyzed())) {
 
-        //            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
-        //                analyze();
-        //            }
-        //        }
-    }
+//        //            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes) {
+//        //                analyze();
+//        //            }
+//        //        }
+//    }
 
-    adjustButtons();
     adjustVisitedState();
 
     reloadFileType();
@@ -248,68 +245,15 @@ void XMultiDisasmWidget::getSymbols()
 {
     if (g_pXInfoDB) {
         DialogXInfoDBTransferProcess dialogTransfer(this);
+        XInfoDBTransfer::OPTIONS options = {};
+        options.pDevice = g_pXInfoDB->getDevice();
+        options.fileType = g_pXInfoDB->getFileType();
 
-        dialogTransfer.symbols(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
+        dialogTransfer.setData(g_pXInfoDB, XInfoDBTransfer::COMMAND_SYMBOLS, options);
 
         dialogTransfer.showDialogDelay();
         // TODO mn reload
     }
-}
-
-void XMultiDisasmWidget::analyze()
-{
-    if (g_pXInfoDB) {
-        XDeviceTableView::DEVICESTATE state = ui->scrollAreaDisasm->getDeviceState();
-
-        DialogXInfoDBTransferProcess dialogTransfer(this);
-
-        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
-
-        dialogTransfer.showDialogDelay();
-
-        ui->scrollAreaDisasm->adjustAfterAnalysis();
-
-        ui->scrollAreaDisasm->setDeviceState(state);
-    }
-}
-
-void XMultiDisasmWidget::clearAnalysis()
-{
-    if (g_pXInfoDB) {
-        XDeviceTableView::DEVICESTATE state = ui->scrollAreaDisasm->getDeviceState();
-
-        DialogXInfoDBTransferProcess dialogTransfer(this);
-
-        dialogTransfer.clear(g_pXInfoDB);
-
-        dialogTransfer.showDialogDelay();
-
-        ui->scrollAreaDisasm->adjustAfterAnalysis();
-
-        ui->scrollAreaDisasm->setDeviceState(state);
-    }
-}
-
-void XMultiDisasmWidget::adjustButtons()
-{
-#ifdef QT_SQL_LIB
-    if (g_pXInfoDB) {
-        ui->groupBoxAnalysis->show();
-        ui->pushButtonSymbols->show();
-
-        bool bIsAnalyses = g_pXInfoDB->isAnalyzed();  // TODO rework
-
-        ui->pushButtonAnalyze->setEnabled(!bIsAnalyses);
-        ui->pushButtonClear->setEnabled(bIsAnalyses);
-        ui->pushButtonSymbols->setEnabled(g_pXInfoDB->isSymbolsPresent());
-    } else {
-        ui->groupBoxAnalysis->hide();
-        ui->pushButtonSymbols->hide();
-    }
-#else
-    ui->groupBoxAnalysis->hide();
-    ui->pushButtonSymbols->hide();
-#endif
 }
 
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)
@@ -339,18 +283,6 @@ void XMultiDisasmWidget::on_comboBoxType_currentIndexChanged(int nIndex)
     Q_UNUSED(nIndex)
 
     reloadFileType();
-}
-
-void XMultiDisasmWidget::on_pushButtonAnalyze_clicked()
-{
-    analyze();
-    adjustButtons();
-}
-
-void XMultiDisasmWidget::on_pushButtonClear_clicked()
-{
-    clearAnalysis();
-    adjustButtons();
 }
 
 void XMultiDisasmWidget::adjustVisitedState()

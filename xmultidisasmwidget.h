@@ -61,17 +61,12 @@ private:
     void reloadFileType();
     void adjustMode();
     void getSymbols();
-    void analyze();
-    void clearAnalysis();
-    void adjustButtons();
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
     void on_pushButtonSymbols_clicked();
     void on_checkBoxReadonly_toggled(bool bChecked);
     void on_comboBoxType_currentIndexChanged(int nIndex);
-    void on_pushButtonAnalyze_clicked();
-    void on_pushButtonClear_clicked();
     void adjustVisitedState();
     void on_toolButtonVisitedPrev_clicked();
     void on_toolButtonVisitedNext_clicked();
