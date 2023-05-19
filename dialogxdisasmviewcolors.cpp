@@ -101,7 +101,7 @@ void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
     this->close();
 }
 
-void DialogXDisasmViewColors::addRecord(qint32 nRow, const QString &sGroup, QString sText, XOptions::ID id)
+void DialogXDisasmViewColors::addRecord(qint32 nRow, const QString &sGroup, const QString &sText, XOptions::ID id)
 {
     QPushButton *pButtonTextColor = new QPushButton;
     pButtonTextColor->setText(tr("Text"));
