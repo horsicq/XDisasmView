@@ -1564,6 +1564,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionHex(tr("Hex"), this);
         QAction actionEditHex(tr("Hex"), this);
         QAction actionReferences(tr("References"), this);
+        QAction actionAnalyzeAnalyze(tr("Analyze"), this);
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
         QAction actionAnalyzeRemove(tr("Remove"), this);
 
@@ -1754,6 +1755,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
         }
 
         if (mstate.bSize) {
+            {
+                actionAnalyzeAnalyze.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE));
+                connect(&actionAnalyzeAnalyze, SIGNAL(triggered()), this, SLOT(_analyzeAnalyze()));
+                menuAnalyze.addAction(&actionAnalyzeAnalyze);
+            }
             {
                 actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
                 connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
@@ -2020,22 +2026,67 @@ void XDisasmView::_references()
     }
 }
 
+void XDisasmView::_analyzeAnalyze()
+{
+    if (getXInfoDB()) {
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::_analyzeAnalyze()");
+#endif
+        STATE state = getState();
+
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets ???
+
+        if (nAddress != -1) {
+            qint64 nViewStart = getViewOffsetStart();
+
+            DialogXInfoDBTransferProcess dialogTransfer(this);
+
+            XInfoDBTransfer::OPTIONS options = {};
+            options.pDevice = getXInfoDB()->getDevice();
+            options.fileType = getXInfoDB()->getFileType();
+            options.nAddress = nAddress;
+            options.nSize = state.nSelectionViewSize;
+
+            dialogTransfer.setData(getXInfoDB(), XInfoDBTransfer::COMMAND_ANALYZE, options);
+
+            dialogTransfer.showDialogDelay();
+            adjustAfterAnalysis();
+
+            setState(state);
+            setViewOffsetStart(nViewStart);
+        }
+    }
+}
+
 void XDisasmView::_analyzeDisasm()
 {
     if (getXInfoDB()) {
-        STATE state = getState();
-        qint64 nViewStart = getViewOffsetStart();
 #ifdef QT_DEBUG
         qDebug("void XDisasmView::_analyzeDisasm()");
 #endif
-        // TODO
-        //        DialogXInfoDBTransferProcess dialogTransfer(this);
-        //        dialogTransfer.analyze(g_pXInfoDB, g_pXInfoDB->getDevice(), g_pXInfoDB->getFileType());
-        //        dialogTransfer.showDialogDelay();
-        //        adjustAfterAnalysis();
+        STATE state = getState();
 
-        setState(state);
-        setViewOffsetStart(nViewStart);
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets ???
+
+        if (nAddress != -1) {
+            qint64 nViewStart = getViewOffsetStart();
+
+            DialogXInfoDBTransferProcess dialogTransfer(this);
+
+            XInfoDBTransfer::OPTIONS options = {};
+            options.pDevice = getXInfoDB()->getDevice();
+            options.fileType = getXInfoDB()->getFileType();
+            options.nAddress = nAddress;
+            options.nSize = state.nSelectionViewSize;
+
+            dialogTransfer.setData(getXInfoDB(), XInfoDBTransfer::COMMAND_DISASM, options);
+
+            dialogTransfer.showDialogDelay();
+            adjustAfterAnalysis();
+
+            setState(state);
+            setViewOffsetStart(nViewStart);
+        }
     }
 }
 
@@ -2047,7 +2098,7 @@ void XDisasmView::_analyzeRemove()
 #endif
         STATE state = getState();
 
-        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets
 
         if (nAddress != -1) {
             qint64 nViewStart = getViewOffsetStart();
