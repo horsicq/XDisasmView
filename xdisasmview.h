@@ -58,8 +58,10 @@ class XDisasmView : public XDeviceTableEditView {
         SC_SIGNATURE,
         SC_FOLLOWIN_HEX,
         SC_EDIT_HEX,
+        SC_ANALYZE_ANALYZE,
         SC_ANALYZE_DISASM,
         SC_ANALYZE_REMOVE,
+        SC_ANALYZE_SYMBOLS,
         __SC_SIZE,
         // TODO more
     };
@@ -214,6 +216,7 @@ protected slots:
     void _analyzeAnalyze();
     void _analyzeDisasm();
     void _analyzeRemove();
+    void _analyzeSymbols();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size

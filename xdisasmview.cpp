@@ -1567,6 +1567,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
         QAction actionAnalyzeRemove(tr("Remove"), this);
+        QAction actionAnalyzeSymbols(tr("Symbols"), this);
 
         {
             {
@@ -1761,6 +1762,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 menuAnalyze.addAction(&actionAnalyzeAnalyze);
             }
             {
+                menuAnalyze.addSeparator();
+            }
+            {
                 actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
                 connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
                 menuAnalyze.addAction(&actionAnalyzeDisasm);
@@ -1769,6 +1773,14 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 actionAnalyzeRemove.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE));
                 connect(&actionAnalyzeRemove, SIGNAL(triggered()), this, SLOT(_analyzeRemove()));
                 menuAnalyze.addAction(&actionAnalyzeRemove);
+            }
+            {
+                menuAnalyze.addSeparator();
+            }
+            {
+                actionAnalyzeSymbols.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS));
+                connect(&actionAnalyzeSymbols, SIGNAL(triggered()), this, SLOT(_analyzeSymbols()));
+                menuAnalyze.addAction(&actionAnalyzeSymbols);
             }
             contextMenu.addMenu(&menuAnalyze);
         }
@@ -1896,9 +1908,13 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
         if (!g_shortCuts[SC_ANALYZE_DISASM])
+            g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
+        if (!g_shortCuts[SC_ANALYZE_ANALYZE])
             g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
         if (!g_shortCuts[SC_ANALYZE_REMOVE])
             g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
+        if (!g_shortCuts[SC_ANALYZE_SYMBOLS])
+            g_shortCuts[SC_ANALYZE_SYMBOLS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS), this, SLOT(_analyzeSymbols()));
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {
             if (g_shortCuts[i]) {
@@ -2033,28 +2049,23 @@ void XDisasmView::_analyzeAnalyze()
         qDebug("void XDisasmView::_analyzeAnalyze()");
 #endif
         STATE state = getState();
+        qint64 nViewStart = getViewOffsetStart();
 
-        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets ???
+        DialogXInfoDBTransferProcess dialogTransfer(this);
 
-        if (nAddress != -1) {
-            qint64 nViewStart = getViewOffsetStart();
+        XInfoDBTransfer::OPTIONS options = {};
+        options.pDevice = getXInfoDB()->getDevice();
+        options.fileType = getXInfoDB()->getFileType();
 
-            DialogXInfoDBTransferProcess dialogTransfer(this);
+        // mb TODO options
 
-            XInfoDBTransfer::OPTIONS options = {};
-            options.pDevice = getXInfoDB()->getDevice();
-            options.fileType = getXInfoDB()->getFileType();
-            options.nAddress = nAddress;
-            options.nSize = state.nSelectionViewSize;
+        dialogTransfer.setData(getXInfoDB(), XInfoDBTransfer::COMMAND_ANALYZE, options);
 
-            dialogTransfer.setData(getXInfoDB(), XInfoDBTransfer::COMMAND_ANALYZE, options);
+        dialogTransfer.showDialogDelay();
+        adjustAfterAnalysis();
 
-            dialogTransfer.showDialogDelay();
-            adjustAfterAnalysis();
-
-            setState(state);
-            setViewOffsetStart(nViewStart);
-        }
+        setState(state);
+        setViewOffsetStart(nViewStart);
     }
 }
 
@@ -2119,6 +2130,23 @@ void XDisasmView::_analyzeRemove()
             setState(state);
             setViewOffsetStart(nViewStart);
         }
+    }
+}
+
+void XDisasmView::_analyzeSymbols()
+{
+    if (getXInfoDB()) {
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::_analyzeSymbols()");
+#endif
+        DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_ALL, QVariant(), true);
+
+        connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
+
+        XOptions::_adjustStayOnTop(&dialogSymbols, true);
+
+        dialogSymbols.exec();
     }
 }
 
