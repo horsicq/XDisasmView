@@ -691,6 +691,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, const QString &
 
     if (g_bIsHighlight) {
         bool bNOP = false;
+        bool bSave = false;
 
         if (_sMnenonic == "nop") {
             bNOP = true;
@@ -701,6 +702,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, const QString &
 
         if (g_mapOpcodeColorMap.contains(_sMnenonic)) {
             pPainter->save();
+            bSave = true;
 
             OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
 
@@ -725,7 +727,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, const QString &
             pPainter->drawText(_rectString, sString, _qTextOptions);
         }
 
-        if (bNOP) {
+        if (bNOP && bSave) {
             pPainter->restore();
         }
     } else {
@@ -1105,6 +1107,7 @@ void XDisasmView::updateData()
         if (getXInfoDB()) {
 #ifdef USE_XPROCESS
             nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
+            qDebug("Current IP %s", XBinary::valueToHex(nCurrentIP).toLatin1().data());
 #endif
         }
 
