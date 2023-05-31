@@ -859,11 +859,13 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
         OPCODECOLOR colorRET = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_RET);
         OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
         OPCODECOLOR colorPOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
+        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_NOP);
 
         mapResult.insert("bl", colorBL);
         mapResult.insert("ret", colorRET);
         mapResult.insert("push", colorPUSH);
         mapResult.insert("pop", colorPOP);
+        mapResult.insert("nop", colorNOP);
     }
 
     return mapResult;

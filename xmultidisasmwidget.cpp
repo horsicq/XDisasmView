@@ -269,11 +269,6 @@ void XMultiDisasmWidget::registerShortcuts(bool bState)
     Q_UNUSED(bState)
 }
 
-void XMultiDisasmWidget::on_pushButtonSymbols_clicked()
-{
-    ui->scrollAreaDisasm->showSymbols(XSymbolsWidget::MODE_ALL, 0);
-}
-
 void XMultiDisasmWidget::on_checkBoxReadonly_toggled(bool bChecked)
 {
     ui->scrollAreaDisasm->setReadonly(bChecked);

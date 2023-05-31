@@ -55,6 +55,7 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     addRecord(nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_RET);
     addRecord(nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_PUSH);
     addRecord(nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_POP);
+    addRecord(nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_NOP);
 
     //    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE, 20);
@@ -93,6 +94,7 @@ void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
     // TODO more
 }
 

@@ -64,7 +64,6 @@ private:
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
-    void on_pushButtonSymbols_clicked();
     void on_checkBoxReadonly_toggled(bool bChecked);
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void adjustVisitedState();
