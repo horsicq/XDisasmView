@@ -326,11 +326,21 @@ void XDisasmView::adjustScrollCount()
         record.nViewOffset = nViewOffset;
         record.nScrollCount = record.nSize;
 
+        bool bAdd = true;
         // TODO XInfoDB
-        nScrollStart += record.nScrollCount;
-        nViewOffset += record.nSize;
 
-        g_listViewStruct.append(record);
+        if ((getMemoryMap()->fileType == XBinary::FT_MACHO32) || (getMemoryMap()->fileType == XBinary::FT_MACHO64)) {
+            if (i == 0) {
+                bAdd = false; // DO NOT add zeropage
+            }
+        }
+
+        if (bAdd) {
+            nScrollStart += record.nScrollCount;
+            nViewOffset += record.nSize;
+
+            g_listViewStruct.append(record);
+        }
     }
 
     setViewSize(nViewOffset);
