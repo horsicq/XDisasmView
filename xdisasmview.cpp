@@ -331,7 +331,7 @@ void XDisasmView::adjustScrollCount()
 
         if ((getMemoryMap()->fileType == XBinary::FT_MACHO32) || (getMemoryMap()->fileType == XBinary::FT_MACHO64)) {
             if (i == 0) {
-                bAdd = false; // DO NOT add zeropage
+                bAdd = false;  // DO NOT add zeropage
             }
         }
 
@@ -2092,7 +2092,7 @@ void XDisasmView::_analyzeDisasm()
 #endif
         STATE state = getState();
 
-        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets ???
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);  // TODO Offsets ???
 
         if (nAddress != -1) {
             qint64 nViewStart = getViewOffsetStart();
@@ -2124,7 +2124,7 @@ void XDisasmView::_analyzeRemove()
 #endif
         STATE state = getState();
 
-        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset); // TODO Offsets
+        XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);  // TODO Offsets
 
         if (nAddress != -1) {
             qint64 nViewStart = getViewOffsetStart();
