@@ -1824,7 +1824,7 @@ qint64 XDisasmView::getCurrentViewOffsetFromScroll()
 
     qint64 nMaxValue = getMaxScrollValue();
 
-    if (getTotalScrollCount() > nMaxValue) {  // TODO a flag for large files
+    if (getTotalScrollCount() > (quint64)nMaxValue) {  // TODO a flag for large files
         if (nValue == getMaxScrollValue()) {
             nResult = getViewSize() - g_nBytesProLine;
         } else {
