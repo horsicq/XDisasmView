@@ -219,7 +219,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
     result.nSelectionDeviceOffset = viewOffsetToDeviceOffset(state.nSelectionViewOffset, bGlobalOffset);
     result.nStartDeviceOffset = viewOffsetToDeviceOffset(getViewOffsetStart(), bGlobalOffset);
 
-    if (result.nSelectionDeviceOffset != -1) {
+    if (result.nSelectionDeviceOffset != (quint64)-1) {
         result.nSelectionSize = state.nSelectionViewSize;
         // TODO if virtual region return 0
     }
@@ -260,6 +260,8 @@ qint64 XDisasmView::deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset)
 
 qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset)
 {
+    Q_UNUSED(bGlobalOffset)
+
     qint64 nResult = 0;
 
     //    if (isAnalyzed()) {
@@ -450,7 +452,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
         qint64 nOffset = 0;
         //        qint64 nOffsetOld = 0;
 
-        if (viewStruct.nAddress != -1) {
+        if (viewStruct.nAddress != (XADDR)-1) {
             nAddress = viewStruct.nAddress + (nViewOffset - viewStruct.nViewOffset);
         }
 
@@ -470,18 +472,18 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             if (getXInfoDB()) {
                 XInfoDB::SHOWRECORD showRecord = {};
 
-                if (nAddress != -1) {
+                if (nAddress != (XADDR)-1) {
                     showRecord = getXInfoDB()->getShowRecordByAddress(nAddress, true);
                 }
                 // TODO offset !!!
 
                 if (showRecord.bValid) {
                     if (nViewOffset > nOldViewOffset) {
-                        if (nAddress != -1) {
+                        if (nAddress != (XADDR)-1) {
                             nResult = _getViewOffsetByAddress(showRecord.nAddress + showRecord.nSize);
                         }
                     } else {
-                        if (nAddress != -1) {
+                        if (nAddress != (XADDR)-1) {
                             nResult = _getViewOffsetByAddress(showRecord.nAddress);
                         }
                     }
@@ -958,7 +960,7 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByAddress(XADDR nAddress)
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nAddress != -1) && (g_listViewStruct.at(i).nAddress <= nAddress) &&
+        if ((g_listViewStruct.at(i).nAddress != (XADDR)-1) && (g_listViewStruct.at(i).nAddress <= nAddress) &&
             (nAddress < (g_listViewStruct.at(i).nAddress + g_listViewStruct.at(i).nSize))) {
             result = g_listViewStruct.at(i);
             break;
@@ -1042,7 +1044,7 @@ XADDR XDisasmView::_getAddressByViewOffset(qint64 nViewOffset)
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         if ((g_listViewStruct.at(i).nViewOffset <= nViewOffset) && (nViewOffset < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) {
-            if (g_listViewStruct.at(i).nAddress != -1) {
+            if (g_listViewStruct.at(i).nAddress != (XADDR)-1) {
                 nResult = g_listViewStruct.at(i).nAddress + (nViewOffset - g_listViewStruct.at(i).nViewOffset);
             }
             break;
@@ -1144,7 +1146,7 @@ void XDisasmView::updateData()
                         record.nDeviceOffset = -1;
                     }
 
-                    if (viewStruct.nAddress != -1) {
+                    if (viewStruct.nAddress != (XADDR)-1) {
                         record.nVirtualAddress = viewStruct.nAddress + (nCurrentViewOffset - viewStruct.nViewOffset);
                     } else {
                         record.nVirtualAddress = -1;
@@ -1293,12 +1295,12 @@ void XDisasmView::updateData()
                     if (record.nDeviceOffset != -1) {
                         sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), record.nDeviceOffset);
                         _nCurrent = record.nDeviceOffset;
-                    } else if (record.nVirtualAddress != -1) {
+                    } else if (record.nVirtualAddress != (XADDR)-1) {
                         sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), record.nVirtualAddress);
                         _nCurrent = record.nVirtualAddress;
                     }
 
-                    if (record.nVirtualAddress != -1) {
+                    if (record.nVirtualAddress != (XADDR)-1) {
                         if (getXInfoDB()) {
                             sSymbol = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
                         }
@@ -2040,7 +2042,7 @@ void XDisasmView::_hexSlot()
     if (g_options.bMenu_Hex) {
         DEVICESTATE state = getDeviceState();
 
-        if (state.nSelectionDeviceOffset != -1) {
+        if (state.nSelectionDeviceOffset != (quint64)-1) {
             emit showOffsetHex(state.nSelectionDeviceOffset);
         }
     }
@@ -2094,7 +2096,7 @@ void XDisasmView::_analyzeDisasm()
 
         XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);  // TODO Offsets ???
 
-        if (nAddress != -1) {
+        if (nAddress != (XADDR)-1) {
             qint64 nViewStart = getViewOffsetStart();
 
             DialogXInfoDBTransferProcess dialogTransfer(this);
@@ -2126,7 +2128,7 @@ void XDisasmView::_analyzeRemove()
 
         XADDR nAddress = _getAddressByViewOffset(state.nSelectionViewOffset);  // TODO Offsets
 
-        if (nAddress != -1) {
+        if (nAddress != (XADDR)-1) {
             qint64 nViewStart = getViewOffsetStart();
 
             DialogXInfoDBTransferProcess dialogTransfer(this);
@@ -2179,6 +2181,8 @@ void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
 
 void XDisasmView::showReferences(XADDR nAddress)
 {
+    Q_UNUSED(nAddress)
+
     DialogXDisasmReferences dialogReferences(this);
 
     //    dialogReferences.setData(getXInfoDB(), nAddress);
