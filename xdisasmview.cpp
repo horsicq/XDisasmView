@@ -1771,7 +1771,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             }
             contextMenu.addMenu(&menuSelect);
         }
-
+#ifdef QT_SQL_LIB
         if (mstate.bSize) {
             {
                 actionAnalyzeAnalyze.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE));
@@ -1801,6 +1801,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             }
             contextMenu.addMenu(&menuAnalyze);
         }
+#endif
 
         // TODO reset select
 
@@ -2028,10 +2029,8 @@ void XDisasmView::_signatureSlot()
 
     if (state.nSelectionSize) {
         DialogMultiDisasmSignature dmds(this);
-
-        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getMemoryMap(), g_handle);
-
         dmds.setGlobal(getShortcuts(), getGlobalOptions());
+        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getMemoryMap(), g_handle);
 
         dmds.exec();
     }
