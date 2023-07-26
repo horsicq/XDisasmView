@@ -156,7 +156,6 @@ private:
         MODE_OPCODE_ADDRESS,
     };
 
-    XCapstone::DISASM_RESULT _disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize);
     QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
     qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
     MENU_STATE getMenuState();

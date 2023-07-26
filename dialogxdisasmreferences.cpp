@@ -30,3 +30,9 @@ DialogXDisasmReferences::~DialogXDisasmReferences()
 {
     delete ui;
 }
+
+void DialogXDisasmReferences::on_pushButtonClose_clicked()
+{
+    this->close();
+}
+

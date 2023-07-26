@@ -38,6 +38,9 @@ public:
 signals:
     void currentAddressChanged(XADDR nAddress, qint64 nSize);
 
+private slots:
+    void on_pushButtonClose_clicked();
+
 private:
     Ui::DialogXDisasmReferences *ui;
 };

@@ -382,18 +382,6 @@ qint64 XDisasmView::addressToViewOffset(XADDR nAddress)
     return nResult;
 }
 
-XCapstone::DISASM_RESULT XDisasmView::_disasm(XADDR nVirtualAddress, char *pData, qint32 nDataSize)
-{
-    XCapstone::DISASM_RESULT result = XCapstone::disasm_ex(g_handle, g_options.disasmMode, pData, nDataSize, nVirtualAddress, g_disasmOptions);
-
-    if (g_bIsUppercase) {
-        result.sMnemonic = result.sMnemonic.toUpper();
-        result.sString = result.sString.toUpper();
-    }
-
-    return result;
-}
-
 QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
 {
     QString sResult = disasmResult.sString;
@@ -416,6 +404,7 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
                 if (sReplace != "") {
                     QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToRelative, 16));
                     sResult = disasmResult.sString.replace(sOrigin, sReplace);
+                    // TODO Check UpperCase
                 }
             }
 
@@ -425,6 +414,7 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
                 if (sReplace != "") {
                     QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToMemory, 16));
                     sResult = disasmResult.sString.replace(sOrigin, sReplace);
+                    // TODO Check UpperCase
                 }
             }
         }
@@ -494,8 +484,11 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
         }
 
         if ((!bSuccess) && (nOffset != -1)) {
-            qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
-            qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
+            qint64 nStartOffset = 0;
+            qint64 nEndOffset = 0;
+
+            nStartOffset = nOffset - 5 * g_nOpcodeSize;
+            nEndOffset = nOffset + 5 * g_nOpcodeSize;
 
             if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
             {
@@ -548,71 +541,6 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 nSize -= disasmResult.nSize;
             }
         }
-
-        //        if ((!bSuccess) && (nOffset != -1)) {
-        //            qint64 nStartOffset = nOffset - 5 * g_nOpcodeSize;
-        //            qint64 nEndOffset = nOffset + 5 * g_nOpcodeSize;
-
-        //            if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
-        //            {
-        //                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-        //            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM64) {
-        //                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-        //            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_X86) {
-        //                QByteArray _baData = read_array(nStartOffset, 2);
-
-        //                if (*((quint16 *)_baData.data()) == 0)  // 0000
-        //                {
-        //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-        //                }
-        //            }
-
-        //            nStartOffset = qMax(nStartOffset, (qint64)0);
-        //            nEndOffset = qMin(nEndOffset, getViewSize());
-
-        ////            if (nOffset > nOffsetOld) {
-        ////                nStartOffset = qMax(nStartOffset, nOldViewOffset);
-        ////            }
-
-        //            qint32 nSize = nEndOffset - nStartOffset;
-
-        //            QByteArray baData = read_array(nStartOffset, nSize);
-
-        //            nSize = baData.size();
-
-        //            qint64 _nCurrentOffset = 0;
-
-        //            // TODO nOffset<nOldOffset
-        //            while (nSize > 0) {
-        //                qint64 _nOffset = nStartOffset + _nCurrentOffset;
-
-        //                XCapstone::DISASM_RESULT disasmResult =
-        //                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
-
-        //                if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
-        //                    if (_nOffset == nOffset) {
-        //                        nResult = _nOffset;
-        //                    } else {
-        ////                        if (nOffsetOld != -1) {
-        ////                            if (nOffset > nOffsetOld) {
-        ////                                nResult = _nOffset + disasmResult.nSize;
-        ////                            } else {
-        ////                                nResult = _nOffset;
-        ////                            }
-        ////                        } else {
-        ////                            nResult = _nOffset;
-        ////                        }
-        //                    }
-
-        //                    break;
-        //                }
-
-        //                _nCurrentOffset += disasmResult.nSize;
-        //                nSize -= disasmResult.nSize;
-        //            }
-
-        //            bSuccess = true;
-        //        }
     }
 
     return nResult;
@@ -1166,8 +1094,8 @@ void XDisasmView::updateData()
                             record.disasmResult.bIsValid = (showRecord.nSize != 0);
                             record.disasmResult.nAddress = showRecord.nAddress;
                             record.disasmResult.nSize = showRecord.nSize;
-                            record.disasmResult.sMnemonic = showRecord.sRecText1;
-                            record.disasmResult.sString = showRecord.sRecText2;
+//                            record.disasmResult.sMnemonic = showRecord.sRecText1;
+//                            record.disasmResult.sString = showRecord.sRecText2;
 
                             if (g_bIsUppercase) {
                                 record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
@@ -1188,9 +1116,16 @@ void XDisasmView::updateData()
                                 nBufferSize = record.disasmResult.nSize;
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
+                                // TODO !!!
                                 if ((record.disasmResult.sMnemonic == "db") && (record.disasmResult.sString == "")) {
                                     record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size());
                                 }
+                            }
+
+                            if ((showRecord.recordType == XInfoDB::RT_CODE) && (record.nDeviceOffset != -1)) {
+                                XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
+                                record.disasmResult.sString = _disasmResult.sString;
                             }
 
                             record.sBytes = baBuffer.toHex().data();
@@ -1212,7 +1147,7 @@ void XDisasmView::updateData()
                                 break;
                             }
 
-                            record.disasmResult = _disasm(record.nVirtualAddress, baBuffer.data(), baBuffer.size());
+                            record.disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
 
                             nBufferSize = record.disasmResult.nSize;
                             baBuffer.resize(nBufferSize);
@@ -1231,6 +1166,12 @@ void XDisasmView::updateData()
                         }
                         bSuccess = true;
                     }
+
+                    if (g_bIsUppercase) {
+                        record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+                        record.disasmResult.sString = record.disasmResult.sString.toUpper();
+                    }
+
                 } else {
                     nViewSize = 0;
                 }
@@ -1319,6 +1260,15 @@ void XDisasmView::updateData()
                     if (sSymbol != "") {
                         record.sLocation = QString("%1.%2").arg(record.sLocation, sSymbol);
                     }
+                } else if (getAddressMode() == MODE_LABEL) {
+                    QString sSymbol;
+                    if (record.nVirtualAddress != (XADDR)-1) {
+                        if (getXInfoDB()) {
+                            sSymbol = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
+                        }
+                    }
+
+                    record.sLocation = sSymbol;
                 }
 
                 g_listRecords.append(record);
@@ -1495,7 +1445,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         textOption.bIsCurrentIP = ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION));
         //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
         textOption.bIsBreakpoint = ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION));
-        textOption.bIsAnalysed = ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_BYTES));
+        textOption.bIsAnalysed = ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE));
 
         if (nColumn == COLUMN_ARROWS) {
             if (bIsDebugger) {
@@ -1952,7 +1902,13 @@ void XDisasmView::_headerClicked(qint32 nColumn)
         } else if (getAddressMode() == MODE_OFFSET) {
             setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
             setAddressMode(MODE_RELADDRESS);
-        } else if ((getAddressMode() == MODE_RELADDRESS) || (getAddressMode() == MODE_THIS)) {
+        } else if (getAddressMode() == MODE_RELADDRESS) {
+            setColumnTitle(COLUMN_LOCATION, tr("Label"));
+            setAddressMode(MODE_LABEL);
+        } else if (getAddressMode() == MODE_LABEL) {
+            setColumnTitle(COLUMN_LOCATION, tr("Address"));
+            setAddressMode(MODE_ADDRESS);
+        } else if (getAddressMode() == MODE_THIS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
             setAddressMode(MODE_ADDRESS);
         }
