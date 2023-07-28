@@ -80,6 +80,13 @@ class XDisasmView : public XDeviceTableEditView {
         qint64 nSize;
     };
 
+    struct TRANSRECORD {
+        qint64 nViewOffset;
+        XADDR nAddress;
+        qint64 nOffset;
+        qint64 nSize;
+    };
+
 public:
     struct OPTIONS {
         XADDR nInitAddress;
@@ -183,6 +190,7 @@ private:
     VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
     VIEWSTRUCT _getViewStructByScroll(qint64 nValue);  // TODO mb remove
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
+    QList<TRANSRECORD> _getTransRecords(qint64 nViewOffset, qint64 nSize);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);
     qint64 _getViewOffsetByAddress(XADDR nAddress);
     XADDR _getAddressByViewOffset(qint64 nViewOffset);

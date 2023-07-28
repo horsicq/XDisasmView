@@ -930,6 +930,33 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByViewOffset(qint64 nViewOffs
     return result;
 }
 
+QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewOffset, qint64 nSize)
+{
+    QList<XDisasmView::TRANSRECORD> listResult;
+
+    qint32 nNumberOfRecords = g_listViewStruct.count();
+
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        if (((nViewOffset + nSize) > g_listViewStruct.at(i).nViewOffset) && ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) ||
+            ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) > nViewOffset) && ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize)))) {
+
+            qint64 nNewViewOffset = qMax(g_listViewStruct.at(i).nViewOffset, nViewOffset);
+            qint64 nNewViewSize = qMin(g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize, nViewOffset + nSize) - nNewViewOffset;
+            qint64 nDelta = nNewViewOffset - nViewOffset;
+
+            XDisasmView::TRANSRECORD record = {};
+            record.nViewOffset = nNewViewOffset;
+            record.nSize = nNewViewSize;
+            record.nAddress = g_listViewStruct.at(i).nAddress + nDelta;
+            record.nOffset = g_listViewStruct.at(i).nOffset + nDelta;
+
+            listResult.append(record);
+        }
+    }
+
+    return listResult;
+}
+
 qint64 XDisasmView::_getOffsetByViewOffset(qint64 nViewOffset)
 {
     qint64 nResult = -1;
@@ -1097,10 +1124,10 @@ void XDisasmView::updateData()
 //                            record.disasmResult.sMnemonic = showRecord.sRecText1;
 //                            record.disasmResult.sString = showRecord.sRecText2;
 
-                            if (g_bIsUppercase) {
-                                record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
-                                record.disasmResult.sString = record.disasmResult.sString.toUpper();
-                            }
+//                            if (g_bIsUppercase) {
+//                                record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+//                                record.disasmResult.sString = record.disasmResult.sString.toUpper();
+//                            }
 
                             if (showRecord.nRefTo) {
                                 XInfoDB::RELRECORD relRecord = getXInfoDB()->getRelRecordByAddress(record.nVirtualAddress);
