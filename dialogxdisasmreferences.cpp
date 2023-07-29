@@ -35,4 +35,3 @@ void DialogXDisasmReferences::on_pushButtonClose_clicked()
 {
     this->close();
 }
-
