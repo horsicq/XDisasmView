@@ -40,21 +40,21 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_bIsUppercase = false;
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
-    g_modeOpcode = MODE_OPCODE_SYMBOLADDRESS;
+    g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
+    g_bytesMode = BYTESMODE_RAW;
 
     addColumn("");  // Arrows
                     //    addColumn(tr("Address"),0,true);
     addColumn(tr("Address"), 0, true);
     //    addColumn(tr("Offset"));
-    addColumn(tr("Bytes"));
+    addColumn(tr("Bytes"), 0, true);
     addColumn(QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")), 0, true);  // TODO fix it in _adjustWindow
     addColumn(tr("Comment"));
 
     //    setLastColumnStretch(true);
 
     setTextFont(getMonoFont());
-
-    setAddressMode(MODE_ADDRESS);
+    setAddressMode(LOCMODE_ADDRESS);
 
     _qTextOptions.setWrapMode(QTextOption::NoWrap);
 
@@ -387,14 +387,14 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
     QString sResult = disasmResult.sString;
 
     if (getXInfoDB()) {
-        if ((g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) || (g_modeOpcode == MODE_OPCODE_SYMBOL) || (g_modeOpcode == MODE_OPCODE_ADDRESS)) {
+        if ((g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) || (g_opcodeMode == OPCODEMODE_SYMBOL) || (g_opcodeMode == OPCODEMODE_ADDRESS)) {
             XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
 
-            if (g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) {
+            if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
                 riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-            } else if (g_modeOpcode == MODE_OPCODE_SYMBOL) {
+            } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
                 riType = XInfoDB::RI_TYPE_SYMBOL;
-            } else if (g_modeOpcode == MODE_OPCODE_ADDRESS) {
+            } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
@@ -1217,7 +1217,13 @@ void XDisasmView::updateData()
 #endif
                 }
 
-                if (getAddressMode() == MODE_THIS) {
+                if (record.nVirtualAddress != (XADDR)-1) {
+                    if (getXInfoDB()) {
+                        record.sLabel = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
+                    }
+                }
+
+                if (getAddressMode() == LOCMODE_THIS) {
                     qint64 nDelta = 0;
                     XADDR _nCurrent = 0;
 
@@ -1230,7 +1236,7 @@ void XDisasmView::updateData()
                     }
 
                     record.sLocation = XBinary::thisToString(nDelta);
-                } else if (getAddressMode() == MODE_ADDRESS) {
+                } else if (getAddressMode() == LOCMODE_ADDRESS) {
                     QString sPrefix;
                     XADDR _nCurrent = record.nVirtualAddress;
 
@@ -1244,7 +1250,7 @@ void XDisasmView::updateData()
                     } else {
                         record.sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
                     }
-                } else if (getAddressMode() == MODE_OFFSET) {
+                } else if (getAddressMode() == LOCMODE_OFFSET) {
                     QString sPrefix;
                     XADDR _nCurrent = record.nDeviceOffset;
 
@@ -1258,7 +1264,7 @@ void XDisasmView::updateData()
                     } else {
                         record.sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
                     }
-                } else if (getAddressMode() == MODE_RELADDRESS) {
+                } else if (getAddressMode() == LOCMODE_RELADDRESS) {
                     QString sPrefix;
                     QString sSymbol;
                     XADDR _nCurrent = 0;
@@ -1290,15 +1296,8 @@ void XDisasmView::updateData()
                     if (sSymbol != "") {
                         record.sLocation = QString("%1.%2").arg(record.sLocation, sSymbol);
                     }
-                } else if (getAddressMode() == MODE_LABEL) {
-                    QString sSymbol;
-                    if (record.nVirtualAddress != (XADDR)-1) {
-                        if (getXInfoDB()) {
-                            sSymbol = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
-                        }
-                    }
-
-                    record.sLocation = sSymbol;
+                } else if (getAddressMode() == LOCMODE_LABEL) {
+                    record.sLocation = record.sLabel;
                 }
 
                 g_listRecords.append(record);
@@ -1510,7 +1509,11 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         //            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOffset,&textOption);
         //        }
         else if (nColumn == COLUMN_BYTES) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
+            if (g_bytesMode == BYTESMODE_RAW) {
+                drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
+            } else if (g_bytesMode == BYTESMODE_LABEL) {
+                drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLabel, &textOption);
+            }
         } else if (nColumn == COLUMN_OPCODE) {
             QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
 
@@ -1926,37 +1929,47 @@ void XDisasmView::registerShortcuts(bool bState)
 void XDisasmView::_headerClicked(qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
-        if (getAddressMode() == MODE_ADDRESS) {
+        if (getAddressMode() == LOCMODE_ADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Offset"));
-            setAddressMode(MODE_OFFSET);
-        } else if (getAddressMode() == MODE_OFFSET) {
+            setAddressMode(LOCMODE_OFFSET);
+        } else if (getAddressMode() == LOCMODE_OFFSET) {
             setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
-            setAddressMode(MODE_RELADDRESS);
-        } else if (getAddressMode() == MODE_RELADDRESS) {
+            setAddressMode(LOCMODE_RELADDRESS);
+        } else if (getAddressMode() == LOCMODE_RELADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Label"));
-            setAddressMode(MODE_LABEL);
-        } else if (getAddressMode() == MODE_LABEL) {
+            setAddressMode(LOCMODE_LABEL);
+        } else if (getAddressMode() == LOCMODE_LABEL) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setAddressMode(MODE_ADDRESS);
-        } else if (getAddressMode() == MODE_THIS) {
+            setAddressMode(LOCMODE_ADDRESS);
+        } else if (getAddressMode() == LOCMODE_THIS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setAddressMode(MODE_ADDRESS);
+            setAddressMode(LOCMODE_ADDRESS);
         }
 
         adjust(true);
     } else if (nColumn == COLUMN_OPCODE) {
-        if (g_modeOpcode == MODE_OPCODE_SYMBOLADDRESS) {
+        if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
             setColumnTitle(COLUMN_OPCODE, tr("Opcode"));
-            g_modeOpcode = MODE_OPCODE_ORIGINAL;
-        } else if (g_modeOpcode == MODE_OPCODE_ORIGINAL) {
+            g_opcodeMode = OPCODEMODE_ORIGINAL;
+        } else if (g_opcodeMode == OPCODEMODE_ORIGINAL) {
             setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Symbol")));
-            g_modeOpcode = MODE_OPCODE_SYMBOL;
-        } else if (g_modeOpcode == MODE_OPCODE_SYMBOL) {
+            g_opcodeMode = OPCODEMODE_SYMBOL;
+        } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
             setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Address")));
-            g_modeOpcode = MODE_OPCODE_ADDRESS;
-        } else if (g_modeOpcode == MODE_OPCODE_ADDRESS) {
+            g_opcodeMode = OPCODEMODE_ADDRESS;
+        } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
             setColumnTitle(COLUMN_OPCODE, QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")));
-            g_modeOpcode = MODE_OPCODE_SYMBOLADDRESS;
+            g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
+        }
+
+        adjust(true);
+    } else if (nColumn == COLUMN_BYTES) {
+        if (g_bytesMode == BYTESMODE_RAW) {
+            setColumnTitle(COLUMN_BYTES, tr("Label"));
+            g_bytesMode = BYTESMODE_LABEL;
+        } else if (g_bytesMode == BYTESMODE_LABEL) {
+            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
+            g_bytesMode = BYTESMODE_RAW;
         }
 
         adjust(true);
@@ -1969,7 +1982,7 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
         setColumnTitle(COLUMN_LOCATION, "");
-        setAddressMode(MODE_THIS);
+        setAddressMode(LOCMODE_THIS);
 
         if (nRow < g_listRecords.count()) {
             g_nThisBaseVirtualAddress = g_listRecords.at(nRow).nViewOffset;

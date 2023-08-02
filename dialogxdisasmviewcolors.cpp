@@ -39,7 +39,7 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     ui->tableWidgetColors->clear();
 
     ui->tableWidgetColors->setColumnCount(6);
-    ui->tableWidgetColors->setRowCount(12);
+    ui->tableWidgetColors->setRowCount(13);
 
     qint32 nRow = 0;
     // TODO another assemblers

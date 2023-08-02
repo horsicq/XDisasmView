@@ -131,7 +131,8 @@ private:
 
     struct RECORD {
         QString sLocation;
-        QString sBytes;  // mb TODO labels
+        QString sBytes;
+        QString sLabel;
         QString sComment;
         qint64 nViewOffset;  // Line
         XADDR nVirtualAddress;
@@ -156,11 +157,16 @@ private:
         bool bHex;
     };
 
-    enum MODE_OPCODE {
-        MODE_OPCODE_ORIGINAL = 0,
-        MODE_OPCODE_SYMBOLADDRESS,
-        MODE_OPCODE_SYMBOL,
-        MODE_OPCODE_ADDRESS,
+    enum OPCODEMODE {
+        OPCODEMODE_ORIGINAL = 0,
+        OPCODEMODE_SYMBOLADDRESS,
+        OPCODEMODE_SYMBOL,
+        OPCODEMODE_ADDRESS,
+    };
+
+    enum BYTESMODE {
+        BYTESMODE_RAW = 0,
+        BYTESMODE_LABEL
     };
 
     QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
@@ -245,7 +251,8 @@ private:
     bool g_bIsAddressColon;
     bool g_bIsUppercase;
     bool g_bIsHighlight;
-    MODE_OPCODE g_modeOpcode;
+    OPCODEMODE g_opcodeMode;
+    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
     bool g_bHtest;                              // TODO remove
