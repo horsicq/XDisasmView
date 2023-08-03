@@ -31,6 +31,11 @@ DialogXDisasmReferences::~DialogXDisasmReferences()
     delete ui;
 }
 
+void DialogXDisasmReferences::setData(XInfoDB *pXInfoDB, QVariant varValue, bool bReload)
+{
+    // TODO
+}
+
 void DialogXDisasmReferences::on_pushButtonClose_clicked()
 {
     this->close();

@@ -6,6 +6,7 @@ HEADERS += \
     $$PWD/dialogmultidisasmsignature.h \
     $$PWD/dialogxdisasmreferences.h \
     $$PWD/dialogxdisasmviewcolors.h \
+    $$PWD/xdisasmreferenceswidget.h \
     $$PWD/xdisasmview.h \
     $$PWD/xdisasmviewoptionswidget.h \
     $$PWD/xmultidisasmwidget.h
@@ -15,6 +16,7 @@ SOURCES += \
     $$PWD/dialogmultidisasmsignature.cpp \
     $$PWD/dialogxdisasmreferences.cpp \
     $$PWD/dialogxdisasmviewcolors.cpp \
+    $$PWD/xdisasmreferenceswidget.cpp \
     $$PWD/xdisasmview.cpp \
     $$PWD/xdisasmviewoptionswidget.cpp \
     $$PWD/xmultidisasmwidget.cpp
@@ -24,6 +26,7 @@ FORMS += \
     $$PWD/dialogmultidisasmsignature.ui \
     $$PWD/dialogxdisasmreferences.ui \
     $$PWD/dialogxdisasmviewcolors.ui \
+    $$PWD/xdisasmreferenceswidget.ui \
     $$PWD/xdisasmviewoptionswidget.ui \
     $$PWD/xmultidisasmwidget.ui
 

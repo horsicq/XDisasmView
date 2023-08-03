@@ -37,4 +37,6 @@ set(XDISASMVIEW_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/dialogxdisasmviewcolors.ui
     ${CMAKE_CURRENT_LIST_DIR}/dialogxdisasmreferences.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dialogxdisasmreferences.ui
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmreferenceswidget.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmreferenceswidget.ui
 )

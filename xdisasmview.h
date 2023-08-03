@@ -225,7 +225,7 @@ protected slots:
     void _goToXrefSlot();
     void _signatureSlot();
     void _hexSlot();
-    void _references();
+    void _referencesSlot();
     void _analyzeAnalyze();
     void _analyzeDisasm();
     void _analyzeRemove();

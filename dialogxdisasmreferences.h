@@ -35,6 +35,8 @@ public:
     explicit DialogXDisasmReferences(QWidget *pParent = nullptr);
     ~DialogXDisasmReferences();
 
+    void setData(XInfoDB *pXInfoDB, QVariant varValue, bool bReload = true);
+
 signals:
     void currentAddressChanged(XADDR nAddress, qint64 nSize);
 

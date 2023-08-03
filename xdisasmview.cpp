@@ -1611,7 +1611,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             if (record.bHasRefFrom) {
                 actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
                 actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
-                connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_references()));
+                connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_referencesSlot()));
                 menuGoTo.addAction(&actionReferences);
             }
 
@@ -2046,7 +2046,7 @@ void XDisasmView::_hexSlot()
     }
 }
 
-void XDisasmView::_references()
+void XDisasmView::_referencesSlot()
 {
     QAction *pAction = qobject_cast<QAction *>(sender());
 
@@ -2168,7 +2168,6 @@ void XDisasmView::_analyzeSymbols()
 void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
 {
     DialogXSymbols dialogSymbols(this);
-
     dialogSymbols.setData(getXInfoDB(), mode, varValue, true);
 
     connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
@@ -2182,8 +2181,7 @@ void XDisasmView::showReferences(XADDR nAddress)
     Q_UNUSED(nAddress)
 
     DialogXDisasmReferences dialogReferences(this);
-
-    //    dialogReferences.setData(getXInfoDB(), nAddress);
+    dialogReferences.setData(getXInfoDB(), nAddress);
 
     connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
