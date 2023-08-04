@@ -21,9 +21,7 @@
 #include "xdisasmreferenceswidget.h"
 #include "ui_xdisasmreferenceswidget.h"
 
-XDisasmReferencesWidget::XDisasmReferencesWidget(QWidget *pParent) :
-    QWidget(pParent),
-    ui(new Ui::XDisasmReferencesWidget)
+XDisasmReferencesWidget::XDisasmReferencesWidget(QWidget *pParent) : QWidget(pParent), ui(new Ui::XDisasmReferencesWidget)
 {
     ui->setupUi(this);
 }

@@ -27,8 +27,7 @@ namespace Ui {
 class XDisasmReferencesWidget;
 }
 
-class XDisasmReferencesWidget : public QWidget
-{
+class XDisasmReferencesWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -39,4 +38,4 @@ private:
     Ui::XDisasmReferencesWidget *ui;
 };
 
-#endif // XDISASMREFERENCESWIDGET_H
+#endif  // XDISASMREFERENCESWIDGET_H
