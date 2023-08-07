@@ -21,21 +21,49 @@
 #ifndef XDISASMREFERENCESWIDGET_H
 #define XDISASMREFERENCESWIDGET_H
 
-#include <QWidget>
+#include "xinfodb.h"
+#include "xshortcutswidget.h"
 
 namespace Ui {
 class XDisasmReferencesWidget;
 }
 
-class XDisasmReferencesWidget : public QWidget {
+class XDisasmReferencesWidget : public XShortcutsWidget {
     Q_OBJECT
+
+    enum HEADER_COLUMN {
+        HEADER_COLUMN_ADDRESS = 0,
+        HEADER_COLUMN_CODE,
+        __HEADER_COLUMN_size
+    };
+
+    enum USERROLE {
+        USERROLE_ADDRESS = 0,
+    };
 
 public:
     explicit XDisasmReferencesWidget(QWidget *pParent = nullptr);
     ~XDisasmReferencesWidget();
 
+    void setData(XInfoDB *pXInfoDB, XADDR nAddress, bool bReload = true);
+    void reload();
+
+signals:
+    void currentAddressChanged(XADDR nAddress);
+
+protected:
+    virtual void registerShortcuts(bool bState);
+
+private slots:
+    void on_pushButtonSaveSymbols_clicked();
+    void onTableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+
 private:
     Ui::XDisasmReferencesWidget *ui;
+    XInfoDB *g_pXInfoDB;
+    XADDR g_nAddress;
+    QStandardItemModel *g_pModel;
+    QStandardItemModel *g_pOldModel;
 };
 
 #endif  // XDISASMREFERENCESWIDGET_H

@@ -24,6 +24,8 @@
 DialogXDisasmReferences::DialogXDisasmReferences(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogXDisasmReferences)
 {
     ui->setupUi(this);
+
+    connect(ui->widgetReferences, SIGNAL(currentAddressChanged(XADDR)), this, SIGNAL(currentAddressChanged(XADDR)));
 }
 
 DialogXDisasmReferences::~DialogXDisasmReferences()
@@ -31,9 +33,9 @@ DialogXDisasmReferences::~DialogXDisasmReferences()
     delete ui;
 }
 
-void DialogXDisasmReferences::setData(XInfoDB *pXInfoDB, QVariant varValue, bool bReload)
+void DialogXDisasmReferences::setData(XInfoDB *pXInfoDB, XADDR nAddress, bool bReload)
 {
-    // TODO
+    ui->widgetReferences->setData(pXInfoDB, nAddress, bReload);
 }
 
 void DialogXDisasmReferences::on_pushButtonClose_clicked()

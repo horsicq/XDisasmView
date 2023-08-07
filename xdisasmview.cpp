@@ -2181,9 +2181,9 @@ void XDisasmView::showReferences(XADDR nAddress)
     Q_UNUSED(nAddress)
 
     DialogXDisasmReferences dialogReferences(this);
-    dialogReferences.setData(getXInfoDB(), nAddress);
+    dialogReferences.setData(getXInfoDB(), nAddress, true);
 
-    connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
+    connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR)), this, SLOT(goToAddressSlot(XADDR)));
 
     XOptions::_adjustStayOnTop(&dialogReferences, true);
     dialogReferences.exec();

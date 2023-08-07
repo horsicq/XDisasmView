@@ -35,10 +35,10 @@ public:
     explicit DialogXDisasmReferences(QWidget *pParent = nullptr);
     ~DialogXDisasmReferences();
 
-    void setData(XInfoDB *pXInfoDB, QVariant varValue, bool bReload = true);
+    void setData(XInfoDB *pXInfoDB, XADDR nAddress, bool bReload = true);
 
 signals:
-    void currentAddressChanged(XADDR nAddress, qint64 nSize);
+    void currentAddressChanged(XADDR nAddress);
 
 private slots:
     void on_pushButtonClose_clicked();
