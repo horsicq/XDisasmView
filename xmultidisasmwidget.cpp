@@ -96,10 +96,9 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
     delete ui;
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB)
+void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options)
 {
     g_pDevice = pDevice;
-    g_pXInfoDB = pXInfoDB;
     g_options = options;
 
     if (pDevice) {
@@ -107,8 +106,6 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, OPTIONS options, XInfoDB *p
     } else {
         ui->scrollAreaDisasm->setDevice(nullptr);
     }
-
-    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 
     //    if (g_pXInfoDB) {
     //        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());  // TODO Check mb remove
@@ -135,6 +132,11 @@ void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
 void XMultiDisasmWidget::setBackupDevice(QIODevice *pDevice)
 {
     ui->scrollAreaDisasm->setBackupDevice(pDevice);
+}
+
+void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
+{
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
 }
 
 void XMultiDisasmWidget::goToAddress(XADDR nAddress)

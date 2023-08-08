@@ -46,9 +46,10 @@ public:
     explicit XMultiDisasmWidget(QWidget *pParent = nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice, OPTIONS options, XInfoDB *pXInfoDB = nullptr);
+    void setData(QIODevice *pDevice, OPTIONS options);
     void setDevice(QIODevice *pDevice);
     void setBackupDevice(QIODevice *pDevice);
+    void setXInfoDB(XInfoDB *pXInfoDB);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
