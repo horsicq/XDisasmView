@@ -108,3 +108,11 @@ void XDisasmReferencesWidget::onTableView_currentRowChanged(const QModelIndex &c
     emit currentAddressChanged(nAddress);
 }
 
+void XDisasmReferencesWidget::on_tableViewReferences_clicked(const QModelIndex &index)
+{
+    QModelIndex _index = ui->tableViewReferences->model()->index(index.row(), 0);
+
+    XADDR nAddress = ui->tableViewReferences->model()->data(_index, Qt::UserRole + USERROLE_ADDRESS).toULongLong();
+
+    emit currentAddressChanged(nAddress);
+}

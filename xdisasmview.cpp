@@ -382,7 +382,7 @@ qint64 XDisasmView::addressToViewOffset(XADDR nAddress)
     return nResult;
 }
 
-QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
+QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult)
 {
     QString sResult = disasmResult.sString;
 
@@ -398,25 +398,7 @@ QString XDisasmView::convertOpcodeString(XCapstone::DISASM_RESULT disasmResult)
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
-            if (disasmResult.relType) {
-                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToRelative), riType);
-
-                if (sReplace != "") {
-                    QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToRelative, 16));
-                    sResult = disasmResult.sString.replace(sOrigin, sReplace);
-                    // TODO Check UpperCase
-                }
-            }
-
-            if (disasmResult.memType) {
-                QString sReplace = XInfoDB::recordInfoToString(getXInfoDB()->getRecordInfoCache(disasmResult.nXrefToMemory), riType);
-
-                if (sReplace != "") {
-                    QString sOrigin = QString("0x%1").arg(QString::number(disasmResult.nXrefToMemory, 16));
-                    sResult = disasmResult.sString.replace(sOrigin, sReplace);
-                    // TODO Check UpperCase
-                }
-            }
+            sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType);
         }
     }
 
@@ -592,20 +574,20 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 
     if (pTextOption->bIsSelected) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_SELECTED));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colSelected);
     }
 
     if (pTextOption->bIsBreakpoint) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_BREAKPOINT));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colBreakpoint);
     } else if (pTextOption->bIsAnalysed) {
-        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, getColor(TCLOLOR_ANALYSED));
+        pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colAnalyzed);
     } /*else if (pTextOption->bIsCursor) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::WindowText));
         pPainter->setPen(viewport()->palette().color(QPalette::Base));
     }*/
 
-    if (pTextOption->bHighlight) {
-        drawDisasmText(pPainter, rectText, sText);
+    if (pTextOption->bASMHighlight) {
+        drawAsmText(pPainter, rectText, sText);
     } else {
         pPainter->drawText(rectText, sText, _qTextOptions);
     }
@@ -615,7 +597,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawDisasmText(QPainter *pPainter, QRect rect, const QString &sText)
+void XDisasmView::drawAsmText(QPainter *pPainter, QRect rect, const QString &sText)
 {
     QString sMnemonic = sText.section("|", 0, 0);
     QString sString = sText.section("|", 1, 1);
@@ -943,7 +925,7 @@ QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewOffset
                 ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize)))) {
             qint64 nNewViewOffset = qMax(g_listViewStruct.at(i).nViewOffset, nViewOffset);
             qint64 nNewViewSize = qMin(g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize, nViewOffset + nSize) - nNewViewOffset;
-            qint64 nDelta = nNewViewOffset - nViewOffset;
+            qint64 nDelta = nNewViewOffset - g_listViewStruct.at(i).nViewOffset;
 
             XDisasmView::TRANSRECORD record = {};
             record.nViewOffset = nNewViewOffset;
@@ -1079,6 +1061,23 @@ void XDisasmView::updateData()
             nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
             qDebug("Current IP %s", XBinary::valueToHex(nCurrentIP).toLatin1().data());
 #endif
+        }
+
+        g_listHighlightsRegion.clear();
+        if (getXInfoDB()) {
+            QList<XDisasmView::TRANSRECORD> listTransRecords = _getTransRecords(nViewOffsetStart, nNumberLinesProPage * 15); // TODO 15 const
+
+            qint32 nNumberOfTransRecords = listTransRecords.count();
+
+            for (qint32 i = 0; i < nNumberOfTransRecords; i++) {
+                QList<XInfoDB::BOOKMARKRECORD> listBookMarks;
+
+                if (listTransRecords.at(i).nOffset != -1) {
+                    listBookMarks = getXInfoDB()->getBookmarkRecords(listTransRecords.at(i).nOffset, XInfoDB::LT_OFFSET, listTransRecords.at(i).nSize);
+                }
+
+                g_listHighlightsRegion.append(_convertBookmarksToHighlightRegion(&listBookMarks));
+            }
         }
 
         for (qint32 i = 0; i < nNumberLinesProPage; i++) {
@@ -1300,6 +1299,20 @@ void XDisasmView::updateData()
                     record.sLocation = record.sLabel;
                 }
 
+                QList<HIGHLIGHTREGION> listHighLightRegions;
+
+                if (record.nDeviceOffset != -1) {
+                    listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XInfoDB::LT_OFFSET);
+                }
+
+                if (listHighLightRegions.count()) {
+                    record.bIsBytesHighlighted = true;
+                    record.colBytesBackground = listHighLightRegions.at(0).colBackground;
+                    record.colBytesBackgroundSelected = listHighLightRegions.at(0).colBackgroundSelected;
+                } else {
+                    record.colBytesBackgroundSelected = getColor(TCLOLOR_SELECTED);
+                }
+
                 g_listRecords.append(record);
 
                 nCurrentViewOffset += nViewSize;
@@ -1469,12 +1482,31 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         //        }
 
-        textOption.bIsSelected = isViewOffsetSelected(nOffset);
+        if (isViewOffsetSelected(nOffset)) {
+            textOption.bIsSelected = true;
 
-        textOption.bIsCurrentIP = ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION));
+            if (g_listRecords.at(nRow).bIsBytesHighlighted && (nColumn == COLUMN_BYTES)) {
+                textOption.colSelected = g_listRecords.at(nRow).colBytesBackgroundSelected;
+            } else {
+                textOption.colSelected = getColor(TCLOLOR_SELECTED);
+            }
+        }
+
+        if ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION)) {
+            textOption.bIsCurrentIP = true;
+        }
+
+        if ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION)) {
+            textOption.bIsBreakpoint = true;
+            textOption.colBreakpoint = getColor(TCLOLOR_BREAKPOINT);
+        }
+
+        if ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE)) {
+            textOption.bIsAnalysed = true;
+            textOption.colBreakpoint = getColor(TCLOLOR_ANALYSED);
+        }
+
         //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
-        textOption.bIsBreakpoint = ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION));
-        textOption.bIsAnalysed = ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE));
 
         if (nColumn == COLUMN_ARROWS) {
             if (bIsDebugger) {
@@ -1509,6 +1541,10 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         //            drawText(pPainter,nLeft,nTop,nWidth,nHeight,g_listRecords.at(nRow).sOffset,&textOption);
         //        }
         else if (nColumn == COLUMN_BYTES) {
+            if (g_listRecords.at(nRow).bIsBytesHighlighted) {
+                pPainter->fillRect(nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).colBytesBackground);
+            }
+
             if (g_bytesMode == BYTESMODE_RAW) {
                 drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
             } else if (g_bytesMode == BYTESMODE_LABEL) {
@@ -1517,7 +1553,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         } else if (nColumn == COLUMN_OPCODE) {
             QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
 
-            textOption.bHighlight = true;
+            textOption.bASMHighlight = true;
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, sOpcode, &textOption);
         } else if (nColumn == COLUMN_COMMENT) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sComment, &textOption);

@@ -147,6 +147,9 @@ private:
         qint32 nArraySize;
         bool bIsEnd;
         bool bHasRefFrom;
+        bool bIsBytesHighlighted;
+        QColor colBytesBackground;
+        QColor colBytesBackgroundSelected;
         // TODO jmp/jcc
     };
 
@@ -169,7 +172,7 @@ private:
         BYTESMODE_LABEL
     };
 
-    QString convertOpcodeString(XCapstone::DISASM_RESULT disasmResult);
+    QString convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
     MENU_STATE getMenuState();
 
@@ -178,12 +181,15 @@ private:
         bool bIsCurrentIP;
         //        bool bIsCursor;
         bool bIsBreakpoint;
-        bool bHighlight;
+        bool bASMHighlight;
         bool bIsAnalysed;
+        QColor colSelected;
+        QColor colBreakpoint;
+        QColor colAnalyzed;
     };
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
-    void drawDisasmText(QPainter *pPainter, QRect rect, const QString &sText);
+    void drawAsmText(QPainter *pPainter, QRect rect, const QString &sText);
     void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     QMap<QString, OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
@@ -257,6 +263,7 @@ private:
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
     bool g_bHtest;                              // TODO remove
     QList<VIEWSTRUCT> g_listViewStruct;
+    QList<HIGHLIGHTREGION> g_listHighlightsRegion;
 };
 
 #endif  // XDISASMVIEW_H

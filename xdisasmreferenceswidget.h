@@ -57,6 +57,7 @@ protected:
 private slots:
     void on_pushButtonSaveSymbols_clicked();
     void onTableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous);
+    void on_tableViewReferences_clicked(const QModelIndex &index);
 
 private:
     Ui::XDisasmReferencesWidget *ui;
