@@ -1065,7 +1065,7 @@ void XDisasmView::updateData()
 
         g_listHighlightsRegion.clear();
         if (getXInfoDB()) {
-            QList<XDisasmView::TRANSRECORD> listTransRecords = _getTransRecords(nViewOffsetStart, nNumberLinesProPage * 16); // TODO 16 const
+            QList<XDisasmView::TRANSRECORD> listTransRecords = _getTransRecords(nViewOffsetStart, nNumberLinesProPage * 16);  // TODO 16 const
 
             qint32 nNumberOfTransRecords = listTransRecords.count();
 
