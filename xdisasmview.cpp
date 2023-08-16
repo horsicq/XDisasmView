@@ -919,6 +919,7 @@ QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewOffset
     qint32 nNumberOfRecords = g_listViewStruct.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        // TODO Check
         if (((nViewOffset + nSize) > g_listViewStruct.at(i).nViewOffset) &&
                 ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) ||
             ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) > nViewOffset) &&
