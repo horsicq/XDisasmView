@@ -94,7 +94,7 @@ void XDisasmView::adjustView()
     reload(true);
 }
 
-void XDisasmView::setData(QIODevice *pDevice, XDisasmView::OPTIONS options, bool bReload)
+void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bReload)
 {
     g_options = options;
 

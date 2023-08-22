@@ -102,7 +102,7 @@ public:
 
     void _adjustView();
     void adjustView();
-    void setData(QIODevice *pDevice, OPTIONS options, bool bReload = true);
+    void setData(QIODevice *pDevice, const OPTIONS &options, bool bReload = true);
     OPTIONS getOptions();
     XBinary::DM getDisasmMode();
     XADDR getSelectionInitAddress();
