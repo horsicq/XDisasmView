@@ -38,7 +38,7 @@ DialogMultiDisasm::~DialogMultiDisasm()
     delete ui;
 }
 
-void DialogMultiDisasm::setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options)
+void DialogMultiDisasm::setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options)
 {
     ui->widgetDisasm->setData(pDevice, options);
 

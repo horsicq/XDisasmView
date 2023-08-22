@@ -920,10 +920,10 @@ QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewOffset
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         // TODO Check
-        if (((nViewOffset + nSize) > g_listViewStruct.at(i).nViewOffset) &&
-                ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize))) ||
-            ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) > nViewOffset) &&
-                ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize)))) {
+        if ((((nViewOffset + nSize) > g_listViewStruct.at(i).nViewOffset) &&
+                ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize)))) ||
+            (((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) > nViewOffset) &&
+                ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize))))) {
             qint64 nNewViewOffset = qMax(g_listViewStruct.at(i).nViewOffset, nViewOffset);
             qint64 nNewViewSize = qMin(g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize, nViewOffset + nSize) - nNewViewOffset;
             qint64 nDelta = nNewViewOffset - g_listViewStruct.at(i).nViewOffset;
@@ -1577,7 +1577,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QMenu menuCopy(tr("Copy"), this);
         QMenu menuFollowIn(tr("Follow in"), this);
         QMenu menuEdit(tr("Edit"), this);
-
+#ifdef QT_SQL_LIB
+        QMenu menuBookmarks(tr("Bookmarks"), this);
+#endif
         QAction actionGoToAddress(tr("Address"), this);
         QAction actionGoToOffset(tr("Offset"), this);
         QAction actionGoToEntryPoint("", this);
@@ -1605,7 +1607,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
         QAction actionAnalyzeRemove(tr("Remove"), this);
         QAction actionAnalyzeSymbols(tr("Symbols"), this);
-
+#ifdef QT_SQL_LIB
+        QAction actionBookmarkNew(tr("New"), this);
+        QAction actionBookmarkList(tr("List"), this);
+#endif
         {
             {
                 actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
@@ -1820,6 +1825,23 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 menuAnalyze.addAction(&actionAnalyzeSymbols);
             }
             contextMenu.addMenu(&menuAnalyze);
+
+            {
+                actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_HEX_BOOKMARKS_NEW));
+                connect(&actionBookmarkNew, SIGNAL(triggered()), this, SLOT(_bookmarkNew()));
+            }
+            {
+                actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_HEX_BOOKMARKS_LIST));
+                if (getViewWidgetState(VIEWWIDGET_BOOKMARKS)) {
+                    actionBookmarkList.setCheckable(true);
+                    actionBookmarkList.setChecked(true);
+                }
+                connect(&actionBookmarkList, SIGNAL(triggered()), this, SLOT(_bookmarkList()));
+            }
+
+            menuBookmarks.addAction(&actionBookmarkNew);
+            menuBookmarks.addAction(&actionBookmarkList);
+            contextMenu.addMenu(&menuBookmarks);
         }
 #endif
 

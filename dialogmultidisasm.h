@@ -36,7 +36,7 @@ public:
     explicit DialogMultiDisasm(QWidget *pParent = nullptr);
     ~DialogMultiDisasm();
 
-    void setData(QIODevice *pDevice, XMultiDisasmWidget::OPTIONS options);
+    void setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
 
 signals:
