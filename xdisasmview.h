@@ -58,6 +58,7 @@ class XDisasmView : public XDeviceTableEditView {
         SC_FOLLOWIN_HEX,
         SC_EDIT_HEX,
 #ifdef QT_SQL_LIB
+        SC_ANALYZE_ALL,
         SC_ANALYZE_ANALYZE,
         SC_ANALYZE_DISASM,
         SC_ANALYZE_REMOVE,
@@ -233,11 +234,14 @@ protected slots:
     void _signatureSlot();
     void _hexSlot();
     void _referencesSlot();
+    void _analyzeAll();
     void _analyzeAnalyze();
     void _analyzeDisasm();
     void _analyzeRemove();
+    void _analyzeClear();
     void _analyzeSymbols();
     void _analyzeFunctions();
+    void _transfer(XInfoDBTransfer::COMMAND command);
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
