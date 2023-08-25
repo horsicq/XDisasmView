@@ -46,7 +46,7 @@ public:
     explicit XMultiDisasmWidget(QWidget *pParent = nullptr);
     ~XMultiDisasmWidget();
 
-    void setData(QIODevice *pDevice, OPTIONS options);
+    void setData(QIODevice *pDevice, const OPTIONS &options);
     void setDevice(QIODevice *pDevice);
     void setBackupDevice(QIODevice *pDevice);
     void setXInfoDB(XInfoDB *pXInfoDB);

@@ -28,7 +28,6 @@
 #include "xcapstone.h"
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"
-#include "dialogxdisasmreferences.h"
 #include "dialogxinfodbtransferprocess.h"
 
 // TODO AbstractQuery
@@ -58,10 +57,13 @@ class XDisasmView : public XDeviceTableEditView {
         SC_SIGNATURE,
         SC_FOLLOWIN_HEX,
         SC_EDIT_HEX,
+#ifdef QT_SQL_LIB
         SC_ANALYZE_ANALYZE,
         SC_ANALYZE_DISASM,
         SC_ANALYZE_REMOVE,
         SC_ANALYZE_SYMBOLS,
+        SC_ANALYZE_FUNCTIONS,
+#endif
         __SC_SIZE,
         // TODO more
     };
@@ -111,7 +113,6 @@ public:
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
     virtual qint64 viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset = false);
-    void showSymbols(XSymbolsWidget::MODE mode, QVariant varValue);
     void showReferences(XADDR nAddress);
 
 private:
@@ -236,6 +237,7 @@ protected slots:
     void _analyzeDisasm();
     void _analyzeRemove();
     void _analyzeSymbols();
+    void _analyzeFunctions();
 
 signals:
     void showOffsetHex(qint64 nOffset);  // TODO Offset/Size

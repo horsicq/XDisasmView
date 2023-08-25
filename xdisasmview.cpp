@@ -1607,6 +1607,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
         QAction actionAnalyzeRemove(tr("Remove"), this);
         QAction actionAnalyzeSymbols(tr("Symbols"), this);
+        QAction actionAnalyzeFunctions(tr("Functions"), this);
 #ifdef QT_SQL_LIB
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
@@ -1824,6 +1825,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 connect(&actionAnalyzeSymbols, SIGNAL(triggered()), this, SLOT(_analyzeSymbols()));
                 menuAnalyze.addAction(&actionAnalyzeSymbols);
             }
+            {
+                actionAnalyzeFunctions.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS));
+                connect(&actionAnalyzeFunctions, SIGNAL(triggered()), this, SLOT(_analyzeFunctions()));
+                menuAnalyze.addAction(&actionAnalyzeFunctions);
+            }
             contextMenu.addMenu(&menuAnalyze);
 
             {
@@ -1967,14 +1973,18 @@ void XDisasmView::registerShortcuts(bool bState)
             g_shortCuts[SC_HEXSIGNATURE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE), this, SLOT(_hexSignatureSlot()));
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
-        if (!g_shortCuts[SC_ANALYZE_DISASM])
-            g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
+#ifdef QT_SQL_LIB
         if (!g_shortCuts[SC_ANALYZE_ANALYZE])
+            g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
+        if (!g_shortCuts[SC_ANALYZE_DISASM])
             g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
         if (!g_shortCuts[SC_ANALYZE_REMOVE])
             g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
         if (!g_shortCuts[SC_ANALYZE_SYMBOLS])
             g_shortCuts[SC_ANALYZE_SYMBOLS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS), this, SLOT(_analyzeSymbols()));
+        if (!g_shortCuts[SC_ANALYZE_FUNCTIONS])
+            g_shortCuts[SC_ANALYZE_FUNCTIONS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS), this, SLOT(_analyzeFunctions()));
+#endif
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {
             if (g_shortCuts[i]) {
@@ -2224,26 +2234,36 @@ void XDisasmView::_analyzeSymbols()
     }
 }
 
-void XDisasmView::showSymbols(XSymbolsWidget::MODE mode, QVariant varValue)
+void XDisasmView::_analyzeFunctions()
 {
-    DialogXSymbols dialogSymbols(this);
-    dialogSymbols.setData(getXInfoDB(), mode, varValue, true);
+    if (getXInfoDB()) {
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::_analyzeFunctions()");
+#endif
+        DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_FUNCTIONS, QVariant(), true);
 
-    connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
+        connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
-    XOptions::_adjustStayOnTop(&dialogSymbols, true);
-    dialogSymbols.exec();
+        XOptions::_adjustStayOnTop(&dialogSymbols, true);
+
+        dialogSymbols.exec();
+    }
 }
 
 void XDisasmView::showReferences(XADDR nAddress)
 {
-    Q_UNUSED(nAddress)
+    if (getXInfoDB()) {
+#ifdef QT_DEBUG
+        qDebug("void XDisasmView::showReferences()");
+#endif
+        DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_REFERENCES, nAddress, true);
 
-    DialogXDisasmReferences dialogReferences(this);
-    dialogReferences.setData(getXInfoDB(), nAddress, true);
+        connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
-    connect(&dialogReferences, SIGNAL(currentAddressChanged(XADDR)), this, SLOT(goToAddressSlot(XADDR)));
+        XOptions::_adjustStayOnTop(&dialogSymbols, true);
 
-    XOptions::_adjustStayOnTop(&dialogReferences, true);
-    dialogReferences.exec();
+        dialogSymbols.exec();
+    }
 }
