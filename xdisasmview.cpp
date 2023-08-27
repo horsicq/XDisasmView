@@ -921,9 +921,9 @@ QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewOffset
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         // TODO Check
         if ((((nViewOffset + nSize) > g_listViewStruct.at(i).nViewOffset) &&
-                ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize)))) ||
+             ((g_listViewStruct.at(i).nViewOffset >= nViewOffset) || ((nViewOffset + nSize) < (g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize)))) ||
             (((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) > nViewOffset) &&
-                ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize))))) {
+             ((nViewOffset >= g_listViewStruct.at(i).nViewOffset) || ((g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize) < (nViewOffset + nSize))))) {
             qint64 nNewViewOffset = qMax(g_listViewStruct.at(i).nViewOffset, nViewOffset);
             qint64 nNewViewSize = qMin(g_listViewStruct.at(i).nViewOffset + g_listViewStruct.at(i).nSize, nViewOffset + nSize) - nNewViewOffset;
             qint64 nDelta = nNewViewOffset - g_listViewStruct.at(i).nViewOffset;
@@ -1980,8 +1980,7 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
 #ifdef QT_SQL_LIB
-        if (!g_shortCuts[SC_ANALYZE_ALL])
-            g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
+        if (!g_shortCuts[SC_ANALYZE_ALL]) g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
         if (!g_shortCuts[SC_ANALYZE_ANALYZE])
             g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
         if (!g_shortCuts[SC_ANALYZE_DISASM])
