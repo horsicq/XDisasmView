@@ -227,7 +227,7 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
     return result;
 }
 
-void XDisasmView::setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset)
+void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset)
 {
     _goToViewOffset(deviceOffsetToViewOffset(deviceState.nStartDeviceOffset, bGlobalOffset));
     _initSetSelection(deviceOffsetToViewOffset(deviceState.nSelectionDeviceOffset, bGlobalOffset), deviceState.nSelectionSize);
@@ -346,7 +346,6 @@ void XDisasmView::adjustScrollCount()
     }
 
     setViewSize(nViewOffset);
-
     setTotalScrollCount(nScrollStart);
 }
 

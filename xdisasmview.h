@@ -110,7 +110,7 @@ public:
     XBinary::DM getDisasmMode();
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
-    void setDeviceState(DEVICESTATE deviceState, bool bGlobalOffset = false);
+    void setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset = false);
     virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
     virtual qint64 viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset = false);
