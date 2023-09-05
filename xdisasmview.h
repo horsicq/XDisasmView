@@ -120,6 +120,7 @@ private:
     enum COLUMN {
         COLUMN_ARROWS = 0,
         COLUMN_LOCATION,
+        COLUMN_INFO,
         COLUMN_BYTES,
         COLUMN_OPCODE,
         COLUMN_COMMENT
@@ -152,6 +153,7 @@ private:
         bool bIsBytesHighlighted;
         QColor colBytesBackground;
         QColor colBytesBackgroundSelected;
+        quint32 nRefFrom;
         // TODO jmp/jcc
     };
 
