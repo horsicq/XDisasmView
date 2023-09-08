@@ -1618,6 +1618,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionAnalyzeRemove(tr("Remove"), this);
         QAction actionAnalyzeSymbols(tr("Symbols"), this);
         QAction actionAnalyzeFunctions(tr("Functions"), this);
+        QAction actionAnalyzeClear(tr("Clear"), this);
 #ifdef QT_SQL_LIB
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
@@ -1845,6 +1846,15 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 connect(&actionAnalyzeFunctions, SIGNAL(triggered()), this, SLOT(_analyzeFunctions()));
                 menuAnalyze.addAction(&actionAnalyzeFunctions);
             }
+            {
+                menuAnalyze.addSeparator();
+            }
+            {
+                actionAnalyzeClear.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_CLEAR));
+                connect(&actionAnalyzeClear, SIGNAL(triggered()), this, SLOT(_analyzeClear()));
+                menuAnalyze.addAction(&actionAnalyzeClear);
+            }
+
             contextMenu.addMenu(&menuAnalyze);
 
             {
