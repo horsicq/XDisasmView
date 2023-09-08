@@ -153,7 +153,7 @@ private:
         bool bIsBytesHighlighted;
         QColor colBytesBackground;
         QColor colBytesBackgroundSelected;
-        quint32 nRefFrom;
+        quint32 nInfo;
         // TODO jmp/jcc
     };
 

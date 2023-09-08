@@ -1139,7 +1139,7 @@ void XDisasmView::updateData()
                                 record.disasmResult.nMemorySize = relRecord.nMemorySize;
                             }
 
-                            record.nRefFrom = showRecord.nRefFrom;
+                            record.nInfo = showRecord.nBranch;
 
                             if (record.nDeviceOffset != -1) {
                                 nBufferSize = record.disasmResult.nSize;
@@ -1545,8 +1545,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         }
         else if(nColumn==COLUMN_INFO) {
             QString sInfoText;
-            if (g_listRecords.at(nRow).nRefFrom) {
-                sInfoText = QString::number(g_listRecords.at(nRow).nRefFrom);
+            if (g_listRecords.at(nRow).nInfo) {
+                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
             }
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, sInfoText, &textOption);
         }
