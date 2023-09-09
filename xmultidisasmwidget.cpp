@@ -222,7 +222,7 @@ void XMultiDisasmWidget::reloadFileType()
         // TODO Check
         if (ui->scrollAreaDisasm->getXInfoDB()) {
             ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
-//            getSymbols();
+            //            getSymbols();
         }
 
         ui->scrollAreaDisasm->setData(g_pDevice, options);

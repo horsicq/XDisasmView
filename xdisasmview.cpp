@@ -46,7 +46,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     addColumn("");  // Arrows
                     //    addColumn(tr("Address"),0,true);
     addColumn(tr("Address"), 0, true);
-    addColumn(""); // Info
+    addColumn("");  // Info
     addColumn(tr("Bytes"), 0, true);
     addColumn(QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")), 0, true);  // TODO fix it in _adjustWindow
     addColumn(tr("Comment"));
@@ -1405,10 +1405,8 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if ((g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP) ||
-                    (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_COND) ||
-                    (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_UNCOND)){
-
+                if ((g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP) || (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_COND) ||
+                    (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_UNCOND)) {
                     bool bIsSelected = isViewOffsetSelected(g_listRecords.at(i).nViewOffset);
                     bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XCapstone::RELTYPE_JMP_COND);
 
@@ -1542,15 +1540,13 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);
-        }
-        else if(nColumn==COLUMN_INFO) {
+        } else if (nColumn == COLUMN_INFO) {
             QString sInfoText;
             if (g_listRecords.at(nRow).nInfo) {
                 sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
             }
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, sInfoText, &textOption);
-        }
-        else if (nColumn == COLUMN_BYTES) {
+        } else if (nColumn == COLUMN_BYTES) {
             if (g_listRecords.at(nRow).bIsBytesHighlighted) {
                 pPainter->fillRect(nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).colBytesBackground);
             }
