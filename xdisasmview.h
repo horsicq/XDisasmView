@@ -253,9 +253,7 @@ private:
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
     csh g_handle;
-
     QShortcut *g_shortCuts[__SC_SIZE];
-
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
     QMap<QString, OPCODECOLOR> g_mapOpcodeColorMap;
