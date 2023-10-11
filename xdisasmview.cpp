@@ -728,6 +728,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
         OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP);
         OPCODECOLOR colorJMP = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP);
         OPCODECOLOR colorINT3 = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_INT3);
+        OPCODECOLOR colorSYSCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_SYSCALL);
 
         if ((syntax == XBinary::SYNTAX_DEFAULT) || (syntax == XBinary::SYNTAX_INTEL) || (syntax == XBinary::SYNTAX_MASM)) {
             mapResult.insert("call", colorCALL);
@@ -743,6 +744,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
             mapResult.insert("jnz", colorJCC);
             mapResult.insert("ja", colorJCC);
             mapResult.insert("jc", colorJCC);
+            mapResult.insert("syscall", colorSYSCALL);
         } else if (syntax == XBinary::SYNTAX_ATT) {
             {
                 mapResult.insert("callw", colorCALL);
@@ -774,6 +776,7 @@ QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::
             mapResult.insert("jnz", colorJCC);
             mapResult.insert("ja", colorJCC);
             mapResult.insert("jc", colorJCC);
+            mapResult.insert("syscall", colorSYSCALL);
         }
     } else if ((XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM) || (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM64)) {
         OPCODECOLOR colorBL = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);

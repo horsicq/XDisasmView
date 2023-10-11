@@ -36,26 +36,77 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 {
     g_pOptions = pOptions;
 
+    QList<RECORD> listRecords;
+    qint32 nRow = 0;
+
+    // TODO another assemblers
+    {
+        RECORD record = {nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_CALL};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_RET};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_JCC};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_PUSH};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_POP};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_NOP};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_JMP};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_INT3};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", "SYSCALL", XOptions::ID_DISASM_COLOR_X86_SYSCALL};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_BL};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_RET};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_PUSH};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_POP};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_NOP};
+        listRecords.append(record);
+    }
+
+    qint32 nNumberOfRecords = listRecords.count();
+
     ui->tableWidgetColors->clear();
 
     ui->tableWidgetColors->setColumnCount(6);
-    ui->tableWidgetColors->setRowCount(13);
+    ui->tableWidgetColors->setRowCount(nNumberOfRecords);
 
-    qint32 nRow = 0;
-    // TODO another assemblers
-    addRecord(nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_CALL);
-    addRecord(nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_RET);
-    addRecord(nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_JCC);
-    addRecord(nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_PUSH);
-    addRecord(nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_POP);
-    addRecord(nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_NOP);
-    addRecord(nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_JMP);
-    addRecord(nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_INT3);
-    addRecord(nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_BL);
-    addRecord(nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_RET);
-    addRecord(nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_PUSH);
-    addRecord(nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_POP);
-    addRecord(nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_NOP);
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        addRecord(listRecords.at(i));
+    }
 
     //    ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR,80);
     ui->tableWidgetColors->setColumnWidth(COLUMN_TEXT_COLOR_REMOVE, 20);
@@ -89,6 +140,7 @@ void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JMP, QString("%1|%2").arg(QColor(Qt::darkBlue).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_SYSCALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     // ARM
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -159,6 +211,11 @@ void DialogXDisasmViewColors::addRecord(qint32 nRow, const QString &sGroup, cons
     g_mapColors.insert(id, g_pOptions->getValue(id).toString());
 
     updateRow(nRow);
+}
+
+void DialogXDisasmViewColors::addRecord(const RECORD &record)
+{
+    addRecord(record.nRow, record.sGroup, record.sText, record.id);
 }
 
 void DialogXDisasmViewColors::updateRow(qint32 nRow)

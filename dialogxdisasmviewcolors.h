@@ -44,6 +44,13 @@ class DialogXDisasmViewColors : public QDialog {
         COLUMN_STRING
     };
 
+    struct RECORD {
+        qint32 nRow;
+        QString sGroup;
+        QString sText;
+        XOptions::ID id;
+    };
+
 public:
     explicit DialogXDisasmViewColors(QWidget *pParent = nullptr);
     ~DialogXDisasmViewColors();
@@ -55,6 +62,7 @@ public:
 private slots:
     void on_pushButtonCancel_clicked();
     void addRecord(qint32 nRow, const QString &sGroup, const QString &sText, XOptions::ID id);
+    void addRecord(const RECORD &record);
     void updateRow(qint32 nRow);
     void on_pushButtonOK_clicked();
     void pushButtonSlot();
