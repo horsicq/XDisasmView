@@ -41,6 +41,10 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 
     // TODO another assemblers
     {
+        RECORD record = {nRow++, "", tr("Registers"), XOptions::ID_DISASM_COLOR_REGS};
+        listRecords.append(record);
+    }
+    {
         RECORD record = {nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_CALL};
         listRecords.append(record);
     }
@@ -131,6 +135,7 @@ void DialogXDisasmViewColors::save()
 void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
 {
     // Colors
+    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), "")); // TODO color
     // X86
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -157,25 +162,25 @@ void DialogXDisasmViewColors::on_pushButtonCancel_clicked()
 
 void DialogXDisasmViewColors::addRecord(qint32 nRow, const QString &sGroup, const QString &sText, XOptions::ID id)
 {
-    QPushButton *pButtonTextColor = new QPushButton;
-    pButtonTextColor->setText(tr("Text"));
-    pButtonTextColor->setProperty("ROW", nRow);
-    pButtonTextColor->setProperty("COLUMN", COLUMN_TEXT_COLOR);
-    pButtonTextColor->setProperty("ID", id);
+    QPushButton *pButtonColor = new QPushButton;
+    pButtonColor->setText(tr("Color"));
+    pButtonColor->setProperty("ROW", nRow);
+    pButtonColor->setProperty("COLUMN", COLUMN_TEXT_COLOR);
+    pButtonColor->setProperty("ID", id);
 
-    connect(pButtonTextColor, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
+    connect(pButtonColor, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR, pButtonTextColor);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR, pButtonColor);
 
-    QPushButton *pButtonTextColorRemove = new QPushButton;
-    pButtonTextColorRemove->setText(QString("X"));
-    pButtonTextColorRemove->setProperty("ROW", nRow);
-    pButtonTextColorRemove->setProperty("COLUMN", COLUMN_TEXT_COLOR_REMOVE);
-    pButtonTextColorRemove->setProperty("ID", id);
+    QPushButton *pButtonColorRemove = new QPushButton;
+    pButtonColorRemove->setText(QString("X"));
+    pButtonColorRemove->setProperty("ROW", nRow);
+    pButtonColorRemove->setProperty("COLUMN", COLUMN_TEXT_COLOR_REMOVE);
+    pButtonColorRemove->setProperty("ID", id);
 
-    connect(pButtonTextColorRemove, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
+    connect(pButtonColorRemove, SIGNAL(clicked(bool)), this, SLOT(pushButtonSlot()));
 
-    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR_REMOVE, pButtonTextColorRemove);
+    ui->tableWidgetColors->setCellWidget(nRow, COLUMN_TEXT_COLOR_REMOVE, pButtonColorRemove);
 
     QPushButton *pButtonBackgroundColor = new QPushButton;
     pButtonBackgroundColor->setText(tr("Background"));
@@ -258,7 +263,7 @@ void DialogXDisasmViewColors::pushButtonSlot()
             QColor color;
             color.setNamedColor(sTextColor);
 
-            color = QColorDialog::getColor(color, this, tr("Text"));
+            color = QColorDialog::getColor(color, this, tr("Color"));
 
             sTextColor = color.name();
         } else if (nColumn == COLUMN_BACKGROUND_COLOR) {

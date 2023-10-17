@@ -77,8 +77,12 @@ void XDisasmView::_adjustView()
     g_bIsAddressColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_ADDRESSCOLON).toBool();
 
     g_syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
+    g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
 
-    g_mapOpcodeColorMap = getOpcodeColorMap(g_options.disasmMode, g_syntax);
+    g_mapColors = getColorRecordsMap();
+//    g_mapColorMapRegisters = getColorMapRegisters(g_options.disasmMode, g_syntax);
+    // TODO arrows color
+    // TODO BP color
 
     if (g_handle) {
         XCapstone::closeHandle(&g_handle);
@@ -471,12 +475,12 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             nStartOffset = nOffset - 5 * g_nOpcodeSize;
             nEndOffset = nOffset + 5 * g_nOpcodeSize;
 
-            if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM)  // TODO Check
+            if (g_dmFamily == XBinary::DMFAMILY_ARM)  // TODO Check
             {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_ARM64) {
+            } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-            } else if (XBinary::getDisasmFamily(g_options.disasmMode) == XBinary::DMFAMILY_X86) {
+            } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
                 QByteArray _baData = read_array(nStartOffset, 2);
 
                 if (*((quint16 *)_baData.data()) == 0)  // 0000
@@ -596,7 +600,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawAsmText(QPainter *pPainter, QRect rect, const QString &sText)
+void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
     QString sMnemonic = sText.section("|", 0, 0);
     QString sString = sText.section("|", 1, 1);
@@ -611,45 +615,58 @@ void XDisasmView::drawAsmText(QPainter *pPainter, QRect rect, const QString &sTe
     // TODO registers !!!
 
     if (g_bIsHighlight) {
-        bool bNOP = false;
-        bool bSave = false;
-
-        if (_sMnenonic == "nop") {
-            bNOP = true;
-        }
+        COLOR_RECORD opcodeColorNOP = {};
 
         QRect _rectMnemonic = rect;
         _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
-        if (g_mapOpcodeColorMap.contains(_sMnenonic)) {
+        COLOR_RECORD opcodeColor = getOpcodeColor(_sMnenonic);
+
+        if (XCapstone::isNoOpcode(g_dmFamily, _sMnenonic, g_syntax)) {
+            opcodeColorNOP = opcodeColor;
+        }
+
+        bool bHighlight = (opcodeColor.colBackground.isValid() || opcodeColor.colMain.isValid());
+
+        if (bHighlight) {
             pPainter->save();
-            bSave = true;
+        }
 
-            OPCODECOLOR opcodeColor = g_mapOpcodeColorMap.value(_sMnenonic);
+        if (opcodeColor.colBackground.isValid()) {
+            pPainter->fillRect(_rectMnemonic, QBrush(opcodeColor.colBackground));
+        }
 
-            if (opcodeColor.colBackground.isValid()) {
-                pPainter->fillRect(_rectMnemonic, QBrush(opcodeColor.colBackground));
-            }
+        if (opcodeColor.colMain.isValid()) {
+            pPainter->setPen(opcodeColor.colMain);
+        }
 
-            pPainter->setPen(opcodeColor.colText);
-            pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
+        pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
 
-            if (!bNOP) {
-                pPainter->restore();
-            }
-        } else {
-            pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
+        if (bHighlight) {
+            pPainter->restore();
         }
 
         if (sString != "") {
             QRect _rectString = rect;
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
-            pPainter->drawText(_rectString, sString, _qTextOptions);
-        }
+            if (opcodeColorNOP.colBackground.isValid() || opcodeColorNOP.colMain.isValid()) {
+                pPainter->save();
 
-        if (bNOP && bSave) {
-            pPainter->restore();
+                if (opcodeColorNOP.colBackground.isValid()) {
+                    pPainter->fillRect(_rectString, QBrush(opcodeColorNOP.colBackground));
+                }
+
+                if (opcodeColorNOP.colMain.isValid()) {
+                    pPainter->setPen(opcodeColorNOP.colMain);
+                }
+
+                pPainter->drawText(_rectString, sString, _qTextOptions);
+
+                pPainter->restore();
+            } else {
+                drawArg(pPainter, _rectString, sString);
+            }
         }
     } else {
         QString sOpcode = sMnemonic;
@@ -659,6 +676,30 @@ void XDisasmView::drawAsmText(QPainter *pPainter, QRect rect, const QString &sTe
         }
         // TODO
         pPainter->drawText(rect, sOpcode, _qTextOptions);
+    }
+}
+
+void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
+{
+    if (sText.contains(", ")) {
+        qint32 nArgCount = sText.count(", ");
+
+        QRect _rectArg = rect;
+
+        for (qint32 i = 0; i <= nArgCount; i++) {
+            QString sArg = sText.section(", ", i, i);
+
+            drawArg(pPainter, _rectArg, sArg);
+
+            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+            if (i == (nArgCount - 1)) {
+                pPainter->drawText(_rectArg, ", ", _qTextOptions);
+                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
+            }
+        }
+    } else {
+        pPainter->drawText(rect, sText, _qTextOptions);
     }
 }
 
@@ -715,100 +756,152 @@ void XDisasmView::drawLine(QPainter *pPainter, QPointF pointStart, QPointF point
     pPainter->restore();
 }
 
-QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
+QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
 {
-    QMap<QString, OPCODECOLOR> mapResult;
+    QMap<XOptions::ID, COLOR_RECORD> mapResult;
 
-    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
-        OPCODECOLOR colorCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL);
-        OPCODECOLOR colorJCC = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JCC);
-        OPCODECOLOR colorRET = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_RET);
-        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_PUSH);
-        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_POP);
-        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_NOP);
-        OPCODECOLOR colorJMP = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_JMP);
-        OPCODECOLOR colorINT3 = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_INT3);
-        OPCODECOLOR colorSYSCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_SYSCALL);
-
-        if ((syntax == XBinary::SYNTAX_DEFAULT) || (syntax == XBinary::SYNTAX_INTEL) || (syntax == XBinary::SYNTAX_MASM)) {
-            mapResult.insert("call", colorCALL);
-            mapResult.insert("ret", colorRET);
-            mapResult.insert("push", colorPUSH);
-            mapResult.insert("pop", colorPOP);
-            mapResult.insert("nop", colorNOP);
-            mapResult.insert("jmp", colorJMP);
-            mapResult.insert("int3", colorINT3);
-            mapResult.insert("je", colorJCC);
-            mapResult.insert("jne", colorJCC);
-            mapResult.insert("jz", colorJCC);
-            mapResult.insert("jnz", colorJCC);
-            mapResult.insert("ja", colorJCC);
-            mapResult.insert("jc", colorJCC);
-            mapResult.insert("syscall", colorSYSCALL);
-        } else if (syntax == XBinary::SYNTAX_ATT) {
-            {
-                mapResult.insert("callw", colorCALL);
-                mapResult.insert("calll", colorCALL);
-                mapResult.insert("callq", colorCALL);
-            }
-            {
-                mapResult.insert("retw", colorRET);
-                mapResult.insert("retl", colorRET);
-                mapResult.insert("retq", colorRET);
-            }
-            {
-                mapResult.insert("pushw", colorPUSH);
-                mapResult.insert("pushl", colorPUSH);
-                mapResult.insert("pushq", colorPUSH);
-            }
-            {
-                mapResult.insert("popw", colorPUSH);
-                mapResult.insert("popl", colorPUSH);
-                mapResult.insert("popq", colorPUSH);
-            }
-
-            mapResult.insert("nop", colorNOP);
-            mapResult.insert("jmp", colorJMP);
-            mapResult.insert("int3", colorINT3);
-            mapResult.insert("je", colorJCC);
-            mapResult.insert("jne", colorJCC);
-            mapResult.insert("jz", colorJCC);
-            mapResult.insert("jnz", colorJCC);
-            mapResult.insert("ja", colorJCC);
-            mapResult.insert("jc", colorJCC);
-            mapResult.insert("syscall", colorSYSCALL);
-        }
-    } else if ((XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM) || (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM64)) {
-        OPCODECOLOR colorBL = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);
-        OPCODECOLOR colorRET = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_RET);
-        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
-        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
-        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_NOP);
-
-        mapResult.insert("bl", colorBL);
-        mapResult.insert("ret", colorRET);
-        mapResult.insert("push", colorPUSH);
-        mapResult.insert("pop", colorPOP);
-        mapResult.insert("nop", colorNOP);
+    if (g_dmFamily == XBinary::DMFAMILY_X86) {
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_CALL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_JCC));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_RET, getColorRecord(XOptions::ID_DISASM_COLOR_X86_RET));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_X86_PUSH));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_POP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_POP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_NOP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_JMP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_JMP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_INT3, getColorRecord(XOptions::ID_DISASM_COLOR_X86_INT3));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_SYSCALL));
+        // TODO
     }
+
+    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_REGS));
+
+//    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
+//        OPCODECOLOR colorCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL);
+//        OPCODECOLOR colorJCC = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorRET = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorJMP = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorINT3 = getOpcodeColor(XOptions::);
+//        OPCODECOLOR colorSYSCALL = getOpcodeColor(XOptions::);
+
+//        if ((syntax == XBinary::SYNTAX_DEFAULT) || (syntax == XBinary::SYNTAX_INTEL) || (syntax == XBinary::SYNTAX_MASM)) {
+//            mapResult.insert("call", colorCALL);
+//            mapResult.insert("ret", colorRET);
+//            mapResult.insert("push", colorPUSH);
+//            mapResult.insert("pop", colorPOP);
+//            mapResult.insert("nop", colorNOP);
+//            mapResult.insert("jmp", colorJMP);
+//            mapResult.insert("int3", colorINT3);
+//            mapResult.insert("je", colorJCC);
+//            mapResult.insert("jne", colorJCC);
+//            mapResult.insert("jz", colorJCC);
+//            mapResult.insert("jnz", colorJCC);
+//            mapResult.insert("ja", colorJCC);
+//            mapResult.insert("jc", colorJCC);
+//            mapResult.insert("syscall", colorSYSCALL);
+//        } else if (syntax == XBinary::SYNTAX_ATT) {
+//            {
+//                mapResult.insert("callw", colorCALL);
+//                mapResult.insert("calll", colorCALL);
+//                mapResult.insert("callq", colorCALL);
+//            }
+//            {
+//                mapResult.insert("retw", colorRET);
+//                mapResult.insert("retl", colorRET);
+//                mapResult.insert("retq", colorRET);
+//            }
+//            {
+//                mapResult.insert("pushw", colorPUSH);
+//                mapResult.insert("pushl", colorPUSH);
+//                mapResult.insert("pushq", colorPUSH);
+//            }
+//            {
+//                mapResult.insert("popw", colorPUSH);
+//                mapResult.insert("popl", colorPUSH);
+//                mapResult.insert("popq", colorPUSH);
+//            }
+
+//            mapResult.insert("nop", colorNOP);
+//            mapResult.insert("jmp", colorJMP);
+//            mapResult.insert("int3", colorINT3);
+//            mapResult.insert("je", colorJCC);
+//            mapResult.insert("jne", colorJCC);
+//            mapResult.insert("jz", colorJCC);
+//            mapResult.insert("jnz", colorJCC);
+//            mapResult.insert("ja", colorJCC);
+//            mapResult.insert("jc", colorJCC);
+//            mapResult.insert("syscall", colorSYSCALL);
+//        }
+//    } else if ((XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM) || (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM64)) {
+//        OPCODECOLOR colorBL = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);
+//        OPCODECOLOR colorRET = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_RET);
+//        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
+//        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
+//        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_NOP);
+
+//        mapResult.insert("bl", colorBL);
+//        mapResult.insert("ret", colorRET);
+//        mapResult.insert("push", colorPUSH);
+//        mapResult.insert("pop", colorPOP);
+//        mapResult.insert("nop", colorNOP);
+//    }
 
     return mapResult;
 }
 
-XDisasmView::OPCODECOLOR XDisasmView::getOpcodeColor(XOptions::ID id)
+//QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
+//{
+//    Q_UNUSED(syntax)
+
+//    QMap<QString, OPCODECOLOR> mapResult;
+
+//    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
+////        if (sBackgroundCode != "") {
+////            result.colBackground.setNamedColor(sBackgroundCode);
+////        }
+
+//        OPCODECOLOR color = {};
+//        color.colText.setNamedColor("#0000ff"); // TODO
+
+//        mapResult.insert("rax", color);
+//        mapResult.insert("eax", color);
+//        mapResult.insert("ax", color);
+//        mapResult.insert("al", color);
+//        mapResult.insert("ah", color);
+//    }
+
+//    return mapResult;
+//}
+
+XDisasmView::COLOR_RECORD XDisasmView::getColorRecord(XOptions::ID id)
 {
-    OPCODECOLOR result = {};
+    COLOR_RECORD result = {};
 
     QString sCode = getGlobalOptions()->getValue(id).toString();
-    QString sTextCode = sCode.section("|", 0, 0);
+    QString sColorCode = sCode.section("|", 0, 0);
     QString sBackgroundCode = sCode.section("|", 1, 1);
 
-    if (sTextCode != "") {
-        result.colText.setNamedColor(sTextCode);
+    if (sColorCode != "") {
+        result.colMain.setNamedColor(sColorCode);
     }
 
     if (sBackgroundCode != "") {
         result.colBackground.setNamedColor(sBackgroundCode);
+    }
+
+    return result;
+}
+
+XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
+{
+    COLOR_RECORD result = {};
+
+    if (g_dmFamily == XBinary::DMFAMILY_X86) {
+        if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_CALL);
+        }
     }
 
     return result;

@@ -69,8 +69,8 @@ class XDisasmView : public XDeviceTableEditView {
         // TODO more
     };
 
-    struct OPCODECOLOR {
-        QColor colText;
+    struct COLOR_RECORD {
+        QColor colMain;
         QColor colBackground;
     };
 
@@ -193,11 +193,14 @@ private:
     };
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
-    void drawAsmText(QPainter *pPainter, QRect rect, const QString &sText);
+    void drawAsmText(QPainter *pPainter, const QRect &rect, const QString &sText);
+    void drawArg(QPainter *pPainter, const QRect &rect, const QString &sText);
     void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
-    QMap<QString, OPCODECOLOR> getOpcodeColorMap(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
-    OPCODECOLOR getOpcodeColor(XOptions::ID id);
+    QMap<XOptions::ID, COLOR_RECORD> getColorRecordsMap();
+//    QMap<QString, OPCODECOLOR> getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
+    COLOR_RECORD getColorRecord(XOptions::ID id);
+    COLOR_RECORD getOpcodeColor(QString sOpcode);
 
 private:
     RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);
@@ -256,8 +259,9 @@ private:
     QShortcut *g_shortCuts[__SC_SIZE];
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QMap<QString, OPCODECOLOR> g_mapOpcodeColorMap;
+    QMap<XOptions::ID, COLOR_RECORD> g_mapColors;
     XBinary::SYNTAX g_syntax;
+    XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
     bool g_bIsAddressColon;
