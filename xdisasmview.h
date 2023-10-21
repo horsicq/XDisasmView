@@ -198,7 +198,7 @@ private:
     void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     QMap<XOptions::ID, COLOR_RECORD> getColorRecordsMap();
-//    QMap<QString, OPCODECOLOR> getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
+    //    QMap<QString, OPCODECOLOR> getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
     COLOR_RECORD getColorRecord(XOptions::ID id);
     COLOR_RECORD getOpcodeColor(QString sOpcode);
 

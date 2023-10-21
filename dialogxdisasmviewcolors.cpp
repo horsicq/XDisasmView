@@ -135,7 +135,7 @@ void DialogXDisasmViewColors::save()
 void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
 {
     // Colors
-    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), "")); // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
     // X86
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
