@@ -795,6 +795,12 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_INT3, getColorRecord(XOptions::ID_DISASM_COLOR_X86_INT3));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_SYSCALL));
         // TODO
+    } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_BL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_RET));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_PUSH));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_POP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_POP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_NOP));
     }
 
     mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_GENERAL));
