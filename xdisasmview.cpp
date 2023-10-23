@@ -622,7 +622,7 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
 
         COLOR_RECORD opcodeColor = getOpcodeColor(_sMnenonic);
 
-        if (XCapstone::isNoOpcode(g_dmFamily, _sMnenonic, g_syntax)) {
+        if (XCapstone::isNopOpcode(g_dmFamily, _sMnenonic, g_syntax)) {
             opcodeColorNOP = opcodeColor;
         }
 
@@ -699,7 +699,31 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
             }
         }
     } else {
-        pPainter->drawText(rect, sText, _qTextOptions);
+        COLOR_RECORD colorReg = {};
+
+        if (XCapstone::isGeneralRegister(g_dmFamily, sText, g_syntax)) {
+            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_GENERAL);
+        } else if (XCapstone::isSegmentRegister(g_dmFamily, sText, g_syntax)) {
+            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_SEGMENT);
+        }
+
+        if (colorReg.colBackground.isValid() || colorReg.colMain.isValid()) {
+            pPainter->save();
+
+            if (colorReg.colBackground.isValid()) {
+                pPainter->fillRect(rect, QBrush(colorReg.colBackground));
+            }
+
+            if (colorReg.colMain.isValid()) {
+                pPainter->setPen(colorReg.colMain);
+            }
+
+            pPainter->drawText(rect, sText, _qTextOptions);
+
+            pPainter->restore();
+        } else {
+            pPainter->drawText(rect, sText, _qTextOptions);
+        }
     }
 }
 
@@ -773,7 +797,8 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         // TODO
     }
 
-    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_REGS));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_GENERAL));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_SEGMENT));
 
     //    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
     //        OPCODECOLOR colorCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL);
@@ -901,6 +926,22 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
         if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_CALL);
+        } else if (XCapstone::isJccOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_JCC);
+        } else if (XCapstone::isRetOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_RET);
+        } else if (XCapstone::isPushOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_PUSH);
+        } else if (XCapstone::isPopOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_POP);
+        } else if (XCapstone::isNopOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_NOP);
+        } else if (XCapstone::isJumpOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_JMP);
+        } else if (XCapstone::isInt3Opcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_INT3);
+        } else if (XCapstone::isSyscallOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_SYSCALL);
         }
     }
 
@@ -1310,7 +1351,7 @@ void XDisasmView::updateData()
                 if (getXInfoDB()) {
 #ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
-                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress);  // mb TODO region Address + Size
+                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_INT3);  // mb TODO region Address + Size  // mb TODO get default software breakpoint
 #endif
                 }
 
