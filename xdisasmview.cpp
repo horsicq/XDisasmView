@@ -806,32 +806,6 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
     mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_GENERAL));
     mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_SEGMENT));
 
-    //    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
-    //        OPCODECOLOR colorCALL = getOpcodeColor(XOptions::ID_DISASM_COLOR_X86_CALL);
-    //        OPCODECOLOR colorJCC = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorRET = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorJMP = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorINT3 = getOpcodeColor(XOptions::);
-    //        OPCODECOLOR colorSYSCALL = getOpcodeColor(XOptions::);
-
-    //        if ((syntax == XBinary::SYNTAX_DEFAULT) || (syntax == XBinary::SYNTAX_INTEL) || (syntax == XBinary::SYNTAX_MASM)) {
-    //            mapResult.insert("call", colorCALL);
-    //            mapResult.insert("ret", colorRET);
-    //            mapResult.insert("push", colorPUSH);
-    //            mapResult.insert("pop", colorPOP);
-    //            mapResult.insert("nop", colorNOP);
-    //            mapResult.insert("jmp", colorJMP);
-    //            mapResult.insert("int3", colorINT3);
-    //            mapResult.insert("je", colorJCC);
-    //            mapResult.insert("jne", colorJCC);
-    //            mapResult.insert("jz", colorJCC);
-    //            mapResult.insert("jnz", colorJCC);
-    //            mapResult.insert("ja", colorJCC);
-    //            mapResult.insert("jc", colorJCC);
-    //            mapResult.insert("syscall", colorSYSCALL);
     //        } else if (syntax == XBinary::SYNTAX_ATT) {
     //            {
     //                mapResult.insert("callw", colorCALL);
