@@ -705,7 +705,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
             colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_GENERAL);
         } else if (XCapstone::isSegmentRegister(g_dmFamily, sText, g_syntax)) {
             colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_SEGMENT);
-        }
+        } // TODO more MMX float
 
         if (colorReg.colBackground.isValid() || colorReg.colMain.isValid()) {
             pPainter->save();
@@ -1331,7 +1331,7 @@ void XDisasmView::updateData()
                 if (getXInfoDB()) {
 #ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
-                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_INT3);  // mb TODO region Address + Size  // mb TODO get default software breakpoint
+                    record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_DEFAULT);  // mb TODO region Address + Size  // mb TODO get default software breakpoint
 #endif
                 }
 
