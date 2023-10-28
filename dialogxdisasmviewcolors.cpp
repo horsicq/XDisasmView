@@ -41,67 +41,71 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 
     // TODO another assemblers
     {
-        RECORD record = {nRow++, "", tr("General registers"), XOptions::ID_DISASM_COLOR_REGS_GENERAL};
+        RECORD record = {nRow++, "", tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "", tr("Segment registers"), XOptions::ID_DISASM_COLOR_REGS_SEGMENT};
+        RECORD record = {nRow++, "", tr("Segment registers"), XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_CALL};
+        RECORD record = {nRow++, "x86/amd64", tr("Opcodes"), XOptions::ID_DISASM_COLOR_X86_OPCODE};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_RET};
+        RECORD record = {nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_JCC};
+        RECORD record = {nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_OPCODE_RET};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_PUSH};
+        RECORD record = {nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_POP};
+        RECORD record = {nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_NOP};
+        RECORD record = {nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_OPCODE_POP};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_JMP};
+        RECORD record = {nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_INT3};
+        RECORD record = {nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "x86/amd64", "SYSCALL", XOptions::ID_DISASM_COLOR_X86_SYSCALL};
+        RECORD record = {nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_BL};
+        RECORD record = {nRow++, "x86/amd64", "SYSCALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_RET};
+        RECORD record = {nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_PUSH};
+        RECORD record = {nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_POP};
+        RECORD record = {nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_NOP};
+        RECORD record = {nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP};
         listRecords.append(record);
     }
 
@@ -139,24 +143,25 @@ void DialogXDisasmViewColors::save()
 void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
 {
     // Colors
-    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
-    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
     // X86
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JCC, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_JMP, QString("%1|%2").arg(QColor(Qt::darkBlue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_SYSCALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP, QString("%1|%2").arg(QColor(Qt::darkBlue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     // ARM
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
     // TODO more
 }
 

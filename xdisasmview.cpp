@@ -702,9 +702,9 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         COLOR_RECORD colorReg = {};
 
         if (XCapstone::isGeneralRegister(g_dmFamily, sText, g_syntax)) {
-            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_GENERAL);
+            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
         } else if (XCapstone::isSegmentRegister(g_dmFamily, sText, g_syntax)) {
-            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS_SEGMENT);
+            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
         } // TODO more MMX float
 
         if (colorReg.colBackground.isValid() || colorReg.colMain.isValid()) {
@@ -785,26 +785,27 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
     QMap<XOptions::ID, COLOR_RECORD> mapResult;
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_CALL));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_JCC));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_RET, getColorRecord(XOptions::ID_DISASM_COLOR_X86_RET));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_X86_PUSH));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_POP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_POP));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_NOP));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_JMP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_JMP));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_INT3, getColorRecord(XOptions::ID_DISASM_COLOR_X86_INT3));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_SYSCALL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL));
         // TODO
     } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
-        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_BL));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_RET));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_PUSH));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_POP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_POP));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_NOP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP));
     }
 
-    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_GENERAL));
-    mapResult.insert(XOptions::ID_DISASM_COLOR_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_REGS_SEGMENT));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT));
 
     //        } else if (syntax == XBinary::SYNTAX_ATT) {
     //            {
@@ -905,23 +906,25 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
         if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_CALL);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL);
         } else if (XCapstone::isJccOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_JCC);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC);
         } else if (XCapstone::isRetOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_RET);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET);
         } else if (XCapstone::isPushOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_PUSH);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH);
         } else if (XCapstone::isPopOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_POP);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP);
         } else if (XCapstone::isNopOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_NOP);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP);
         } else if (XCapstone::isJumpOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_JMP);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP);
         } else if (XCapstone::isInt3Opcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_INT3);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3);
         } else if (XCapstone::isSyscallOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_SYSCALL);
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL);
+        } else {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE);
         }
     }
 
