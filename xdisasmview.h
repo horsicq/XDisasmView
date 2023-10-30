@@ -201,6 +201,7 @@ private:
     //    QMap<QString, OPCODECOLOR> getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
     COLOR_RECORD getColorRecord(XOptions::ID id);
     COLOR_RECORD getOpcodeColor(QString sOpcode);
+    COLOR_RECORD getRegisterColor(QString sRegister);
 
 private:
     RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);

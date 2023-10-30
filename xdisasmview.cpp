@@ -699,13 +699,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
             }
         }
     } else {
-        COLOR_RECORD colorReg = {};
-
-        if (XCapstone::isGeneralRegister(g_dmFamily, sText, g_syntax)) {
-            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
-        } else if (XCapstone::isSegmentRegister(g_dmFamily, sText, g_syntax)) {
-            colorReg = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
-        }  // TODO more MMX float
+        COLOR_RECORD colorReg = getRegisterColor(sText);
 
         if (colorReg.colBackground.isValid() || colorReg.colMain.isValid()) {
             pPainter->save();
@@ -785,6 +779,10 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
     QMap<XOptions::ID, COLOR_RECORD> mapResult;
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC));
@@ -797,6 +795,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL));
         // TODO
     } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH));
@@ -804,8 +803,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP));
     }
 
-    mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL));
-    mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT));
+
 
     //        } else if (syntax == XBinary::SYNTAX_ATT) {
     //            {
@@ -925,6 +923,38 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL);
         } else {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE);
+        }
+    }
+
+    return result;
+}
+
+XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
+{
+    COLOR_RECORD result = {};
+
+    if (g_dmFamily == XBinary::DMFAMILY_X86) {
+        bool bGeneralReg = false;
+        bool bSegmentReg = false;
+        bool bDebugReg = false;
+
+        if (XCapstone::isGeneralRegister(g_dmFamily, sRegister, g_syntax)) {
+            bGeneralReg = true;
+        } else if (XCapstone::isSegmentRegister(g_dmFamily, sRegister, g_syntax)) {
+            bSegmentReg = true;
+        } else if (XCapstone::isDebugRegister(g_dmFamily, sRegister, g_syntax)) {
+            bDebugReg = true;
+        }
+
+        if (bGeneralReg || bSegmentReg || bDebugReg) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS);
+            if (bGeneralReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
+            } else if (bSegmentReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
+            } else if (bDebugReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG);
+            }  // TODO more MMX float
         }
     }
 

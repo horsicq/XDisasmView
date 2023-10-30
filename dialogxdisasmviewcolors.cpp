@@ -41,11 +41,19 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
 
     // TODO another assemblers
     {
-        RECORD record = {nRow++, "", tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
+        RECORD record = {nRow++, "x86/amd64", tr("Registers"), XOptions::ID_DISASM_COLOR_X86_REGS};
         listRecords.append(record);
     }
     {
-        RECORD record = {nRow++, "", tr("Segment registers"), XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT};
+        RECORD record = {nRow++, "x86/amd64", tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", tr("Segment registers"), XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "x86/amd64", tr("Debug registers"), XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG};
         listRecords.append(record);
     }
     {
@@ -86,6 +94,10 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
     }
     {
         RECORD record = {nRow++, "x86/amd64", "SYSCALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL};
+        listRecords.append(record);
+    }
+    {
+        RECORD record = {nRow++, "arm/arm64", tr("Opcodes"), XOptions::ID_DISASM_COLOR_ARM_OPCODE};
         listRecords.append(record);
     }
     {
@@ -143,9 +155,11 @@ void DialogXDisasmViewColors::save()
 void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
 {
     // Colors
+    // X86
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));   // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));   // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
-    // X86
+    pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -157,6 +171,7 @@ void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     // ARM
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
