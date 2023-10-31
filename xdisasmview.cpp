@@ -795,6 +795,8 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL));
         // TODO
     } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_REGS));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET));
@@ -802,9 +804,6 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP));
     }
-
-
-
     //        } else if (syntax == XBinary::SYNTAX_ATT) {
     //            {
     //                mapResult.insert("callw", colorCALL);
@@ -924,6 +923,8 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
         } else {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE);
         }
+    } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
+        result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_OPCODE);
     }
 
     return result;
@@ -933,19 +934,19 @@ XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
 {
     COLOR_RECORD result = {};
 
+    bool bGeneralReg = false;
+    bool bSegmentReg = false;
+    bool bDebugReg = false;
+
+    if (XCapstone::isGeneralRegister(g_dmFamily, sRegister, g_syntax)) {
+        bGeneralReg = true;
+    } else if (XCapstone::isSegmentRegister(g_dmFamily, sRegister, g_syntax)) {
+        bSegmentReg = true;
+    } else if (XCapstone::isDebugRegister(g_dmFamily, sRegister, g_syntax)) {
+        bDebugReg = true;
+    }
+
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        bool bGeneralReg = false;
-        bool bSegmentReg = false;
-        bool bDebugReg = false;
-
-        if (XCapstone::isGeneralRegister(g_dmFamily, sRegister, g_syntax)) {
-            bGeneralReg = true;
-        } else if (XCapstone::isSegmentRegister(g_dmFamily, sRegister, g_syntax)) {
-            bSegmentReg = true;
-        } else if (XCapstone::isDebugRegister(g_dmFamily, sRegister, g_syntax)) {
-            bDebugReg = true;
-        }
-
         if (bGeneralReg || bSegmentReg || bDebugReg) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS);
             if (bGeneralReg) {
@@ -955,6 +956,13 @@ XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
             } else if (bDebugReg) {
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG);
             }  // TODO more MMX float
+        }
+    } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
+        if (bGeneralReg) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS);
+            if (bGeneralReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL);
+            }
         }
     }
 
