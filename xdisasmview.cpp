@@ -798,6 +798,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_REGS));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_B, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_B));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH));

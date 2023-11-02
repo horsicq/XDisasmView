@@ -109,6 +109,10 @@ void DialogXDisasmViewColors::setOptions(XOptions *pOptions)
         listRecords.append(record);
     }
     {
+        RECORD record = {nRow++, "arm/arm64", "B", XOptions::ID_DISASM_COLOR_ARM_OPCODE_B};
+        listRecords.append(record);
+    }
+    {
         RECORD record = {nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL};
         listRecords.append(record);
     }
@@ -182,6 +186,7 @@ void DialogXDisasmViewColors::setDefaultColorValues(XOptions *pOptions)
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_B, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
