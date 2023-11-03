@@ -1374,7 +1374,7 @@ void XDisasmView::updateData()
 #ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
                     record.bIsBreakpoint = getXInfoDB()->isBreakPointPresent(
-                        record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_DEFAULT);  // mb TODO region Address + Size  // mb TODO get default software breakpoint
+                        record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_DEFAULT);  // mb TODO region Address + Size
 #endif
                 }
 

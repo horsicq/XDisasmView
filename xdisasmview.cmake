@@ -33,6 +33,4 @@ set(XDISASMVIEW_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.ui
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.ui
-    ${CMAKE_CURRENT_LIST_DIR}/dialogxdisasmviewcolors.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/dialogxdisasmviewcolors.ui
 )

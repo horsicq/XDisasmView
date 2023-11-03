@@ -4,7 +4,6 @@ DEPENDPATH += $$PWD
 HEADERS += \
     $$PWD/dialogmultidisasm.h \
     $$PWD/dialogmultidisasmsignature.h \
-    $$PWD/dialogxdisasmviewcolors.h \
     $$PWD/xdisasmview.h \
     $$PWD/xdisasmviewoptionswidget.h \
     $$PWD/xmultidisasmwidget.h
@@ -12,7 +11,6 @@ HEADERS += \
 SOURCES += \
     $$PWD/dialogmultidisasm.cpp \
     $$PWD/dialogmultidisasmsignature.cpp \
-    $$PWD/dialogxdisasmviewcolors.cpp \
     $$PWD/xdisasmview.cpp \
     $$PWD/xdisasmviewoptionswidget.cpp \
     $$PWD/xmultidisasmwidget.cpp
@@ -20,7 +18,6 @@ SOURCES += \
 FORMS += \
     $$PWD/dialogmultidisasm.ui \
     $$PWD/dialogmultidisasmsignature.ui \
-    $$PWD/dialogxdisasmviewcolors.ui \
     $$PWD/xdisasmviewoptionswidget.ui \
     $$PWD/xmultidisasmwidget.ui
 

@@ -23,7 +23,7 @@
 
 #include <QFontDialog>
 
-#include "dialogxdisasmviewcolors.h"
+#include "dialogviewcolors.h"
 #include "xoptions.h"
 
 namespace Ui {
