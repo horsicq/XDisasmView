@@ -34,12 +34,18 @@ class XDisasmViewOptionsWidget : public QWidget {
     Q_OBJECT
 
 public:
+    enum MODE {
+        MODE_ALL = 0,
+        MODE_X86,
+        MODE_ARM
+    };
+
     explicit XDisasmViewOptionsWidget(QWidget *pParent = nullptr);
     ~XDisasmViewOptionsWidget();
 
-    void setOptions(XOptions *pOptions);
+    void setOptions(XOptions *pOptions, MODE mode = MODE_ALL);
 
-    static void setDefaultValues(XOptions *pOptions);
+    static void setDefaultValues(XOptions *pOptions, MODE mode = MODE_ALL);
 
 public slots:
     void save();
@@ -52,6 +58,7 @@ private slots:
 private:
     Ui::XDisasmViewOptionsWidget *ui;
     XOptions *g_pOptions;
+    MODE g_mode;
 };
 
 #endif  // XDISASMVIEWOPTIONSWIDGET_H

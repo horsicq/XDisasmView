@@ -481,7 +481,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
-                QByteArray _baData = read_array(nStartOffset, 2);
+                QByteArray _baData = read_array(nStartOffset, 2); // TODO optimize
 
                 if (*((quint16 *)_baData.data()) == 0)  // 0000
                 {
@@ -783,6 +783,8 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_IP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_IP));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC));
@@ -938,6 +940,8 @@ XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
     bool bGeneralReg = false;
     bool bSegmentReg = false;
     bool bDebugReg = false;
+    bool bInstructionPointerReg = false;
+    bool bFlagsReg = false;
 
     if (XCapstone::isGeneralRegister(g_dmFamily, sRegister, g_syntax)) {
         bGeneralReg = true;
@@ -945,6 +949,10 @@ XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
         bSegmentReg = true;
     } else if (XCapstone::isDebugRegister(g_dmFamily, sRegister, g_syntax)) {
         bDebugReg = true;
+    } else if (XCapstone::isInstructionPointerRegister(g_dmFamily, sRegister, g_syntax)) {
+        bInstructionPointerReg = true;
+    } else if (XCapstone::isFlagsRegister(g_dmFamily, sRegister, g_syntax)) {
+        bFlagsReg = true;
     }
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
@@ -956,6 +964,10 @@ XDisasmView::COLOR_RECORD XDisasmView::getRegisterColor(QString sRegister)
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
             } else if (bDebugReg) {
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG);
+            } else if (bInstructionPointerReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_IP);
+            } else if (bFlagsReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS);
             }  // TODO more MMX float
         }
     } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
