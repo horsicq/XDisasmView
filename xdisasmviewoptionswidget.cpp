@@ -83,6 +83,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_IP, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -160,6 +161,10 @@ void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
         }
         {
             DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Flags register"), XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS};
+            listRecords.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {nRow++, "x86/amd64", QString("FPU %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_FPU};
             listRecords.append(record);
         }
         {
