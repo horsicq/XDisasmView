@@ -29,6 +29,7 @@ DialogMultiDisasm::DialogMultiDisasm(QWidget *pParent) : XShortcutsDialog(pParen
     setWindowFlags(Qt::Window);
 
     connect(ui->widgetDisasm, SIGNAL(dataChanged(qint64, qint64)), this, SIGNAL(dataChanged(qint64, qint64)));
+    connect(ui->widgetDisasm, SIGNAL(deviceSizeChanged(qint64, qint64)), this, SIGNAL(deviceSizeChanged(qint64, qint64)));
 
     ui->widgetDisasm->setReadonlyVisible(true);
 }

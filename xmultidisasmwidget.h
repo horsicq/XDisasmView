@@ -76,6 +76,7 @@ protected:
 
 signals:
     void dataChanged(qint64 nDeviceOffset, qint64 nDeviceSize);
+    void deviceSizeChanged(qint64 nOldSize, qint64 nNewSize);
     void showOffsetHex(qint64 nOffset);
 
 private:
