@@ -481,7 +481,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
-                QByteArray _baData = read_array(nStartOffset, 2); // TODO optimize
+                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
 
                 if (*((quint16 *)_baData.data()) == 0)  // 0000
                 {
