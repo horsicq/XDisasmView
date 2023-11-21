@@ -1392,8 +1392,7 @@ void XDisasmView::updateData()
 #ifdef USE_XPROCESS
                     record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
                     // TODO different colors
-//                    record.bIsBreakpoint =
-//                        getXInfoDB()->isBreakPointPresent(record.nVirtualAddress, XInfoDB::BPT_CODE_SOFTWARE_DEFAULT);  // mb TODO region Address + Size
+                    record.breakpointType = getXInfoDB()->findBreakPointByRegion(record.nVirtualAddress, record.disasmResult.nSize).bpType;
 #endif
                 }
 
@@ -1680,7 +1679,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             textOption.bIsCurrentIP = true;
         }
 
-        if ((g_listRecords.at(nRow).bIsBreakpoint) && (nColumn == COLUMN_LOCATION)) {
+        if ((g_listRecords.at(nRow).breakpointType != XInfoDB::BPI_UNKNOWN) && (nColumn == COLUMN_LOCATION)) {
             textOption.bIsBreakpoint = true;
             textOption.colBreakpoint = getColor(TCLOLOR_BREAKPOINT);
         }
@@ -1701,7 +1700,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
                 pPainter->save();
 
-                if (g_listRecords.at(nRow).bIsBreakpoint) {
+                if (g_listRecords.at(nRow).breakpointType != XInfoDB::BPI_UNKNOWN) {
+                    // TODO
                     pPainter->setBrush(Qt::red);
                     pPainter->setPen(Qt::red);
                 } else if (g_listRecords.at(nRow).bIsCurrentIP) {

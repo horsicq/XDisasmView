@@ -141,8 +141,10 @@ private:
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
-        bool bIsBreakpoint;
+#ifdef USE_XPROCESS
+        XInfoDB::BPT breakpointType;
         bool bIsCurrentIP;
+#endif
         bool bIsAnalysed;
         ARRAY array;
         qint32 nArrayLevel;
