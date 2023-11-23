@@ -111,6 +111,127 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     }
 }
 
+QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
+{
+    QList<DialogViewColors::RECORD> listResult;
+
+    // TODO another assemblers
+    if ((mode == MODE_ALL) || (mode == MODE_X86)) {
+        QString sGroup = "x86/amd64";
+
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Registers"), XOptions::ID_DISASM_COLOR_X86_REGS};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Segment registers"), XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Debug registers"), XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Instruction pointer register"), XOptions::ID_DISASM_COLOR_X86_REGS_IP};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Flags register"), XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, QString("FPU %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_FPU};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Opcodes"), XOptions::ID_DISASM_COLOR_X86_OPCODE};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "CALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "RET", XOptions::ID_DISASM_COLOR_X86_OPCODE_RET};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "JCC", XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "PUSH", XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "POP", XOptions::ID_DISASM_COLOR_X86_OPCODE_POP};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "NOP", XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "JMP", XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "INT3", XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "SYSCALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL};
+            listResult.append(record);
+        }
+    }
+
+    if ((mode == MODE_ALL) || (mode == MODE_ARM)) {
+        QString sGroup = "arm/arm64";
+
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Registers"), XOptions::ID_DISASM_COLOR_ARM_REGS};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("General registers"), XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Opcodes"), XOptions::ID_DISASM_COLOR_ARM_OPCODE};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "B", XOptions::ID_DISASM_COLOR_ARM_OPCODE_B};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "BL", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "RET", XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "PUSH", XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "POP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, "NOP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP};
+            listResult.append(record);
+        }
+    }
+    return listResult;
+}
+
 void XDisasmViewOptionsWidget::reload()
 {
     g_pOptions->setLineEdit(ui->lineEditDisasmFont, XOptions::ID_DISASM_FONT);
@@ -134,119 +255,7 @@ void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
 {
     DialogViewColors dialogColors(this);
 
-    QList<DialogViewColors::RECORD> listRecords;
-    qint32 nRow = 0;
-
-    // TODO another assemblers
-    if ((g_mode == MODE_ALL) || (g_mode == MODE_X86)) {
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Registers"), XOptions::ID_DISASM_COLOR_X86_REGS};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Segment registers"), XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Debug registers"), XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Instruction pointer register"), XOptions::ID_DISASM_COLOR_X86_REGS_IP};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Flags register"), XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", QString("FPU %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_FPU};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", tr("Opcodes"), XOptions::ID_DISASM_COLOR_X86_OPCODE};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "CALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "RET", XOptions::ID_DISASM_COLOR_X86_OPCODE_RET};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "JCC", XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "PUSH", XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "POP", XOptions::ID_DISASM_COLOR_X86_OPCODE_POP};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "NOP", XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "JMP", XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "INT3", XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "x86/amd64", "SYSCALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL};
-            listRecords.append(record);
-        }
-    }
-
-    if ((g_mode == MODE_ALL) || (g_mode == MODE_ARM)) {
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", tr("Registers"), XOptions::ID_DISASM_COLOR_ARM_REGS};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", tr("General registers"), XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", tr("Opcodes"), XOptions::ID_DISASM_COLOR_ARM_OPCODE};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "B", XOptions::ID_DISASM_COLOR_ARM_OPCODE_B};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "BL", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "RET", XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "PUSH", XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "POP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP};
-            listRecords.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {nRow++, "arm/arm64", "NOP", XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP};
-            listRecords.append(record);
-        }
-    }
+    QList<DialogViewColors::RECORD> listRecords = getRecords(g_mode);
 
     dialogColors.setOptions(g_pOptions, listRecords);
 

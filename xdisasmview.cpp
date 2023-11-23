@@ -1674,16 +1674,16 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
                 textOption.colSelected = getColor(TCLOLOR_SELECTED);
             }
         }
-
+#ifdef USE_XPROCESS
         if ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION)) {
             textOption.bIsCurrentIP = true;
         }
 
-        if ((g_listRecords.at(nRow).breakpointType != XInfoDB::BPI_UNKNOWN) && (nColumn == COLUMN_LOCATION)) {
+        if ((g_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) && (nColumn == COLUMN_LOCATION)) {
             textOption.bIsBreakpoint = true;
             textOption.colBreakpoint = getColor(TCLOLOR_BREAKPOINT);
         }
-
+#endif
         if ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE)) {
             textOption.bIsAnalysed = true;
             textOption.colAnalyzed = getColor(TCLOLOR_ANALYSED);
@@ -1699,8 +1699,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
                 qint32 _nTop = nTop + 2;
 
                 pPainter->save();
-
-                if (g_listRecords.at(nRow).breakpointType != XInfoDB::BPI_UNKNOWN) {
+#ifdef USE_XPROCESS
+                if (g_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) {
                     // TODO
                     pPainter->setBrush(Qt::red);
                     pPainter->setPen(Qt::red);
@@ -1711,7 +1711,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
                     pPainter->setBrush(Qt::gray);  // TODO consts
                     pPainter->setPen(Qt::gray);
                 }
-
+#endif
                 pPainter->drawEllipse(QRect(_nLeft, _nTop, _nWidth, _nHeight));
 
                 pPainter->restore();
