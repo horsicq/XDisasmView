@@ -261,13 +261,13 @@ void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
     XOptions::handleFontButton(this, ui->lineEditDisasmFont);
 }
 
-void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
+void XDisasmViewOptionsWidget::on_pushButtonDisasmOpcodes_clicked()
 {
     DialogViewColors dialogColors(this);
 
     QList<DialogViewColors::RECORD> listRecords = getRecords(g_mode);
 
-    dialogColors.setOptions(g_pOptions, listRecords);
+    dialogColors.setOptions(g_pOptions, listRecords, tr("Opcodes"));
 
     dialogColors.exec();
 }

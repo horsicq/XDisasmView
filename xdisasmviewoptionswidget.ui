@@ -154,9 +154,9 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="pushButtonDisasmColors">
+           <widget class="QPushButton" name="pushButtonDisasmOpcodes">
             <property name="text">
-             <string>Colors</string>
+             <string>Opcodes</string>
             </property>
            </widget>
           </item>

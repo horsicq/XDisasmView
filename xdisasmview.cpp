@@ -698,6 +698,18 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
             }
         }
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
+        QRect _rectArg = rect;
+
+        QString _sPref = sText.section("[", 0, 0) + "[";
+        QString sArg = sText.section("[", 1, 1);
+        sArg = sArg.section("]", 0, 0);
+
+        pPainter->drawText(_rectArg, _sPref, _qTextOptions);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+        drawArg(pPainter, _rectArg, sArg);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+        pPainter->drawText(_rectArg, "]", _qTextOptions);
     } else {
         COLOR_RECORD colorReg = getOperandColor(sText);
 
