@@ -798,6 +798,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_IP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_IP));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_FPU));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_XMM, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_XMM));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_NUMBERS, getColorRecord(XOptions::ID_DISASM_COLOR_X86_NUMBERS));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL));
@@ -958,6 +959,7 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
     bool bInstructionPointerReg = false;
     bool bFlagsReg = false;
     bool bFPUReg = false;
+    bool bXMMReg = false;
     bool bNumber = false;
 
     if (XCapstone::isGeneralRegister(g_dmFamily, sOperand, g_syntax)) {
@@ -972,12 +974,14 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
         bFlagsReg = true;
     } else if (XCapstone::isFPURegister(g_dmFamily, sOperand, g_syntax)) {
         bFPUReg = true;
+    } else if (XCapstone::isXMMRegister(g_dmFamily, sOperand, g_syntax)) {
+        bXMMReg = true;
     } else if (XCapstone::isNumber(g_dmFamily, sOperand, g_syntax)) {
         bNumber = true;
     }
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        if (bGeneralReg || bSegmentReg || bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg) {
+        if (bGeneralReg || bSegmentReg || bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg || bXMMReg) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS);
             if (bGeneralReg) {
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
@@ -991,7 +995,9 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS);
             } else if (bFPUReg) {
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FPU);
-            }  // TODO more MMX float
+            } else if (bXMMReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_XMM);
+            }  // TODO more
         } else if (bNumber) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_NUMBERS);
         }

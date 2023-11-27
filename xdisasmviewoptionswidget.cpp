@@ -84,6 +84,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_IP, QString("%1|%2").arg(QColor(Qt::red).name(), ""));       // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, QString("%1|%2").arg(QColor(Qt::red).name(), ""));      // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_XMM, QString("%1|%2").arg(QColor(Qt::red).name(), ""));      // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));      // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -147,6 +148,10 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
         }
         {
             DialogViewColors::RECORD record = {sGroup, QString("FPU %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_FPU};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, QString("XMM %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_XMM};
             listResult.append(record);
         }
         {
