@@ -698,6 +698,26 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
             }
         }
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.toLower().contains("ptr "))) {
+        QRect _rectArg = rect;
+
+        QString _sPref = sText.section("ptr ", 0, 0) + "ptr "; // TODO Check lower
+        QString sArg = sText.section("ptr ", 1, 1); // TODO Check lower
+
+        pPainter->drawText(_rectArg, _sPref, _qTextOptions);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+        drawArg(pPainter, _rectArg, sArg);
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(":"))) {
+        QRect _rectArg = rect;
+
+        QString _sPref = sText.section(":", 0, 0);
+        QString sArg = sText.section(":", 1, 1);
+
+        drawArg(pPainter, _rectArg, _sPref);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+        pPainter->drawText(_rectArg, ":", _qTextOptions);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ":").width());
+        drawArg(pPainter, _rectArg, sArg);
     } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
         QRect _rectArg = rect;
 
