@@ -80,8 +80,7 @@ void XDisasmView::_adjustView()
     g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
 
     g_mapColors = getColorRecordsMap();
-    //    g_mapColorMapRegisters = getColorMapRegisters(g_options.disasmMode, g_syntax);
-    // TODO arrows color
+
     // TODO BP color
 
     if (g_handle) {
@@ -730,6 +729,26 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
         pPainter->drawText(_rectArg, "]", _qTextOptions);
+    } else if (XBinary::isRegExpPresent("[-+]", sText)) {
+        qint32 nArgCount = XBinary::getRegExpCount("[-+]", sText);
+
+        QRect _rectArg = rect;
+
+        for (qint32 i = 0; i <= nArgCount; i++) {
+            QString sArg = XBinary::getRegExpSection("[-+]", sText, i, i);
+            sArg = sArg.trimmed();
+
+            drawArg(pPainter, _rectArg, sArg);
+
+            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+            if (i == (nArgCount - 1)) {
+                QString sSigh = XBinary::regExp("[-+]", sText, i);
+                sSigh = QString(" %1 ").arg(sSigh);
+                pPainter->drawText(_rectArg, sSigh, _qTextOptions);
+                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sSigh).width());
+            }
+        }
     } else {
         COLOR_RECORD colorReg = getOperandColor(sText);
 
@@ -753,15 +772,16 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
     }
 }
 
-void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
+void XDisasmView::drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
 {
     pPainter->save();
 
     QPen pen;
 
-    // blackPen.setWidth(10);
     if (bIsSelected) {
-        pen.setColor(Qt::red);
+        pen.setColor(g_mapColors.value(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED).colMain);
+    } else {
+        pen.setColor(g_mapColors.value(XOptions::ID_DISASM_COLOR_ARROWS).colMain);
     }
 
     pPainter->setPen(pen);
@@ -782,18 +802,19 @@ void XDisasmView::drawArrow(QPainter *pPainter, QPointF pointStart, QPointF poin
 
     pPainter->restore();
 
-    drawLine(pPainter, pointStart, pointEnd, bIsSelected, bIsCond);
+    drawArrowLine(pPainter, pointStart, pointEnd, bIsSelected, bIsCond);
 }
 
-void XDisasmView::drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
+void XDisasmView::drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
 {
     pPainter->save();
 
     QPen pen;
 
-    // blackPen.setWidth(10);
     if (bIsSelected) {
-        pen.setColor(Qt::red);
+        pen.setColor(g_mapColors.value(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED).colMain);
+    } else {
+        pen.setColor(g_mapColors.value(XOptions::ID_DISASM_COLOR_ARROWS).colMain);
     }
 
     if (bIsCond) {
@@ -809,6 +830,9 @@ void XDisasmView::drawLine(QPainter *pPainter, QPointF pointStart, QPointF point
 QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
 {
     QMap<XOptions::ID, COLOR_RECORD> mapResult;
+
+    mapResult.insert(XOptions::ID_DISASM_COLOR_ARROWS, getColorRecord(XOptions::ID_DISASM_COLOR_ARROWS));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED, getColorRecord(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED));
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS));
@@ -843,79 +867,9 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP));
         mapResult.insert(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP, getColorRecord(XOptions::ID_DISASM_COLOR_ARM_OPCODE_NOP));
     }
-    //        } else if (syntax == XBinary::SYNTAX_ATT) {
-    //            {
-    //                mapResult.insert("callw", colorCALL);
-    //                mapResult.insert("calll", colorCALL);
-    //                mapResult.insert("callq", colorCALL);
-    //            }
-    //            {
-    //                mapResult.insert("retw", colorRET);
-    //                mapResult.insert("retl", colorRET);
-    //                mapResult.insert("retq", colorRET);
-    //            }
-    //            {
-    //                mapResult.insert("pushw", colorPUSH);
-    //                mapResult.insert("pushl", colorPUSH);
-    //                mapResult.insert("pushq", colorPUSH);
-    //            }
-    //            {
-    //                mapResult.insert("popw", colorPUSH);
-    //                mapResult.insert("popl", colorPUSH);
-    //                mapResult.insert("popq", colorPUSH);
-    //            }
-
-    //            mapResult.insert("nop", colorNOP);
-    //            mapResult.insert("jmp", colorJMP);
-    //            mapResult.insert("int3", colorINT3);
-    //            mapResult.insert("je", colorJCC);
-    //            mapResult.insert("jne", colorJCC);
-    //            mapResult.insert("jz", colorJCC);
-    //            mapResult.insert("jnz", colorJCC);
-    //            mapResult.insert("ja", colorJCC);
-    //            mapResult.insert("jc", colorJCC);
-    //            mapResult.insert("syscall", colorSYSCALL);
-    //        }
-    //    } else if ((XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM) || (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_ARM64)) {
-    //        OPCODECOLOR colorBL = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_BL);
-    //        OPCODECOLOR colorRET = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_RET);
-    //        OPCODECOLOR colorPUSH = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_PUSH);
-    //        OPCODECOLOR colorPOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_POP);
-    //        OPCODECOLOR colorNOP = getOpcodeColor(XOptions::ID_DISASM_COLOR_ARM_NOP);
-
-    //        mapResult.insert("bl", colorBL);
-    //        mapResult.insert("ret", colorRET);
-    //        mapResult.insert("push", colorPUSH);
-    //        mapResult.insert("pop", colorPOP);
-    //        mapResult.insert("nop", colorNOP);
-    //    }
 
     return mapResult;
 }
-
-// QMap<QString, XDisasmView::OPCODECOLOR> XDisasmView::getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax)
-//{
-//     Q_UNUSED(syntax)
-
-//    QMap<QString, OPCODECOLOR> mapResult;
-
-//    if (XBinary::getDisasmFamily(disasmMode) == XBinary::DMFAMILY_X86) {
-////        if (sBackgroundCode != "") {
-////            result.colBackground.setNamedColor(sBackgroundCode);
-////        }
-
-//        OPCODECOLOR color = {};
-//        color.colText.setNamedColor("#0000ff"); // TODO
-
-//        mapResult.insert("rax", color);
-//        mapResult.insert("eax", color);
-//        mapResult.insert("ax", color);
-//        mapResult.insert("al", color);
-//        mapResult.insert("ah", color);
-//    }
-
-//    return mapResult;
-//}
 
 XDisasmView::COLOR_RECORD XDisasmView::getColorRecord(XOptions::ID id)
 {
@@ -1659,18 +1613,18 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                         point3.setY(point1.y() + nDelta);
                     }
 
-                    drawLine(pPainter, point1, point2, bIsSelected, bIsCond);
+                    drawArrowLine(pPainter, point1, point2, bIsSelected, bIsCond);
 
                     if (g_listRecords.at(i).bIsEnd) {
-                        drawLine(pPainter, point2, point3, bIsSelected, bIsCond);
+                        drawArrowLine(pPainter, point2, point3, bIsSelected, bIsCond);
 
                         QPointF point4;
                         point4.setX(point1.x());
                         point4.setY(point3.y());
 
-                        drawArrow(pPainter, point3, point4, bIsSelected, bIsCond);
+                        drawArrowHead(pPainter, point3, point4, bIsSelected, bIsCond);
                     } else {
-                        drawArrow(pPainter, point2, point3, bIsSelected, bIsCond);
+                        drawArrowHead(pPainter, point2, point3, bIsSelected, bIsCond);
                     }
                 }
             }

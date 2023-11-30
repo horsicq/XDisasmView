@@ -75,6 +75,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     pOptions->addID(XOptions::ID_DISASM_UPPERCASE, false);
 
     // Colors
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS, QString("%1|%2").arg("", ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
     // X86
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
@@ -117,6 +119,20 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
 QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
 {
     QList<DialogViewColors::RECORD> listResult;
+
+    {
+        QString sGroup = tr("Arrows");
+
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("All"), XOptions::ID_DISASM_COLOR_ARROWS};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Selected"), XOptions::ID_DISASM_COLOR_ARROWS_SELECTED};
+            listResult.append(record);
+        }
+    }
+
 
     // TODO another assemblers
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
@@ -266,13 +282,13 @@ void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
     XOptions::handleFontButton(this, ui->lineEditDisasmFont);
 }
 
-void XDisasmViewOptionsWidget::on_pushButtonDisasmOpcodes_clicked()
+void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
 {
     DialogViewColors dialogColors(this);
 
     QList<DialogViewColors::RECORD> listRecords = getRecords(g_mode);
 
-    dialogColors.setOptions(g_pOptions, listRecords, tr("Opcodes"));
+    dialogColors.setOptions(g_pOptions, listRecords, tr("Colors"));
 
     dialogColors.exec();
 }

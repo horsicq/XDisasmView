@@ -197,10 +197,9 @@ private:
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
     void drawAsmText(QPainter *pPainter, const QRect &rect, const QString &sText);
     void drawArg(QPainter *pPainter, const QRect &rect, const QString &sText);
-    void drawArrow(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
-    void drawLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
+    void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
+    void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     QMap<XOptions::ID, COLOR_RECORD> getColorRecordsMap();
-    //    QMap<QString, OPCODECOLOR> getColorMapRegisters(XBinary::DM disasmMode, XBinary::SYNTAX syntax = XBinary::SYNTAX_DEFAULT);
     COLOR_RECORD getColorRecord(XOptions::ID id);
     COLOR_RECORD getOpcodeColor(QString sOpcode);
     COLOR_RECORD getOperandColor(QString sOperand);
