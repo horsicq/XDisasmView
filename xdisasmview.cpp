@@ -359,7 +359,7 @@ qint64 XDisasmView::getViewSizeByViewOffset(qint64 nViewOffset)
 
     QByteArray baData = read_array(nViewOffset, g_nOpcodeSize);
 
-    XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data(), baData.size(), 0, g_disasmOptions);
+    XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baData.data(), baData.size(), 0, g_disasmOptions);
 
     nResult = disasmResult.nSize;
 
@@ -504,7 +504,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
                 XCapstone::DISASM_RESULT disasmResult =
-                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
                 if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                     if (_nOffset == nOffset) {
@@ -1331,7 +1331,7 @@ void XDisasmView::updateData()
 
                             if ((showRecord.recordType == XInfoDB::RT_CODE) && (record.nDeviceOffset != -1)) {
                                 XCapstone::DISASM_RESULT _disasmResult =
-                                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
                                 record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
                                 record.disasmResult.sString = _disasmResult.sString;
                             }
@@ -1356,7 +1356,7 @@ void XDisasmView::updateData()
                             }
 
                             record.disasmResult =
-                                XCapstone::disasm_ex(g_handle, g_options.disasmMode, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
 
                             nBufferSize = record.disasmResult.nSize;
                             baBuffer.resize(nBufferSize);
