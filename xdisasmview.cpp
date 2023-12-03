@@ -730,7 +730,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
         pPainter->drawText(_rectArg, "]", _qTextOptions);
-    } else if (XBinary::isRegExpPresent("[-+]", sText)) {
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (XBinary::isRegExpPresent("[-+]", sText))) {
         qint32 nArgCount = XBinary::getRegExpCount("[-+]", sText);
 
         QRect _rectArg = rect;
