@@ -697,11 +697,12 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
             }
         }
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.toLower().contains("ptr "))) {
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+               (sText.toLower().contains("ptr "))) {
         QRect _rectArg = rect;
 
-        QString _sPref = sText.section("ptr ", 0, 0) + "ptr "; // TODO Check lower
-        QString sArg = sText.section("ptr ", 1, 1); // TODO Check lower
+        QString _sPref = sText.section("ptr ", 0, 0) + "ptr ";  // TODO Check lower
+        QString sArg = sText.section("ptr ", 1, 1);             // TODO Check lower
 
         pPainter->drawText(_rectArg, _sPref, _qTextOptions);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
@@ -1330,8 +1331,8 @@ void XDisasmView::updateData()
                             }
 
                             if ((showRecord.recordType == XInfoDB::RT_CODE) && (record.nDeviceOffset != -1)) {
-                                XCapstone::DISASM_RESULT _disasmResult =
-                                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(),
+                                                                                              record.nVirtualAddress, g_disasmOptions);
                                 record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
                                 record.disasmResult.sString = _disasmResult.sString;
                             }

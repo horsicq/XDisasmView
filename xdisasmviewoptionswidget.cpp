@@ -133,7 +133,6 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
         }
     }
 
-
     // TODO another assemblers
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         QString sGroup = "x86/amd64";
