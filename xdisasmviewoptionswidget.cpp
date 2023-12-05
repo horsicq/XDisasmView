@@ -81,6 +81,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_STACK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_IP, QString("%1|%2").arg(QColor(Qt::red).name(), ""));       // TODO color
@@ -143,6 +144,10 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
         }
         {
             DialogViewColors::RECORD record = {sGroup, tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, tr("Stack registers"), XOptions::ID_DISASM_COLOR_X86_REGS_STACK};
             listResult.append(record);
         }
         {
