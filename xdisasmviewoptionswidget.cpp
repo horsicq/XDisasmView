@@ -77,9 +77,11 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     // Colors
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS, QString("%1|%2").arg("", ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));      // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
     // X86
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
-        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_STACK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
@@ -88,8 +90,6 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, QString("%1|%2").arg(QColor(Qt::red).name(), ""));      // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_XMM, QString("%1|%2").arg(QColor(Qt::red).name(), ""));      // TODO color
-        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));      // TODO color
-        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
@@ -103,10 +103,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
 
     if ((mode == MODE_ALL) || (mode == MODE_ARM)) {
         // ARM
-        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
-        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_B, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -133,15 +130,22 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
             listResult.append(record);
         }
     }
+    {
+        DialogViewColors::RECORD record = {"", tr("Registers"), XOptions::ID_DISASM_COLOR_REGS};
+        listResult.append(record);
+    }
+    {
+        DialogViewColors::RECORD record = {"", tr("Numbers"), XOptions::ID_DISASM_COLOR_NUMBERS};
+        listResult.append(record);
+    }
+    {
+        DialogViewColors::RECORD record = {"", tr("Opcodes"), XOptions::ID_DISASM_COLOR_OPCODE};
+        listResult.append(record);
+    }
 
     // TODO another assemblers
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         QString sGroup = "x86/amd64";
-
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Registers"), XOptions::ID_DISASM_COLOR_X86_REGS};
-            listResult.append(record);
-        }
         {
             DialogViewColors::RECORD record = {sGroup, tr("General registers"), XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL};
             listResult.append(record);
@@ -172,14 +176,6 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
         }
         {
             DialogViewColors::RECORD record = {sGroup, QString("XMM %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_XMM};
-            listResult.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Numbers"), XOptions::ID_DISASM_COLOR_X86_NUMBERS};
-            listResult.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Opcodes"), XOptions::ID_DISASM_COLOR_X86_OPCODE};
             listResult.append(record);
         }
         {
@@ -222,21 +218,8 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
 
     if ((mode == MODE_ALL) || (mode == MODE_ARM)) {
         QString sGroup = "arm/arm64";
-
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Registers"), XOptions::ID_DISASM_COLOR_ARM_REGS};
-            listResult.append(record);
-        }
         {
             DialogViewColors::RECORD record = {sGroup, tr("General registers"), XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL};
-            listResult.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Numbers"), XOptions::ID_DISASM_COLOR_ARM_NUMBERS};
-            listResult.append(record);
-        }
-        {
-            DialogViewColors::RECORD record = {sGroup, tr("Opcodes"), XOptions::ID_DISASM_COLOR_ARM_OPCODE};
             listResult.append(record);
         }
         {

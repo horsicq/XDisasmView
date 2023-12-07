@@ -253,6 +253,8 @@ void XMultiDisasmWidget::getSymbols()
         XInfoDBTransfer::OPTIONS options = {};
         options.pDevice = g_pXInfoDB->getDevice();
         options.fileType = g_pXInfoDB->getFileType();
+        options.bIsImage = false;
+        options.nModuleAddress = -1;
 
         dialogTransfer.setData(g_pXInfoDB, XInfoDBTransfer::COMMAND_SYMBOLS, options);
 
