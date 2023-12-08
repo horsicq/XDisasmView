@@ -196,6 +196,7 @@ private:
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
     void drawAsmText(QPainter *pPainter, const QRect &rect, const QString &sText);
+    void drawColorText(QPainter *pPainter, const QRect &rect, const QString &sText, const COLOR_RECORD &colorRecord);
     void drawArg(QPainter *pPainter, const QRect &rect, const QString &sText);
     void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);

@@ -80,6 +80,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));      // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
+    pOptions->addID(XOptions::ID_DISASM_COLOR_REFS, QString("%1|%2").arg(QColor(Qt::darkGreen).name(), ""));
     // X86
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
@@ -140,6 +141,10 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
     }
     {
         DialogViewColors::RECORD record = {"", tr("Opcodes"), XOptions::ID_DISASM_COLOR_OPCODE};
+        listResult.append(record);
+    }
+    {
+        DialogViewColors::RECORD record = {"", tr("References"), XOptions::ID_DISASM_COLOR_REFS};
         listResult.append(record);
     }
 

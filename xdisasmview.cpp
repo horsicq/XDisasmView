@@ -621,48 +621,21 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
 
         COLOR_RECORD opcodeColor = getOpcodeColor(_sMnenonic);
 
+        bool bIsNOP = false;
+
         if (XCapstone::isNopOpcode(g_dmFamily, _sMnenonic, g_syntax)) {
             opcodeColorNOP = opcodeColor;
+            bIsNOP = true;
         }
 
-        bool bHighlight = (opcodeColor.colBackground.isValid() || opcodeColor.colMain.isValid());
-
-        if (bHighlight) {
-            pPainter->save();
-        }
-
-        if (opcodeColor.colBackground.isValid()) {
-            pPainter->fillRect(_rectMnemonic, QBrush(opcodeColor.colBackground));
-        }
-
-        if (opcodeColor.colMain.isValid()) {
-            pPainter->setPen(opcodeColor.colMain);
-        }
-
-        pPainter->drawText(_rectMnemonic, sMnemonic, _qTextOptions);
-
-        if (bHighlight) {
-            pPainter->restore();
-        }
+        drawColorText(pPainter, _rectMnemonic, sMnemonic, opcodeColor);
 
         if (sString != "") {
             QRect _rectString = rect;
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
-            if (opcodeColorNOP.colBackground.isValid() || opcodeColorNOP.colMain.isValid()) {
-                pPainter->save();
-
-                if (opcodeColorNOP.colBackground.isValid()) {
-                    pPainter->fillRect(_rectString, QBrush(opcodeColorNOP.colBackground));
-                }
-
-                if (opcodeColorNOP.colMain.isValid()) {
-                    pPainter->setPen(opcodeColorNOP.colMain);
-                }
-
-                pPainter->drawText(_rectString, sString, _qTextOptions);
-
-                pPainter->restore();
+            if (bIsNOP) {
+                drawColorText(pPainter, _rectString, sString, opcodeColorNOP);
             } else {
                 drawArg(pPainter, _rectString, sString);
             }
@@ -675,6 +648,27 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
         }
         // TODO
         pPainter->drawText(rect, sOpcode, _qTextOptions);
+    }
+}
+
+void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QString &sText, const COLOR_RECORD &colorRecord)
+{
+    if (colorRecord.colBackground.isValid() || colorRecord.colMain.isValid()) {
+        pPainter->save();
+
+        if (colorRecord.colBackground.isValid()) {
+            pPainter->fillRect(rect, QBrush(colorRecord.colBackground));
+        }
+
+        if (colorRecord.colMain.isValid()) {
+            pPainter->setPen(colorRecord.colMain);
+        }
+
+        pPainter->drawText(rect, sText, _qTextOptions);
+
+        pPainter->restore();
+    } else {
+        pPainter->drawText(rect, sText, _qTextOptions);
     }
 }
 
@@ -755,24 +749,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         }
     } else {
         COLOR_RECORD colorReg = getOperandColor(sText);
-
-        if (colorReg.colBackground.isValid() || colorReg.colMain.isValid()) {
-            pPainter->save();
-
-            if (colorReg.colBackground.isValid()) {
-                pPainter->fillRect(rect, QBrush(colorReg.colBackground));
-            }
-
-            if (colorReg.colMain.isValid()) {
-                pPainter->setPen(colorReg.colMain);
-            }
-
-            pPainter->drawText(rect, sText, _qTextOptions);
-
-            pPainter->restore();
-        } else {
-            pPainter->drawText(rect, sText, _qTextOptions);
-        }
+        drawColorText(pPainter, rect, sText, colorReg);
     }
 }
 
@@ -840,6 +817,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
     mapResult.insert(XOptions::ID_DISASM_COLOR_REGS, getColorRecord(XOptions::ID_DISASM_COLOR_REGS));
     mapResult.insert(XOptions::ID_DISASM_COLOR_NUMBERS, getColorRecord(XOptions::ID_DISASM_COLOR_NUMBERS));
     mapResult.insert(XOptions::ID_DISASM_COLOR_OPCODE, getColorRecord(XOptions::ID_DISASM_COLOR_OPCODE));
+    mapResult.insert(XOptions::ID_DISASM_COLOR_REFS, getColorRecord(XOptions::ID_DISASM_COLOR_REFS));
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL));
