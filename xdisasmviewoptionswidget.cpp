@@ -77,14 +77,14 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
     // Colors
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS, QString("%1|%2").arg("", ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_ARROWS_SELECTED, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));          // TODO color
-    pOptions->addID(XOptions::ID_DISASM_COLOR_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));      // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_REGS, QString("%1|%2").arg(QColor(Qt::red).name(), ""));      // TODO color
+    pOptions->addID(XOptions::ID_DISASM_COLOR_NUMBERS, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));  // TODO color
     pOptions->addID(XOptions::ID_DISASM_COLOR_OPCODE, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
     pOptions->addID(XOptions::ID_DISASM_COLOR_REFS, QString("%1|%2").arg(QColor(Qt::darkGreen).name(), ""));
     // X86
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
-        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_STACK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_STACK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT, QString("%1|%2").arg(QColor(Qt::red).name(), ""));  // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG, QString("%1|%2").arg(QColor(Qt::red).name(), ""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_IP, QString("%1|%2").arg(QColor(Qt::red).name(), ""));       // TODO color

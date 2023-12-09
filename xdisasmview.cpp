@@ -726,7 +726,8 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
         pPainter->drawText(_rectArg, "]", _qTextOptions);
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (XBinary::isRegExpPresent("[-+]", sText))) {
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+               (XBinary::isRegExpPresent("[-+]", sText))) {
         qint32 nArgCount = XBinary::getRegExpCount("[-+]", sText);
 
         QRect _rectArg = rect;
@@ -937,7 +938,7 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
     }
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        if (bGeneralReg || bStackReg || bSegmentReg ||bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg || bXMMReg) {
+        if (bGeneralReg || bStackReg || bSegmentReg || bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg || bXMMReg) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
             if (bGeneralReg) {
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
