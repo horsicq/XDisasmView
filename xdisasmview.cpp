@@ -675,8 +675,7 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
 void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
     if (sText.contains("<")) {
-        // TODO links
-        pPainter->drawText(rect, sText, _qTextOptions);
+        drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
     } else if (sText.contains(", ")) {
         qint32 nArgCount = sText.count(", ");
 
