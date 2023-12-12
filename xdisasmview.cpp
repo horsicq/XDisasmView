@@ -674,9 +674,7 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
 
 void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
-    if (sText.contains("<")) {
-        drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
-    } else if (sText.contains(", ")) {
+    if (sText.contains(", ")) {
         qint32 nArgCount = sText.count(", ");
 
         QRect _rectArg = rect;
@@ -747,6 +745,8 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sSigh).width());
             }
         }
+    } else if (sText.contains("<")) {
+        drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
     } else {
         COLOR_RECORD colorReg = getOperandColor(sText);
         drawColorText(pPainter, rect, sText, colorReg);
