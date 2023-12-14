@@ -37,7 +37,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_nThisBaseVirtualAddress = 0;
     g_nThisBaseDeviceOffset = 0;
     g_bIsAddressColon = false;
-    g_bIsUppercase = false;
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
     g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
@@ -73,7 +72,7 @@ void XDisasmView::_adjustView()
     setTextFontFromOptions(XOptions::ID_DISASM_FONT);
 
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
-    g_bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
+    g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
     g_bIsAddressColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_ADDRESSCOLON).toBool();
 
     g_syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
@@ -400,7 +399,7 @@ QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmR
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
-            sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType);
+            sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_syntax, riType, g_disasmOptions);
         }
     }
 
@@ -604,13 +603,6 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
     QString sMnemonic = sText.section("|", 0, 0);
     QString sString = sText.section("|", 1, 1);
 
-    QString _sMnenonic;
-
-    if (g_bIsUppercase) {
-        _sMnenonic = sMnemonic.toLower();
-    } else {
-        _sMnenonic = sMnemonic;
-    }
     // TODO registers !!!
 
     if (g_bIsHighlight) {
@@ -619,11 +611,11 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
         QRect _rectMnemonic = rect;
         _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
-        COLOR_RECORD opcodeColor = getOpcodeColor(_sMnenonic);
+        COLOR_RECORD opcodeColor = getOpcodeColor(sMnemonic.toLower());
 
         bool bIsNOP = false;
 
-        if (XCapstone::isNopOpcode(g_dmFamily, _sMnenonic, g_syntax)) {
+        if (XCapstone::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_syntax)) {
             opcodeColorNOP = opcodeColor;
             bIsNOP = true;
         }
@@ -695,8 +687,16 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                (sText.toLower().contains("ptr "))) {
         QRect _rectArg = rect;
 
-        QString _sPref = sText.section("ptr ", 0, 0) + "ptr ";  // TODO Check lower
-        QString sArg = sText.section("ptr ", 1, 1);             // TODO Check lower
+        QString _sPref = sText.section("ptr ", 0, 0) + "ptr ";
+        QString sArg = sText.section("ptr ", 1, 1);
+
+        if (g_disasmOptions.bIsUppercase) {
+            _sPref = sText.section("PTR ", 0, 0) + "PTR ";
+            sArg = sText.section("PTR ", 1, 1);
+        } else {
+            _sPref = sText.section("ptr ", 0, 0) + "ptr ";
+            sArg = sText.section("ptr ", 1, 1);
+        }
 
         pPainter->drawText(_rectArg, _sPref, _qTextOptions);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
@@ -748,7 +748,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
     } else if (sText.contains("<")) {
         drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
     } else {
-        COLOR_RECORD colorReg = getOperandColor(sText);
+        COLOR_RECORD colorReg = getOperandColor(sText.toLower());
         drawColorText(pPainter, rect, sText, colorReg);
     }
 }
@@ -1309,7 +1309,7 @@ void XDisasmView::updateData()
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
                                 // TODO !!!
-                                if ((record.disasmResult.sMnemonic == "db") && (record.disasmResult.sString == "")) {
+                                if ((record.disasmResult.sMnemonic.toLower() == "db") && (record.disasmResult.sString == "")) {
                                     record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size());
                                 }
                             }
@@ -1357,15 +1357,14 @@ void XDisasmView::updateData()
                             record.disasmResult.nSize = 1;
                             record.disasmResult.sMnemonic = "db";
                             record.disasmResult.sString = "1 dup(?)";
+
+                            if (g_disasmOptions.bIsUppercase) {
+                                record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+                                record.disasmResult.sString = record.disasmResult.sString.toUpper();
+                            }
                         }
                         bSuccess = true;
                     }
-
-                    if (g_bIsUppercase) {
-                        record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
-                        record.disasmResult.sString = record.disasmResult.sString.toUpper();
-                    }
-
                 } else {
                     nViewSize = 0;
                 }
@@ -2247,6 +2246,20 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
         }
 
         adjust(true);
+    } else if (nColumn == COLUMN_OPCODE) {
+        if (nRow < g_listRecords.count()) {
+            XADDR nAddress = -1;
+
+            if (g_listRecords.at(nRow).disasmResult.relType) {
+                nAddress = g_listRecords.at(nRow).disasmResult.nXrefToRelative;
+            } else if (g_listRecords.at(nRow).disasmResult.memType) {
+                nAddress = g_listRecords.at(nRow).disasmResult.nXrefToMemory;
+            }
+
+            if (nAddress != -1) {
+                goToAddress(nAddress, true, true, true);
+            }
+        }
     }
 }
 

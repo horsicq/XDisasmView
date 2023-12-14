@@ -268,7 +268,6 @@ private:
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
     bool g_bIsAddressColon;
-    bool g_bIsUppercase;
     bool g_bIsHighlight;
     OPCODEMODE g_opcodeMode;
     BYTESMODE g_bytesMode;
