@@ -119,6 +119,7 @@ public:
 private:
     enum COLUMN {
         COLUMN_ARROWS = 0,
+        COLUMN_BREAKPOINT,
         COLUMN_LOCATION,
         COLUMN_INFO,
         COLUMN_BYTES,
@@ -126,10 +127,10 @@ private:
         COLUMN_COMMENT
     };
 
-    enum ARRAY {
-        ARRAY_NONE = 0,
-        ARRAY_UP,
-        ARRAY_DOWN
+    enum ARROW {
+        ARROW_NONE = 0,
+        ARROW_UP,
+        ARROW_DOWN
     };
 
     struct RECORD {
@@ -146,7 +147,7 @@ private:
         bool bIsCurrentIP;
 #endif
         bool bIsAnalysed;
-        ARRAY array;
+        ARROW array;
         qint32 nArrayLevel;
         qint32 nMaxLevel;
         qint32 nArraySize;
@@ -156,6 +157,7 @@ private:
         QColor colBytesBackground;
         QColor colBytesBackgroundSelected;
         quint32 nInfo;
+        bool bIsAprox; // TODO mn red color!!!
         // TODO jmp/jcc
     };
 
@@ -273,7 +275,6 @@ private:
     BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
-    bool g_bHtest;                              // TODO remove
     QList<VIEWSTRUCT> g_listViewStruct;
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
 };

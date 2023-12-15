@@ -43,6 +43,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_bytesMode = BYTESMODE_RAW;
 
     addColumn("");  // Arrows
+    addColumn("");  // Breakpoints
                     //    addColumn(tr("Address"),0,true);
     addColumn(tr("Address"), 0, true);
     addColumn("");  // Info
@@ -57,7 +58,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     _qTextOptions.setWrapMode(QTextOption::NoWrap);
 
-    g_bHtest = true;
+    setVerticalLinesVisible(false);
 }
 
 XDisasmView::~XDisasmView()
@@ -354,6 +355,7 @@ void XDisasmView::adjustScrollCount()
 qint64 XDisasmView::getViewSizeByViewOffset(qint64 nViewOffset)
 {
     // TODO
+    // Check always return 1
     qint64 nResult = 0;
 
     QByteArray baData = read_array(nViewOffset, g_nOpcodeSize);
@@ -385,7 +387,7 @@ qint64 XDisasmView::addressToViewOffset(XADDR nAddress)
 
 QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult)
 {
-    QString sResult = disasmResult.sString;
+    QString sResult;
 
     if (getXInfoDB()) {
         if ((g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) || (g_opcodeMode == OPCODEMODE_SYMBOL) || (g_opcodeMode == OPCODEMODE_ADDRESS)) {
@@ -401,6 +403,10 @@ QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmR
 
             sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_syntax, riType, g_disasmOptions);
         }
+    }
+
+    if (sResult == "") {
+        sResult = disasmResult.sString;
     }
 
     return sResult;
@@ -479,12 +485,12 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
-                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
+//                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
 
-                if (*((quint16 *)_baData.data()) == 0)  // 0000
-                {
-                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                }
+//                if (*((quint16 *)_baData.data()) == 0)  // 0000
+//                {
+//                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+//                }
             }
 
             nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
@@ -724,6 +730,19 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
         pPainter->drawText(_rectArg, "]", _qTextOptions);
+    } else if ((g_syntax == XBinary::SYNTAX_ATT) && (sText.contains("("))) {
+        QString sArg1 = sText.section("(", 0, 0);
+        QString sArg2 = sText.section("(", 1, 1);
+        sArg2 = sArg2.section(")", 0, 0);
+
+        QRect _rectArg = rect;
+        drawArg(pPainter, _rectArg, sArg1);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg1).width());
+        pPainter->drawText(_rectArg, "(", _qTextOptions);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "(").width());
+        drawArg(pPainter, _rectArg, sArg2);
+        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg2).width());
+        pPainter->drawText(_rectArg, ")", _qTextOptions);
     } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (!(XBinary::isRegExpPresent("^-", sText))) &&
                                                                                                                                         (XBinary::isRegExpPresent("[-+]", sText))) {
         qint32 nArgCount = XBinary::getRegExpCount("[-+]", sText);
@@ -1167,26 +1186,8 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSO
 
             nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
 
-            if (cursorPosition.nColumn == COLUMN_LOCATION) {
-                osResult.nViewOffset = nBlockOffset;
-                osResult.nSize = nBlockSize;
-            }
-            //            else if(cursorPosition.nColumn==COLUMN_OFFSET)
-            //            {
-            //                osResult.nOffset=nBlockOffset;
-            //                osResult.nSize=nBlockSize;
-            //            }
-            else if (cursorPosition.nColumn == COLUMN_BYTES) {
-                // TODO
-                osResult.nViewOffset = nBlockOffset;
-                osResult.nSize = nBlockSize;
-            } else if (cursorPosition.nColumn == COLUMN_OPCODE) {
-                osResult.nViewOffset = nBlockOffset;
-                osResult.nSize = nBlockSize;
-            } else if (cursorPosition.nColumn == COLUMN_COMMENT) {
-                osResult.nViewOffset = nBlockOffset;
-                osResult.nSize = nBlockSize;
-            }
+            osResult.nViewOffset = nBlockOffset;
+            osResult.nSize = nBlockSize;
         } else {
             if (!isViewOffsetValid(osResult.nViewOffset)) {
                 osResult.nViewOffset = getViewSize();  // TODO Check
@@ -1273,9 +1274,13 @@ void XDisasmView::updateData()
                     bool bSuccess = false;
 
                     if (getXInfoDB() && (record.nVirtualAddress != (XADDR)-1)) {
-                        XInfoDB::SHOWRECORD showRecord = getXInfoDB()->getShowRecordByAddress(record.nVirtualAddress, false);
+                        XInfoDB::SHOWRECORD showRecord = getXInfoDB()->getShowRecordByAddress(record.nVirtualAddress, true);
 
                         if (showRecord.bValid) {
+                            if (record.nVirtualAddress != showRecord.nAddress) {
+                                record.bIsAprox = true;
+                            }
+
                             record.bIsAnalysed = true;
                             record.nVirtualAddress = showRecord.nAddress;
                             record.nDeviceOffset = showRecord.nOffset;
@@ -1516,7 +1521,7 @@ void XDisasmView::updateData()
                             }
                         }
 
-                        g_listRecords[i].array = ARRAY_UP;
+                        g_listRecords[i].array = ARROW_UP;
                     } else if (nCurrentAddress < nXrefTo) {
                         nStart = i;
 
@@ -1535,7 +1540,7 @@ void XDisasmView::updateData()
                             }
                         }
 
-                        g_listRecords[i].array = ARRAY_DOWN;
+                        g_listRecords[i].array = ARROW_DOWN;
                     }
 
                     g_listRecords[i].nArrayLevel = nMaxLevel + 1;
@@ -1556,12 +1561,6 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
     Q_UNUSED(nHeight)
 
     qint32 nArrowDelta = 0;
-
-    if (getXInfoDB()) {
-        if (getXInfoDB()->isDebugger()) {
-            nArrowDelta = getCharWidth() + 2 * getSideDelta();
-        }
-    }
 
     if (nColumn == COLUMN_ARROWS) {
         qint32 nNumberOfRecords = g_listRecords.count();
@@ -1591,9 +1590,9 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                         nDelta += 0.5 * getLineHeight();
                     }
 
-                    if (g_listRecords.at(i).array == ARRAY_UP) {
+                    if (g_listRecords.at(i).array == ARROW_UP) {
                         point3.setY(point1.y() - nDelta);
-                    } else if (g_listRecords.at(i).array == ARRAY_DOWN) {
+                    } else if (g_listRecords.at(i).array == ARROW_DOWN) {
                         point3.setY(point1.y() + nDelta);
                     }
 
@@ -1632,7 +1631,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         //        bool bIsBreakpoint = false;
 
         if (getXInfoDB()) {
-            if (nColumn == COLUMN_ARROWS) {
+            if (nColumn == COLUMN_BREAKPOINT) {
 #ifdef USE_XPROCESS
                 bIsDebugger = getXInfoDB()->isDebugger();
                 //                XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
@@ -1676,15 +1675,16 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
         //        textOption.bIsCursor = (nOffset == nCursorOffset) && (nColumn == COLUMN_BYTES);
 
-        if (nColumn == COLUMN_ARROWS) {
+        if (nColumn == COLUMN_BREAKPOINT) {
             if (bIsDebugger) {
+#ifdef USE_XPROCESS
                 qint32 _nLeft = nLeft + nWidth - getCharWidth() - getSideDelta();
                 qint32 _nWidth = getCharWidth();
                 qint32 _nHeight = _nWidth;
                 qint32 _nTop = nTop + 2;
 
                 pPainter->save();
-#ifdef USE_XPROCESS
+
                 if (g_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) {
                     // TODO
                     pPainter->setBrush(Qt::red);
@@ -1696,10 +1696,10 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
                     pPainter->setBrush(Qt::gray);  // TODO consts
                     pPainter->setPen(Qt::gray);
                 }
-#endif
-                pPainter->drawEllipse(QRect(_nLeft, _nTop, _nWidth, _nHeight));
 
+                pPainter->drawEllipse(QRect(_nLeft, _nTop, _nWidth, _nHeight));
                 pPainter->restore();
+#endif    
             }
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
@@ -2129,6 +2129,7 @@ void XDisasmView::adjustColumns()
     //    setColumnWidth(COLUMN_BYTES,5*getCharWidth());
 
     setColumnWidth(COLUMN_ARROWS, 5 * getCharWidth());
+    setColumnWidth(COLUMN_BREAKPOINT, 2 * getCharWidth());
     setColumnWidth(COLUMN_INFO, 2 * getCharWidth());
     setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
     setColumnWidth(COLUMN_COMMENT, 60 * getCharWidth());
