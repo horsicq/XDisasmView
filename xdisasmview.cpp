@@ -40,7 +40,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
     g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
-    g_bytesMode = BYTESMODE_RAW;
+//    g_bytesMode = BYTESMODE_RAW;
 
     addColumn("");  // Arrows
     addColumn("");  // Breakpoints
@@ -401,7 +401,7 @@ QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmR
                 riType = XInfoDB::RI_TYPE_ADDRESS;
             }
 
-            sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_syntax, riType, g_disasmOptions);
+            sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
         }
     }
 
@@ -684,7 +684,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
 
             _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
 
-            if (i == (nArgCount - 1)) {
+            if (i != nArgCount) {
                 pPainter->drawText(_rectArg, ", ", _qTextOptions);
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
             }
@@ -745,23 +745,27 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         pPainter->drawText(_rectArg, ")", _qTextOptions);
     } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (!(XBinary::isRegExpPresent("^-", sText))) &&
                                                                                                                                         (XBinary::isRegExpPresent("[-+]", sText))) {
-        qint32 nArgCount = XBinary::getRegExpCount("[-+]", sText);
+
+        QString _sText = sText;
+        qint32 nArgCount = XBinary::getRegExpCount("[-+]", _sText);
 
         QRect _rectArg = rect;
 
         for (qint32 i = 0; i <= nArgCount; i++) {
-            QString sArg = XBinary::getRegExpSection("[-+]", sText, i, i);
+            QString sArg = XBinary::getRegExpSection("[-+]", _sText, 0, 0);
             sArg = sArg.trimmed();
 
             drawArg(pPainter, _rectArg, sArg);
 
             _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
 
-            if (i == (nArgCount - 1)) {
-                QString sSigh = XBinary::regExp("[-+]", sText, i);
+            if (i != nArgCount) {
+                QString sSigh = XBinary::regExp("[-+]", _sText, 0);
                 sSigh = QString(" %1 ").arg(sSigh);
                 pPainter->drawText(_rectArg, sSigh, _qTextOptions);
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sSigh).width());
+
+                _sText = _sText.mid(sArg.size() + 3);
             }
         }
     } else if (sText.contains("<")) {
@@ -1338,6 +1342,17 @@ void XDisasmView::updateData()
                         if (record.nDeviceOffset != -1) {
                             nBufferSize = qMin(g_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
 
+                            if (getXInfoDB() && (record.nVirtualAddress != (XADDR)-1)) {
+                                QList<XInfoDB::SHOWRECORD> listRecords = getXInfoDB()->getShowRecordsInRegion(record.nVirtualAddress, nBufferSize);
+
+                                if (listRecords.count()) {
+                                    nBufferSize = listRecords.at(0).nAddress - record.nVirtualAddress;
+                                }
+                            }
+                            if ((g_options.nEntryPointAddress > record.nVirtualAddress) && (g_options.nEntryPointAddress < (record.nVirtualAddress + nBufferSize))) {
+                                nBufferSize = g_options.nEntryPointAddress - record.nVirtualAddress;
+                            }
+
                             baBuffer = read_array(record.nDeviceOffset, nBufferSize);
                             nBufferSize = baBuffer.size();
 
@@ -1465,8 +1480,6 @@ void XDisasmView::updateData()
                     if (sSymbol != "") {
                         record.sLocation = QString("%1.%2").arg(record.sLocation, sSymbol);
                     }
-                } else if (getAddressMode() == LOCMODE_LABEL) {
-                    record.sLocation = record.sLabel;
                 }
 
                 QList<HIGHLIGHTREGION> listHighLightRegions;
@@ -1612,7 +1625,7 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                 }
             }
         }
-    } else if (nColumn == COLUMN_INFO) {
+    } else if (nColumn == COLUMN_LABEL) {
         // TODO
     }
 }
@@ -1704,22 +1717,18 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);
-        } else if (nColumn == COLUMN_INFO) {
-            QString sInfoText;
-            if (g_listRecords.at(nRow).nInfo) {
-                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
-            }
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, sInfoText, &textOption);
+        } else if (nColumn == COLUMN_LABEL) {
+//            QString sInfoText;
+//            if (g_listRecords.at(nRow).nInfo) {
+//                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
+//            }
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLabel, &textOption);
         } else if (nColumn == COLUMN_BYTES) {
             if (g_listRecords.at(nRow).bIsBytesHighlighted) {
                 pPainter->fillRect(nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).colBytesBackground);
             }
 
-            if (g_bytesMode == BYTESMODE_RAW) {
-                drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
-            } else if (g_bytesMode == BYTESMODE_LABEL) {
-                drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLabel, &textOption);
-            }
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
         } else if (nColumn == COLUMN_OPCODE) {
             QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
 
@@ -2129,10 +2138,13 @@ void XDisasmView::adjustColumns()
     //    setColumnWidth(COLUMN_BYTES,5*getCharWidth());
 
     setColumnWidth(COLUMN_ARROWS, 5 * getCharWidth());
-    setColumnWidth(COLUMN_BREAKPOINT, 2 * getCharWidth());
-    setColumnWidth(COLUMN_INFO, 2 * getCharWidth());
+    setColumnWidth(COLUMN_LABEL, 10 * getCharWidth());
     setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
     setColumnWidth(COLUMN_COMMENT, 60 * getCharWidth());
+    setColumnWidth(COLUMN_BREAKPOINT, 2 * getCharWidth());
+#ifndef USE_XPROCESS
+    setColumnEnabled(COLUMN_BREAKPOINT, false);
+#endif
 }
 
 void XDisasmView::registerShortcuts(bool bState)
@@ -2193,9 +2205,6 @@ void XDisasmView::_headerClicked(qint32 nColumn)
             setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
             setAddressMode(LOCMODE_RELADDRESS);
         } else if (getAddressMode() == LOCMODE_RELADDRESS) {
-            setColumnTitle(COLUMN_LOCATION, tr("Label"));
-            setAddressMode(LOCMODE_LABEL);
-        } else if (getAddressMode() == LOCMODE_LABEL) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
             setAddressMode(LOCMODE_ADDRESS);
         } else if (getAddressMode() == LOCMODE_THIS) {
@@ -2220,16 +2229,16 @@ void XDisasmView::_headerClicked(qint32 nColumn)
         }
 
         adjust(true);
-    } else if (nColumn == COLUMN_BYTES) {
-        if (g_bytesMode == BYTESMODE_RAW) {
-            setColumnTitle(COLUMN_BYTES, tr("Label"));
-            g_bytesMode = BYTESMODE_LABEL;
-        } else if (g_bytesMode == BYTESMODE_LABEL) {
-            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
-            g_bytesMode = BYTESMODE_RAW;
-        }
+//    } else if (nColumn == COLUMN_BYTES) {
+//        if (g_bytesMode == BYTESMODE_RAW) {
+//            setColumnTitle(COLUMN_BYTES, tr("Label"));
+//            g_bytesMode = BYTESMODE_LABEL;
+//        } else if (g_bytesMode == BYTESMODE_LABEL) {
+//            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
+//            g_bytesMode = BYTESMODE_RAW;
+//        }
 
-        adjust(true);
+//        adjust(true);
     }
 
     XAbstractTableView::_headerClicked(nColumn);

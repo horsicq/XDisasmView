@@ -121,7 +121,7 @@ private:
         COLUMN_ARROWS = 0,
         COLUMN_BREAKPOINT,
         COLUMN_LOCATION,
-        COLUMN_INFO,
+        COLUMN_LABEL,
         COLUMN_BYTES,
         COLUMN_OPCODE,
         COLUMN_COMMENT
@@ -175,10 +175,9 @@ private:
         OPCODEMODE_ADDRESS,
     };
 
-    enum BYTESMODE {
-        BYTESMODE_RAW = 0,
-        BYTESMODE_LABEL
-    };
+//    enum BYTESMODE {
+//        BYTESMODE_RAW = 0,
+//    };
 
     QString convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
@@ -272,7 +271,7 @@ private:
     bool g_bIsAddressColon;
     bool g_bIsHighlight;
     OPCODEMODE g_opcodeMode;
-    BYTESMODE g_bytesMode;
+//    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
     QList<VIEWSTRUCT> g_listViewStruct;
