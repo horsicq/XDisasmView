@@ -157,7 +157,7 @@ private:
         QColor colBytesBackground;
         QColor colBytesBackgroundSelected;
         quint32 nInfo;
-        bool bIsAprox; // TODO mn red color!!!
+        bool bIsAprox;  // TODO mn red color!!!
         // TODO jmp/jcc
     };
 
@@ -175,9 +175,9 @@ private:
         OPCODEMODE_ADDRESS,
     };
 
-//    enum BYTESMODE {
-//        BYTESMODE_RAW = 0,
-//    };
+    //    enum BYTESMODE {
+    //        BYTESMODE_RAW = 0,
+    //    };
 
     QString convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
@@ -271,7 +271,7 @@ private:
     bool g_bIsAddressColon;
     bool g_bIsHighlight;
     OPCODEMODE g_opcodeMode;
-//    BYTESMODE g_bytesMode;
+    //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
     QList<VIEWSTRUCT> g_listViewStruct;

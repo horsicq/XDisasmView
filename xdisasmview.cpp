@@ -40,7 +40,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
     g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
-//    g_bytesMode = BYTESMODE_RAW;
+    //    g_bytesMode = BYTESMODE_RAW;
 
     addColumn("");  // Arrows
     addColumn("");  // Breakpoints
@@ -485,12 +485,12 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
             } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
-//                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
+                //                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
 
-//                if (*((quint16 *)_baData.data()) == 0)  // 0000
-//                {
-//                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-//                }
+                //                if (*((quint16 *)_baData.data()) == 0)  // 0000
+                //                {
+                //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+                //                }
             }
 
             nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
@@ -743,9 +743,8 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg2);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg2).width());
         pPainter->drawText(_rectArg, ")", _qTextOptions);
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (!(XBinary::isRegExpPresent("^-", sText))) &&
-                                                                                                                                        (XBinary::isRegExpPresent("[-+]", sText))) {
-
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+               (!(XBinary::isRegExpPresent("^-", sText))) && (XBinary::isRegExpPresent("[-+]", sText))) {
         QString _sText = sText;
         qint32 nArgCount = XBinary::getRegExpCount("[-+]", _sText);
 
@@ -1712,16 +1711,16 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
                 pPainter->drawEllipse(QRect(_nLeft, _nTop, _nWidth, _nHeight));
                 pPainter->restore();
-#endif    
+#endif
             }
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);
         } else if (nColumn == COLUMN_LABEL) {
-//            QString sInfoText;
-//            if (g_listRecords.at(nRow).nInfo) {
-//                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
-//            }
+            //            QString sInfoText;
+            //            if (g_listRecords.at(nRow).nInfo) {
+            //                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
+            //            }
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLabel, &textOption);
         } else if (nColumn == COLUMN_BYTES) {
             if (g_listRecords.at(nRow).bIsBytesHighlighted) {
@@ -2229,16 +2228,16 @@ void XDisasmView::_headerClicked(qint32 nColumn)
         }
 
         adjust(true);
-//    } else if (nColumn == COLUMN_BYTES) {
-//        if (g_bytesMode == BYTESMODE_RAW) {
-//            setColumnTitle(COLUMN_BYTES, tr("Label"));
-//            g_bytesMode = BYTESMODE_LABEL;
-//        } else if (g_bytesMode == BYTESMODE_LABEL) {
-//            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
-//            g_bytesMode = BYTESMODE_RAW;
-//        }
+        //    } else if (nColumn == COLUMN_BYTES) {
+        //        if (g_bytesMode == BYTESMODE_RAW) {
+        //            setColumnTitle(COLUMN_BYTES, tr("Label"));
+        //            g_bytesMode = BYTESMODE_LABEL;
+        //        } else if (g_bytesMode == BYTESMODE_LABEL) {
+        //            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
+        //            g_bytesMode = BYTESMODE_RAW;
+        //        }
 
-//        adjust(true);
+        //        adjust(true);
     }
 
     XAbstractTableView::_headerClicked(nColumn);
