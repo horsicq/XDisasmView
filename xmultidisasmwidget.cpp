@@ -197,9 +197,9 @@ void XMultiDisasmWidget::reloadFileType()
         options.bMenu_Hex = g_options.bMenu_Hex;
 
         if (g_options.fileType == XBinary::FT_REGION) {
-            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, g_pDevice, true, g_options.nStartAddress);
+            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, XBinary::MAPMODE_UNKNOWN, g_pDevice,  true, g_options.nStartAddress);
         } else {
-            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, g_pDevice);
+            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, XBinary::MAPMODE_UNKNOWN, g_pDevice);
         }
 
         if (g_options.sArch != "") {
