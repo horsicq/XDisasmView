@@ -39,7 +39,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_bIsAddressColon = false;
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
-    g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
+    // g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
     //    g_bytesMode = BYTESMODE_RAW;
 
     addColumn("");  // Arrows
@@ -48,7 +48,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     addColumn(tr("Address"), 0, true);
     addColumn("");  // Info
     addColumn(tr("Bytes"), 0, true);
-    addColumn(QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")), 0, true);  // TODO fix it in _adjustWindow
+    addColumn(tr("Opcode"), 0, true);  // TODO fix it in _adjustWindow
     addColumn(tr("Comment"));
 
     //    setLastColumnStretch(true);
@@ -390,19 +390,21 @@ QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmR
     QString sResult;
 
     if (getXInfoDB()) {
-        if ((g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) || (g_opcodeMode == OPCODEMODE_SYMBOL) || (g_opcodeMode == OPCODEMODE_ADDRESS)) {
-            XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
+        // if ((g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) || (g_opcodeMode == OPCODEMODE_SYMBOL) || (g_opcodeMode == OPCODEMODE_ADDRESS)) {
+        //     XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
 
-            if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
-                riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-            } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
-                riType = XInfoDB::RI_TYPE_SYMBOL;
-            } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
-                riType = XInfoDB::RI_TYPE_ADDRESS;
-            }
+        //     if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
+        //         riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
+        //     } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
+        //         riType = XInfoDB::RI_TYPE_SYMBOL;
+        //     } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
+        //         riType = XInfoDB::RI_TYPE_ADDRESS;
+        //     }
 
-            sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
-        }
+        //     sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
+        // }
+        XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
+        sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
     }
 
     if (sResult == "") {
@@ -2213,21 +2215,40 @@ void XDisasmView::_headerClicked(qint32 nColumn)
 
         adjust(true);
     } else if (nColumn == COLUMN_OPCODE) {
-        if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
-            setColumnTitle(COLUMN_OPCODE, tr("Opcode"));
-            g_opcodeMode = OPCODEMODE_ORIGINAL;
-        } else if (g_opcodeMode == OPCODEMODE_ORIGINAL) {
-            setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Symbol")));
-            g_opcodeMode = OPCODEMODE_SYMBOL;
-        } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
-            setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Address")));
-            g_opcodeMode = OPCODEMODE_ADDRESS;
-        } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
-            setColumnTitle(COLUMN_OPCODE, QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")));
-            g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
-        }
+        // QMenu contextMenu(this);
+        // QMenu menuWidth(tr("Width"), this);
 
-        adjust(true);
+        // QAction action8(QString("8"), this);
+        // action8.setProperty("width", 8);
+        // connect(&action8, SIGNAL(triggered()), this, SLOT(changeWidth()));
+        // menuWidth.addAction(&action8);
+        // QAction action16(QString("16"), this);
+        // action16.setProperty("width", 16);
+        // connect(&action16, SIGNAL(triggered()), this, SLOT(changeWidth()));
+        // menuWidth.addAction(&action16);
+        // QAction action32(QString("32"), this);
+        // action32.setProperty("width", 32);
+        // connect(&action32, SIGNAL(triggered()), this, SLOT(changeWidth()));
+        // menuWidth.addAction(&action32);
+
+        // contextMenu.addMenu(&menuWidth);
+
+        // contextMenu.exec(QCursor::pos());
+
+        // if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
+        //     setColumnTitle(COLUMN_OPCODE, tr("Opcode"));
+        //     g_opcodeMode = OPCODEMODE_ORIGINAL;
+        // } else if (g_opcodeMode == OPCODEMODE_ORIGINAL) {
+        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Symbol")));
+        //     g_opcodeMode = OPCODEMODE_SYMBOL;
+        // } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
+        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Address")));
+        //     g_opcodeMode = OPCODEMODE_ADDRESS;
+        // } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
+        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")));
+        //     g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
+        // }
+        // adjust(true);
         //    } else if (nColumn == COLUMN_BYTES) {
         //        if (g_bytesMode == BYTESMODE_RAW) {
         //            setColumnTitle(COLUMN_BYTES, tr("Label"));

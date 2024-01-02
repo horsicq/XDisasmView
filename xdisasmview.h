@@ -167,12 +167,12 @@ private:
         bool bHex;
     };
 
-    enum OPCODEMODE {
-        OPCODEMODE_ORIGINAL = 0,
-        OPCODEMODE_SYMBOLADDRESS,
-        OPCODEMODE_SYMBOL,
-        OPCODEMODE_ADDRESS,
-    };
+    // enum OPCODEMODE {
+    //     OPCODEMODE_ORIGINAL = 0,
+    //     OPCODEMODE_SYMBOLADDRESS,
+    //     OPCODEMODE_SYMBOL,
+    //     OPCODEMODE_ADDRESS,
+    // };
 
     //    enum BYTESMODE {
     //        BYTESMODE_RAW = 0,
@@ -269,7 +269,7 @@ private:
     qint64 g_nThisBaseDeviceOffset;
     bool g_bIsAddressColon;
     bool g_bIsHighlight;
-    OPCODEMODE g_opcodeMode;
+    // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
