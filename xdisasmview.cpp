@@ -656,15 +656,18 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
     if (colorRecord.colBackground.isValid() || colorRecord.colMain.isValid()) {
         pPainter->save();
 
+        QRect _rectString = rect;
+        _rectString.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sText).width());
+
         if (colorRecord.colBackground.isValid()) {
-            pPainter->fillRect(rect, QBrush(colorRecord.colBackground));
+            pPainter->fillRect(_rectString, QBrush(colorRecord.colBackground));
         }
 
         if (colorRecord.colMain.isValid()) {
             pPainter->setPen(colorRecord.colMain);
         }
 
-        pPainter->drawText(rect, sText, _qTextOptions);
+        pPainter->drawText(_rectString, sText, _qTextOptions);
 
         pPainter->restore();
     } else {
@@ -674,7 +677,7 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
 
 void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
-    if (sText.contains(", ")) {
+    if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(", "))) {
         qint32 nArgCount = sText.count(", ");
 
         QRect _rectArg = rect;
@@ -769,11 +772,29 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _sText = _sText.mid(sArg.size() + 3);
             }
         }
+    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+               (sText.contains("*"))) {
+        qint32 nArgCount = sText.count("*");
+
+        QRect _rectArg = rect;
+
+        for (qint32 i = 0; i <= nArgCount; i++) {
+            QString sArg = sText.section("*", i, i);
+
+            drawArg(pPainter, _rectArg, sArg);
+
+            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+            if (i != nArgCount) {
+                pPainter->drawText(_rectArg, "*", _qTextOptions);
+                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "*").width());
+            }
+        }
     } else if (sText.contains("<")) {
         drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
     } else {
-        COLOR_RECORD colorReg = getOperandColor(sText.toLower());
-        drawColorText(pPainter, rect, sText, colorReg);
+        COLOR_RECORD colorOperand = getOperandColor(sText.toLower());
+        drawColorText(pPainter, rect, sText, colorOperand);
     }
 }
 
