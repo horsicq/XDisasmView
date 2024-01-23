@@ -677,6 +677,8 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
 
 void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
+    // TODO rewrite
+    // QList<QString> XCapstone::getOperands(syntax, family, sText);
     if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(", "))) {
         qint32 nArgCount = sText.count(", ");
 
@@ -694,7 +696,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
             }
         }
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
                (sText.toLower().contains("ptr "))) {
         QRect _rectArg = rect;
 
@@ -712,7 +714,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         pPainter->drawText(_rectArg, _sPref, _qTextOptions);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
         drawArg(pPainter, _rectArg, sArg);
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(":"))) {
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(":"))) {
         QRect _rectArg = rect;
 
         QString _sPref = sText.section(":", 0, 0);
@@ -723,7 +725,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         pPainter->drawText(_rectArg, ":", _qTextOptions);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ":").width());
         drawArg(pPainter, _rectArg, sArg);
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
         QRect _rectArg = rect;
 
         QString _sPref = sText.section("[", 0, 0) + "[";
@@ -735,7 +737,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
         pPainter->drawText(_rectArg, "]", _qTextOptions);
-    } else if ((g_syntax == XBinary::SYNTAX_ATT) && (sText.contains("("))) {
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && (g_syntax == XBinary::SYNTAX_ATT) && (sText.contains("("))) {
         QString sArg1 = sText.section("(", 0, 0);
         QString sArg2 = sText.section("(", 1, 1);
         sArg2 = sArg2.section(")", 0, 0);
@@ -748,7 +750,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
         drawArg(pPainter, _rectArg, sArg2);
         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg2).width());
         pPainter->drawText(_rectArg, ")", _qTextOptions);
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
                (!(XBinary::isRegExpPresent("^-", sText))) && (XBinary::isRegExpPresent("[-+]", sText))) {
         QString _sText = sText;
         qint32 nArgCount = XBinary::getRegExpCount("[-+]", _sText);
@@ -772,7 +774,7 @@ void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &
                 _sText = _sText.mid(sArg.size() + 3);
             }
         }
-    } else if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
                (sText.contains("*"))) {
         qint32 nArgCount = sText.count("*");
 
