@@ -677,131 +677,151 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
 
 void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
 {
-    // TODO rewrite
-    // QList<QString> XCapstone::getOperands(syntax, family, sText);
-    if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(", "))) {
-        qint32 nArgCount = sText.count(", ");
+    QList<XCapstone::OPERANDPART> listParts = XCapstone::getOperandParts(g_dmFamily, sText, g_syntax);
 
-        QRect _rectArg = rect;
+    qint32 nNumberOfParts = listParts.count();
 
-        for (qint32 i = 0; i <= nArgCount; i++) {
-            QString sArg = sText.section(", ", i, i);
+    QRect _rect = rect;
 
-            drawArg(pPainter, _rectArg, sArg);
+    for (qint32 i = 0; i < nNumberOfParts; i++) {
+        QString sString = listParts.at(i).sString;
 
-            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+        qint32 nWidth = QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sString).width();
+        _rect.setWidth(nWidth);
 
-            if (i != nArgCount) {
-                pPainter->drawText(_rectArg, ", ", _qTextOptions);
-                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
-            }
-        }
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
-               ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
-               (sText.toLower().contains("ptr "))) {
-        QRect _rectArg = rect;
-
-        QString _sPref = sText.section("ptr ", 0, 0) + "ptr ";
-        QString sArg = sText.section("ptr ", 1, 1);
-
-        if (g_disasmOptions.bIsUppercase) {
-            _sPref = sText.section("PTR ", 0, 0) + "PTR ";
-            sArg = sText.section("PTR ", 1, 1);
+        if (listParts.at(i).bIsMain) {
+            COLOR_RECORD colorOperand = getOperandColor(sString.toLower());
+            drawColorText(pPainter, _rect, sString, colorOperand);
         } else {
-            _sPref = sText.section("ptr ", 0, 0) + "ptr ";
-            sArg = sText.section("ptr ", 1, 1);
+            pPainter->drawText(_rect, sString, _qTextOptions);
         }
 
-        pPainter->drawText(_rectArg, _sPref, _qTextOptions);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
-        drawArg(pPainter, _rectArg, sArg);
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
-               ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(":"))) {
-        QRect _rectArg = rect;
-
-        QString _sPref = sText.section(":", 0, 0);
-        QString sArg = sText.section(":", 1, 1);
-
-        drawArg(pPainter, _rectArg, _sPref);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
-        pPainter->drawText(_rectArg, ":", _qTextOptions);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ":").width());
-        drawArg(pPainter, _rectArg, sArg);
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
-               ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
-        QRect _rectArg = rect;
-
-        QString _sPref = sText.section("[", 0, 0) + "[";
-        QString sArg = sText.section("[", 1, 1);
-        sArg = sArg.section("]", 0, 0);
-
-        pPainter->drawText(_rectArg, _sPref, _qTextOptions);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
-        drawArg(pPainter, _rectArg, sArg);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
-        pPainter->drawText(_rectArg, "]", _qTextOptions);
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && (g_syntax == XBinary::SYNTAX_ATT) && (sText.contains("("))) {
-        QString sArg1 = sText.section("(", 0, 0);
-        QString sArg2 = sText.section("(", 1, 1);
-        sArg2 = sArg2.section(")", 0, 0);
-
-        QRect _rectArg = rect;
-        drawArg(pPainter, _rectArg, sArg1);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg1).width());
-        pPainter->drawText(_rectArg, "(", _qTextOptions);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "(").width());
-        drawArg(pPainter, _rectArg, sArg2);
-        _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg2).width());
-        pPainter->drawText(_rectArg, ")", _qTextOptions);
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
-               ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
-               (!(XBinary::isRegExpPresent("^-", sText))) && (XBinary::isRegExpPresent("[-+]", sText))) {
-        QString _sText = sText;
-        qint32 nArgCount = XBinary::getRegExpCount("[-+]", _sText);
-
-        QRect _rectArg = rect;
-
-        for (qint32 i = 0; i <= nArgCount; i++) {
-            QString sArg = XBinary::getRegExpSection("[-+]", _sText, 0, 0);
-            sArg = sArg.trimmed();
-
-            drawArg(pPainter, _rectArg, sArg);
-
-            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
-
-            if (i != nArgCount) {
-                QString sSigh = XBinary::regExp("[-+]", _sText, 0);
-                sSigh = QString(" %1 ").arg(sSigh);
-                pPainter->drawText(_rectArg, sSigh, _qTextOptions);
-                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sSigh).width());
-
-                _sText = _sText.mid(sArg.size() + 3);
-            }
-        }
-    } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
-               ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("*"))) {
-        qint32 nArgCount = sText.count("*");
-
-        QRect _rectArg = rect;
-
-        for (qint32 i = 0; i <= nArgCount; i++) {
-            QString sArg = sText.section("*", i, i);
-
-            drawArg(pPainter, _rectArg, sArg);
-
-            _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
-
-            if (i != nArgCount) {
-                pPainter->drawText(_rectArg, "*", _qTextOptions);
-                _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "*").width());
-            }
-        }
-    } else if (sText.contains("<")) {
-        drawColorText(pPainter, rect, sText, g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS));
-    } else {
-        COLOR_RECORD colorOperand = getOperandColor(sText.toLower());
-        drawColorText(pPainter, rect, sText, colorOperand);
+        _rect.setX(_rect.x() + nWidth);
     }
+
+    // // TODO rewrite
+    // // QList<QString> XCapstone::getOperands(syntax, family, sText);
+    // if (((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(", "))) {
+    //     qint32 nArgCount = sText.count(", ");
+
+    //     QRect _rectArg = rect;
+
+    //     for (qint32 i = 0; i <= nArgCount; i++) {
+    //         QString sArg = sText.section(", ", i, i);
+
+    //         drawArg(pPainter, _rectArg, sArg);
+
+    //         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+    //         if (i != nArgCount) {
+    //             pPainter->drawText(_rectArg, ", ", _qTextOptions);
+    //             _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ", ").width());
+    //         }
+    //     }
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
+    //            ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+    //            (sText.toLower().contains("ptr "))) {
+    //     QRect _rectArg = rect;
+
+    //     QString _sPref = sText.section("ptr ", 0, 0) + "ptr ";
+    //     QString sArg = sText.section("ptr ", 1, 1);
+
+    //     if (g_disasmOptions.bIsUppercase) {
+    //         _sPref = sText.section("PTR ", 0, 0) + "PTR ";
+    //         sArg = sText.section("PTR ", 1, 1);
+    //     } else {
+    //         _sPref = sText.section("ptr ", 0, 0) + "ptr ";
+    //         sArg = sText.section("ptr ", 1, 1);
+    //     }
+
+    //     pPainter->drawText(_rectArg, _sPref, _qTextOptions);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+    //     drawArg(pPainter, _rectArg, sArg);
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
+    //            ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains(":"))) {
+    //     QRect _rectArg = rect;
+
+    //     QString _sPref = sText.section(":", 0, 0);
+    //     QString sArg = sText.section(":", 1, 1);
+
+    //     drawArg(pPainter, _rectArg, _sPref);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+    //     pPainter->drawText(_rectArg, ":", _qTextOptions);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, ":").width());
+    //     drawArg(pPainter, _rectArg, sArg);
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
+    //            ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("["))) {
+    //     QRect _rectArg = rect;
+
+    //     QString _sPref = sText.section("[", 0, 0) + "[";
+    //     QString sArg = sText.section("[", 1, 1);
+    //     sArg = sArg.section("]", 0, 0);
+
+    //     pPainter->drawText(_rectArg, _sPref, _qTextOptions);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, _sPref).width());
+    //     drawArg(pPainter, _rectArg, sArg);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+    //     pPainter->drawText(_rectArg, "]", _qTextOptions);
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) && (g_syntax == XBinary::SYNTAX_ATT) && (sText.contains("("))) {
+    //     QString sArg1 = sText.section("(", 0, 0);
+    //     QString sArg2 = sText.section("(", 1, 1);
+    //     sArg2 = sArg2.section(")", 0, 0);
+
+    //     QRect _rectArg = rect;
+    //     drawArg(pPainter, _rectArg, sArg1);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg1).width());
+    //     pPainter->drawText(_rectArg, "(", _qTextOptions);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "(").width());
+    //     drawArg(pPainter, _rectArg, sArg2);
+    //     _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg2).width());
+    //     pPainter->drawText(_rectArg, ")", _qTextOptions);
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
+    //            ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) &&
+    //            (!(XBinary::isRegExpPresent("^-", sText))) && (XBinary::isRegExpPresent("[-+]", sText))) {
+    //     QString _sText = sText;
+    //     qint32 nArgCount = XBinary::getRegExpCount("[-+]", _sText);
+
+    //     QRect _rectArg = rect;
+
+    //     for (qint32 i = 0; i <= nArgCount; i++) {
+    //         QString sArg = XBinary::getRegExpSection("[-+]", _sText, 0, 0);
+    //         sArg = sArg.trimmed();
+
+    //         drawArg(pPainter, _rectArg, sArg);
+
+    //         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+    //         if (i != nArgCount) {
+    //             QString sSigh = XBinary::regExp("[-+]", _sText, 0);
+    //             sSigh = QString(" %1 ").arg(sSigh);
+    //             pPainter->drawText(_rectArg, sSigh, _qTextOptions);
+    //             _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sSigh).width());
+
+    //             _sText = _sText.mid(sArg.size() + 3);
+    //         }
+    //     }
+    // } else if ((g_dmFamily == XBinary::DMFAMILY_X86) &&
+    //            ((g_syntax == XBinary::SYNTAX_DEFAULT) || (g_syntax == XBinary::SYNTAX_INTEL) || (g_syntax == XBinary::SYNTAX_MASM)) && (sText.contains("*"))) {
+    //     qint32 nArgCount = sText.count("*");
+
+    //     QRect _rectArg = rect;
+
+    //     for (qint32 i = 0; i <= nArgCount; i++) {
+    //         QString sArg = sText.section("*", i, i);
+
+    //         drawArg(pPainter, _rectArg, sArg);
+
+    //         _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sArg).width());
+
+    //         if (i != nArgCount) {
+    //             pPainter->drawText(_rectArg, "*", _qTextOptions);
+    //             _rectArg.setX(_rectArg.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, "*").width());
+    //         }
+    //     }
+    // } else {
+    //     COLOR_RECORD colorOperand = getOperandColor(sText.toLower());
+    //     drawColorText(pPainter, rect, sText, colorOperand);
+    // }
 }
 
 void XDisasmView::drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond)
@@ -958,6 +978,7 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
 {
     COLOR_RECORD result = {};
 
+    bool bRef = false;
     bool bGeneralReg = false;
     bool bStackReg = false;
     bool bSegmentReg = false;
@@ -968,7 +989,9 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
     bool bXMMReg = false;
     bool bNumber = false;
 
-    if (XCapstone::isGeneralRegister(g_dmFamily, sOperand, g_syntax)) {
+    if (XCapstone::isRef(g_dmFamily, sOperand, g_syntax)) {
+        bRef = true;
+    } else if (XCapstone::isGeneralRegister(g_dmFamily, sOperand, g_syntax)) {
         bGeneralReg = true;
     } else if (XCapstone::isStackRegister(g_dmFamily, sOperand, g_syntax)) {
         bStackReg = true;
@@ -988,37 +1011,39 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
         bNumber = true;
     }
 
-    if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        if (bGeneralReg || bStackReg || bSegmentReg || bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg || bXMMReg) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
-            if (bGeneralReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
-            } else if (bStackReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_STACK);
-            } else if (bSegmentReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
-            } else if (bDebugReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG);
-            } else if (bInstructionPointerReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_IP);
-            } else if (bFlagsReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS);
-            } else if (bFPUReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FPU);
-            } else if (bXMMReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_XMM);
+    if (bRef) {
+        result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REFS);
+    } else if (bNumber) {
+        result = g_mapColors.value(XOptions::ID_DISASM_COLOR_NUMBERS);
+    } else {
+        if (g_dmFamily == XBinary::DMFAMILY_X86) {
+            if (bGeneralReg || bStackReg || bSegmentReg || bDebugReg || bInstructionPointerReg || bFlagsReg || bFPUReg || bXMMReg) {
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
+                if (bGeneralReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_GENERAL);
+                } else if (bStackReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_STACK);
+                } else if (bSegmentReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_SEGMENT);
+                } else if (bDebugReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_DEBUG);
+                } else if (bInstructionPointerReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_IP);
+                } else if (bFlagsReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS);
+                } else if (bFPUReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_FPU);
+                } else if (bXMMReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_REGS_XMM);
+                }
             }
-        } else if (bNumber) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_NUMBERS);
-        }
-    } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
-        if (bGeneralReg) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
+        } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
             if (bGeneralReg) {
-                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL);
+                result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
+                if (bGeneralReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL);
+                }
             }
-        } else if (bNumber) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_NUMBERS);
         }
     }
 
@@ -2313,7 +2338,7 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
                 nAddress = g_listRecords.at(nRow).disasmResult.nXrefToMemory;
             }
 
-            if (nAddress != -1) {
+            if (nAddress != (XADDR)-1) {
                 goToAddress(nAddress, true, true, true);
             }
         }
