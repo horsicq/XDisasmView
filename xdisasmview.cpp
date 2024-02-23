@@ -776,7 +776,7 @@ QMap<XOptions::ID, XDisasmView::COLOR_RECORD> XDisasmView::getColorRecordsMap()
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_FPU));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_REGS_XMM, getColorRecord(XOptions::ID_DISASM_COLOR_X86_REGS_XMM));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL));
-        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC));
+        mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH));
         mapResult.insert(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP, getColorRecord(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP));
@@ -826,8 +826,8 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
         if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL);
-        } else if (XCapstone::isJccOpcode(g_dmFamily, sOpcode, g_syntax)) {
-            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC);
+        } else if (XCapstone::isCondJumpOpcode(g_dmFamily, sOpcode, g_syntax)) {
+            result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP);
         } else if (XCapstone::isRetOpcode(g_dmFamily, sOpcode, g_syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET);
         } else if (XCapstone::isPushOpcode(g_dmFamily, sOpcode, g_syntax)) {

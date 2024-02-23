@@ -96,7 +96,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP, QString("%1|%2").arg(QColor(Qt::gray).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
-        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP, QString("%1|%2").arg(QColor(Qt::green).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP, QString("%1|%2").arg(QColor(Qt::darkBlue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3, QString("%1|%2").arg(QColor(Qt::darkGray).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
@@ -192,7 +192,7 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
             listResult.append(record);
         }
         {
-            DialogViewColors::RECORD record = {sGroup, "JCC", XOptions::ID_DISASM_COLOR_X86_OPCODE_JCC};
+            DialogViewColors::RECORD record = {sGroup, "COND JMP", XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP};
             listResult.append(record);
         }
         {
