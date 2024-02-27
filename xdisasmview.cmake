@@ -25,12 +25,17 @@ set(XDISASMVIEW_SOURCES
     ${XSYMBOLSWIDGET_SOURCES}
     ${XDECOMPILER_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.h
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.ui
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.h
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.ui
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmview.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmview.h
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.h
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.ui
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.h
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmviewoptionswidget.ui
 )
