@@ -39,8 +39,10 @@ public:
         XADDR nStartAddress;  // For FT_REGION
         XADDR nInitAddress;
         QString sTitle;
+        bool bModeFixed;
         QString sArch;
         bool bMenu_Hex;
+        bool bHideReadOnly;
     };
 
     explicit XMultiDisasmWidget(QWidget *pParent = nullptr);

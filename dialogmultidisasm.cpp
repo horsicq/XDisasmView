@@ -46,6 +46,10 @@ void DialogMultiDisasm::setData(QIODevice *pDevice, const XMultiDisasmWidget::OP
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
+
+    if (options.bHideReadOnly) {
+        ui->widgetDisasm->setReadonlyVisible(false);
+    }
 }
 
 void DialogMultiDisasm::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)

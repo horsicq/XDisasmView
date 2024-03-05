@@ -206,6 +206,8 @@ void XMultiDisasmWidget::reloadFileType()
             options.memoryMapRegion.sArch = g_options.sArch;
         }
 
+        ui->comboBoxMode->setEnabled(!g_options.bModeFixed);
+
         // ui->scrollAreaDisasm->setData(g_pDevice, options);
 
         XBinary::DM disasmMode = XBinary::getDisasmMode(&options.memoryMapRegion);
