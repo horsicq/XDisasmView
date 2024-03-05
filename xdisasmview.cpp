@@ -1887,16 +1887,18 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addMenu(&menuFollowIn);
         }
 
-        menuEdit.setEnabled(!isReadonly());
+        if (!(g_options.bHideReadOnly)) {
+            menuEdit.setEnabled(!isReadonly());
 
-        if (mstate.bPhysicalSize) {
-            {
-                actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
-                connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
-                menuEdit.addAction(&actionEditHex);
+            if (mstate.bPhysicalSize) {
+                {
+                    actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
+                    connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
+                    menuEdit.addAction(&actionEditHex);
+                }
+
+                contextMenu.addMenu(&menuEdit);
             }
-
-            contextMenu.addMenu(&menuEdit);
         }
         {
             {
@@ -1907,7 +1909,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addMenu(&menuSelect);
         }
 #ifdef QT_SQL_LIB
-        if (mstate.bSize) {
+        if ((mstate.bSize) && (getXInfoDB())) {
             {
                 actionAnalyzeAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL));
                 connect(&actionAnalyzeAll, SIGNAL(triggered()), this, SLOT(_analyzeAll()));
@@ -2102,17 +2104,19 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!g_shortCuts[SC_FOLLOWIN_HEX]) g_shortCuts[SC_FOLLOWIN_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX), this, SLOT(_hexSlot()));
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
 #ifdef QT_SQL_LIB
-        if (!g_shortCuts[SC_ANALYZE_ALL]) g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
-        if (!g_shortCuts[SC_ANALYZE_ANALYZE])
-            g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
-        if (!g_shortCuts[SC_ANALYZE_DISASM])
-            g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
-        if (!g_shortCuts[SC_ANALYZE_REMOVE])
-            g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
-        if (!g_shortCuts[SC_ANALYZE_SYMBOLS])
-            g_shortCuts[SC_ANALYZE_SYMBOLS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS), this, SLOT(_analyzeSymbols()));
-        if (!g_shortCuts[SC_ANALYZE_FUNCTIONS])
-            g_shortCuts[SC_ANALYZE_FUNCTIONS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS), this, SLOT(_analyzeFunctions()));
+        if (getXInfoDB()) {
+            if (!g_shortCuts[SC_ANALYZE_ALL]) g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
+            if (!g_shortCuts[SC_ANALYZE_ANALYZE])
+                g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
+            if (!g_shortCuts[SC_ANALYZE_DISASM])
+                g_shortCuts[SC_ANALYZE_DISASM] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM), this, SLOT(_analyzeDisasm()));
+            if (!g_shortCuts[SC_ANALYZE_REMOVE])
+                g_shortCuts[SC_ANALYZE_REMOVE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE), this, SLOT(_analyzeRemove()));
+            if (!g_shortCuts[SC_ANALYZE_SYMBOLS])
+                g_shortCuts[SC_ANALYZE_SYMBOLS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS), this, SLOT(_analyzeSymbols()));
+            if (!g_shortCuts[SC_ANALYZE_FUNCTIONS])
+                g_shortCuts[SC_ANALYZE_FUNCTIONS] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS), this, SLOT(_analyzeFunctions()));
+        }
 #endif
     } else {
         for (qint32 i = 0; i < __SC_SIZE; i++) {

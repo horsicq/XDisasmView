@@ -195,6 +195,7 @@ void XMultiDisasmWidget::reloadFileType()
         options.nInitAddress = g_options.nInitAddress;
         options.nEntryPointAddress = XFormats::getEntryPointAddress(g_options.fileType, g_pDevice);
         options.bMenu_Hex = g_options.bMenu_Hex;
+        options.bHideReadOnly = g_options.bHideReadOnly;
 
         if (g_options.fileType == XBinary::FT_REGION) {
             options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, XBinary::MAPMODE_UNKNOWN, g_pDevice, true, g_options.nStartAddress);

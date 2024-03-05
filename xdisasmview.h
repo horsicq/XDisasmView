@@ -97,6 +97,7 @@ public:
         XBinary::DM disasmMode;
         bool bAprox;
         bool bMenu_Hex;
+        bool bHideReadOnly;
     };
 
     explicit XDisasmView(QWidget *pParent = nullptr);
