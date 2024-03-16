@@ -2105,7 +2105,8 @@ void XDisasmView::registerShortcuts(bool bState)
         if (!g_shortCuts[SC_EDIT_HEX]) g_shortCuts[SC_EDIT_HEX] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX), this, SLOT(_editHex()));
 #ifdef QT_SQL_LIB
         if (getXInfoDB()) {
-            if (!g_shortCuts[SC_ANALYZE_ALL]) g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
+            if (!g_shortCuts[SC_ANALYZE_ALL])
+                g_shortCuts[SC_ANALYZE_ALL] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL), this, SLOT(_analyzeAll()));
             if (!g_shortCuts[SC_ANALYZE_ANALYZE])
                 g_shortCuts[SC_ANALYZE_ANALYZE] = new QShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE), this, SLOT(_analyzeAnalyze()));
             if (!g_shortCuts[SC_ANALYZE_DISASM])
