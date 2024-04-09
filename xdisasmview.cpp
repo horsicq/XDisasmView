@@ -1246,20 +1246,31 @@ void XDisasmView::updateData()
                                 nBufferSize = record.disasmResult.nSize;
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
-                                // TODO !!!
-                                if ((record.disasmResult.sMnemonic.toLower() == "db") && (record.disasmResult.sString == "")) {
-                                    record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size());
+                                if (showRecord.recordType == XInfoDB::RT_CODE) {
+                                    XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(),
+                                                                                                  record.nVirtualAddress, g_disasmOptions);
+                                    record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
+                                    record.disasmResult.sString = _disasmResult.sString;
+                                } else if (showRecord.recordType == XInfoDB::RT_INTDATATYPE) {
+                                    if (showRecord.nSize == 1) {
+                                        record.disasmResult.sMnemonic = "db";
+                                    } else if (showRecord.nSize == 2) {
+                                        record.disasmResult.sMnemonic = "dw";
+                                    } else if (showRecord.nSize == 4) {
+                                        record.disasmResult.sMnemonic = "dd";
+                                    } else if (showRecord.nSize == 8) {
+                                        record.disasmResult.sMnemonic = "dq";
+                                    }
+
+                                    if (record.disasmResult.sMnemonic != "") {
+                                        record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size(), record.disasmResult.sMnemonic, (getMemoryMap()->endian == XBinary::ENDIAN_BIG));
+                                    }
                                 }
-                            }
 
-                            if ((showRecord.recordType == XInfoDB::RT_CODE) && (record.nDeviceOffset != -1)) {
-                                XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(),
-                                                                                              record.nVirtualAddress, g_disasmOptions);
-                                record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
-                                record.disasmResult.sString = _disasmResult.sString;
+                                record.sBytes = baBuffer.toHex().data();
+                            } else {
+                                // TODO
                             }
-
-                            record.sBytes = baBuffer.toHex().data();
 
                             nViewSize = record.disasmResult.nSize;
 
