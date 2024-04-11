@@ -1247,8 +1247,8 @@ void XDisasmView::updateData()
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
                                 if (showRecord.recordType == XInfoDB::RT_CODE) {
-                                    XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(),
-                                                                                                  record.nVirtualAddress, g_disasmOptions);
+                                    XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(),
+                                                                                                  baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
                                     record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
                                     record.disasmResult.sString = _disasmResult.sString;
                                 } else if (showRecord.recordType == XInfoDB::RT_INTDATATYPE) {
@@ -1263,7 +1263,8 @@ void XDisasmView::updateData()
                                     }
 
                                     if (record.disasmResult.sMnemonic != "") {
-                                        record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size(), record.disasmResult.sMnemonic, (getMemoryMap()->endian == XBinary::ENDIAN_BIG));
+                                        record.disasmResult.sString = XBinary::getDataString(baBuffer.data(), baBuffer.size(), record.disasmResult.sMnemonic,
+                                                                                             (getMemoryMap()->endian == XBinary::ENDIAN_BIG));
                                     }
                                 }
 
