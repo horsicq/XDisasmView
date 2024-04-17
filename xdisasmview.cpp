@@ -493,6 +493,7 @@ qint64 XDisasmView::getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffse
                 //                {
                 //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
                 //                }
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             }
 
             nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
