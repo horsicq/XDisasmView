@@ -157,7 +157,7 @@ private:
         QColor colBytesBackground;
         QColor colBytesBackgroundSelected;
         quint32 nInfo;
-        bool bIsAprox;  // TODO mn red color!!!
+        bool bIsAprox;  // TODO mb red color!!!
         // TODO jmp/jcc
     };
 
@@ -211,7 +211,7 @@ private:
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
     VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
     VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
-    VIEWSTRUCT _getViewStructByScroll(qint64 nValue);  // TODO mb remove
+    // VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
     VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
     QList<TRANSRECORD> _getTransRecords(qint64 nViewOffset, qint64 nSize);
     qint64 _getOffsetByViewOffset(qint64 nViewOffset);

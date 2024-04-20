@@ -995,21 +995,21 @@ XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByAddress(XADDR nAddress)
     return result;
 }
 
-XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByScroll(qint64 nValue)
-{
-    VIEWSTRUCT result = {};
+// XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByScroll(qint64 nValue)
+// {
+//     VIEWSTRUCT result = {};
 
-    qint32 nNumberOfRecords = g_listViewStruct.count();
+//     qint32 nNumberOfRecords = g_listViewStruct.count();
 
-    for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if ((g_listViewStruct.at(i).nScrollStart <= nValue) && (nValue < (g_listViewStruct.at(i).nScrollStart + g_listViewStruct.at(i).nScrollCount))) {
-            result = g_listViewStruct.at(i);
-            break;
-        }
-    }
+//     for (qint32 i = 0; i < nNumberOfRecords; i++) {
+//         if ((g_listViewStruct.at(i).nScrollStart <= nValue) && (nValue < (g_listViewStruct.at(i).nScrollStart + g_listViewStruct.at(i).nScrollCount))) {
+//             result = g_listViewStruct.at(i);
+//             break;
+//         }
+//     }
 
-    return result;
-}
+//     return result;
+// }
 
 XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByViewOffset(qint64 nViewOffset)
 {
