@@ -103,7 +103,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
     g_options = options;
 
     if (pDevice) {
-        XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType);
+        XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_EXECUTABLE);
     } else {
         ui->scrollAreaDisasm->setDevice(nullptr);
     }

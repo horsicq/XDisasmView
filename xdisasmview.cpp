@@ -919,6 +919,8 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
                 result = g_mapColors.value(XOptions::ID_DISASM_COLOR_REGS);
                 if (bGeneralReg) {
                     result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL);
+                } else if (bGeneralReg) {
+                    result = g_mapColors.value(XOptions::ID_DISASM_COLOR_ARM_REGS_STACK);
                 }
             }
         }
