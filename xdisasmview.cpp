@@ -818,7 +818,7 @@ XDisasmView::COLOR_RECORD XDisasmView::getColorRecord(XOptions::ID id)
     return result;
 }
 
-XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
+XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(const QString &sOpcode)
 {
     COLOR_RECORD result = {};
 
@@ -851,7 +851,7 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(QString sOpcode)
     return result;
 }
 
-XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(QString sOperand)
+XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(const QString &sOperand)
 {
     COLOR_RECORD result = {};
 

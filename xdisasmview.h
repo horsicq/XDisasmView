@@ -203,8 +203,8 @@ private:
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     QMap<XOptions::ID, COLOR_RECORD> getColorRecordsMap();
     COLOR_RECORD getColorRecord(XOptions::ID id);
-    COLOR_RECORD getOpcodeColor(QString sOpcode);
-    COLOR_RECORD getOperandColor(QString sOperand);
+    COLOR_RECORD getOpcodeColor(const QString &sOpcode);
+    COLOR_RECORD getOperandColor(const QString &sOperand);
 
 private:
     RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);
