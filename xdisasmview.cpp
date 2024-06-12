@@ -1173,7 +1173,7 @@ void XDisasmView::updateData()
                 QList<XInfoDB::BOOKMARKRECORD> listBookMarks;
 
                 if (listTransRecords.at(i).nOffset != -1) {
-                    listBookMarks = getXInfoDB()->getBookmarkRecords(listTransRecords.at(i).nOffset, XInfoDB::LT_OFFSET, listTransRecords.at(i).nSize);
+                    listBookMarks = getXInfoDB()->getBookmarkRecords(listTransRecords.at(i).nOffset, XBinary::LT_OFFSET, listTransRecords.at(i).nSize);
                 }
 
                 g_listHighlightsRegion.append(_convertBookmarksToHighlightRegion(&listBookMarks));
@@ -1429,7 +1429,7 @@ void XDisasmView::updateData()
                 QList<HIGHLIGHTREGION> listHighLightRegions;
 
                 if (record.nDeviceOffset != -1) {
-                    listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XInfoDB::LT_OFFSET);
+                    listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XBinary::LT_OFFSET);
                 }
 
                 if (listHighLightRegions.count()) {
