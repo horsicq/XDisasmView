@@ -32,7 +32,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     this->g_handle = 0;
 
     //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
-    ui->textEditSignature->setFont(XAbstractTableView::getMonoFont());
+    ui->textEditSignature->setFont(XOptions::getMonoFont());
 
     const bool bBlocked1 = ui->spinBoxCount->blockSignals(true);
     const bool bBlocked2 = ui->comboBoxMethod->blockSignals(true);

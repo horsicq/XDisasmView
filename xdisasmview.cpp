@@ -53,7 +53,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     //    setLastColumnStretch(true);
 
-    setTextFont(getMonoFont());
+    setTextFont(XOptions::getMonoFont());
     setAddressMode(LOCMODE_ADDRESS);
 
     _qTextOptions.setWrapMode(QTextOption::NoWrap);
