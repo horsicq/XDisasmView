@@ -53,7 +53,6 @@ public slots:
     void reload();
 
 private slots:
-    void on_toolButtonDisasmFont_clicked();
     void on_pushButtonDisasmColors_clicked();
 
 private:

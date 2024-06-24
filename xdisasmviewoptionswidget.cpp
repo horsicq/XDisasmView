@@ -47,7 +47,6 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 
 void XDisasmViewOptionsWidget::save()
 {
-    g_pOptions->getLineEdit(ui->lineEditDisasmFont, XOptions::ID_DISASM_FONT);
     g_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
     g_pOptions->getCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
     g_pOptions->getCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
@@ -56,15 +55,7 @@ void XDisasmViewOptionsWidget::save()
 
 void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
 {
-#ifdef Q_OS_WIN
-    pOptions->addID(XOptions::ID_DISASM_FONT, "Courier,10,-1,5,50,0,0,0,0,0");
-#endif
-#ifdef Q_OS_LINUX
-    pOptions->addID(XOptions::ID_DISASM_FONT, "DejaVu Sans Mono,10,-1,5,50,0,0,0,0,0");
-#endif
-#ifdef Q_OS_MACOS
-    pOptions->addID(XOptions::ID_DISASM_FONT, "Menlo,10,-1,5,50,0,0,0,0,0");  // TODO Check
-#endif
+    pOptions->addID(XOptions::ID_DISASM_FONT, XOptions::getMonoFont().toString());
 
     if ((mode == MODE_ALL) || (mode == MODE_X86)) {
         pOptions->addID(XOptions::ID_DISASM_SYNTAX, "");
@@ -262,7 +253,6 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
 
 void XDisasmViewOptionsWidget::reload()
 {
-    g_pOptions->setLineEdit(ui->lineEditDisasmFont, XOptions::ID_DISASM_FONT);
     g_pOptions->setCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
     g_pOptions->setCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
     g_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
@@ -272,11 +262,6 @@ void XDisasmViewOptionsWidget::reload()
     } else {
         ui->groupBoxDisasmSyntax->hide();
     }
-}
-
-void XDisasmViewOptionsWidget::on_toolButtonDisasmFont_clicked()
-{
-    XOptions::handleFontButton(this, ui->lineEditDisasmFont);
 }
 
 void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()

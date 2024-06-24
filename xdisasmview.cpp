@@ -92,7 +92,6 @@ void XDisasmView::_adjustView()
 
 void XDisasmView::adjustView()
 {
-    XShortcutstScrollArea::adjustView();
     _adjustView();
 
     reload(true);

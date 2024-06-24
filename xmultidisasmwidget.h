@@ -58,6 +58,7 @@ public:
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
     void goToAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
+    virtual void adjustView();
 
 private:
     void addMode(XBinary::DM disasmMode);

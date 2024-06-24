@@ -152,6 +152,10 @@ void XMultiDisasmWidget::goToOffset(qint64 nOffset)
     ui->scrollAreaDisasm->reload(true);
 }
 
+void XMultiDisasmWidget::adjustView()
+{
+}
+
 void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
 {
     ui->scrollAreaDisasm->setGlobal(pShortcuts, pXOptions);

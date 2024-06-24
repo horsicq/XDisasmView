@@ -104,7 +104,7 @@ public:
     ~XDisasmView();
 
     void _adjustView();
-    void adjustView();
+    virtual void adjustView();
     void setData(QIODevice *pDevice, const OPTIONS &options, bool bReload = true);
     OPTIONS getOptions();
     XBinary::DM getDisasmMode();
