@@ -36,6 +36,8 @@ public:
     explicit DialogMultiDisasm(QWidget *pParent = nullptr);
     ~DialogMultiDisasm();
 
+    virtual void adjustView() {}
+
     void setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
 
@@ -45,6 +47,9 @@ signals:
 
 private slots:
     void on_pushButtonClose_clicked();
+
+protected:
+    virtual void registerShortcuts(bool bState) { Q_UNUSED(bState) }
 
 private:
     Ui::DialogMultiDisasm *ui;

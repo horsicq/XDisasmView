@@ -49,6 +49,8 @@ public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
 
+    virtual void adjustView() {}
+
     void setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle);
     void reload();
 
@@ -62,6 +64,9 @@ private slots:
     void on_spinBoxCount_valueChanged(int nValue);
     void on_comboBoxMethod_currentIndexChanged(int nIndex);
     void on_pushButtonScan_clicked();
+
+protected:
+    virtual void registerShortcuts(bool bState) { Q_UNUSED(bState) }
 
 private:
     Ui::DialogMultiDisasmSignature *ui;

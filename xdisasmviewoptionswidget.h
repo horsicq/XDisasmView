@@ -21,8 +21,7 @@
 #ifndef XDISASMVIEWOPTIONSWIDGET_H
 #define XDISASMVIEWOPTIONSWIDGET_H
 
-#include <QFontDialog>
-
+#include "xshortcutswidget.h"
 #include "dialogviewcolors.h"
 #include "xoptions.h"
 
@@ -30,7 +29,7 @@ namespace Ui {
 class XDisasmViewOptionsWidget;
 }
 
-class XDisasmViewOptionsWidget : public QWidget {
+class XDisasmViewOptionsWidget : public XShortcutsWidget {
     Q_OBJECT
 
 public:
@@ -42,6 +41,7 @@ public:
 
     explicit XDisasmViewOptionsWidget(QWidget *pParent = nullptr);
     ~XDisasmViewOptionsWidget();
+    virtual void adjustView();
 
     void setOptions(XOptions *pOptions, MODE mode = MODE_ALL);
 
@@ -54,6 +54,9 @@ public slots:
 
 private slots:
     void on_pushButtonDisasmColors_clicked();
+
+protected:
+    virtual void registerShortcuts(bool bState);
 
 private:
     Ui::XDisasmViewOptionsWidget *ui;

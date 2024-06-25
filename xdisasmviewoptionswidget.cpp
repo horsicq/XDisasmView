@@ -22,7 +22,7 @@
 
 #include "ui_xdisasmviewoptionswidget.h"
 
-XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget)
+XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::XDisasmViewOptionsWidget)
 {
     ui->setupUi(this);
 
@@ -35,6 +35,11 @@ XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : QWidget(p
 XDisasmViewOptionsWidget::~XDisasmViewOptionsWidget()
 {
     delete ui;
+}
+
+void XDisasmViewOptionsWidget::adjustView()
+{
+    // TODO
 }
 
 void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
@@ -273,4 +278,9 @@ void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
     dialogColors.setOptions(g_pOptions, listRecords, tr("Colors"));
 
     dialogColors.exec();
+}
+
+void XDisasmViewOptionsWidget::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
 }
