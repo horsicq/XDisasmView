@@ -51,6 +51,11 @@ DialogMultiDisasmSignature::~DialogMultiDisasmSignature()
     delete ui;
 }
 
+void DialogMultiDisasmSignature::adjustView()
+{
+    getGlobalOptions()->adjustTableWidget(ui->tableWidgetSignature, XOptions::ID_VIEW_FONT_TABLEVIEWS);
+}
+
 void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
 {
     this->g_pDevice = pDevice;

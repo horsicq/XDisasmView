@@ -49,7 +49,7 @@ public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
 
-    virtual void adjustView() {}
+    virtual void adjustView();
 
     void setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle);
     void reload();
