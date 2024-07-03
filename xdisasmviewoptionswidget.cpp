@@ -272,6 +272,7 @@ void XDisasmViewOptionsWidget::reload()
 void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
 {
     DialogViewColors dialogColors(this);
+    dialogColors.setGlobal(getShortcuts(), getGlobalOptions());
 
     QList<DialogViewColors::RECORD> listRecords = getRecords(g_mode);
 

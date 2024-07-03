@@ -2337,6 +2337,7 @@ void XDisasmView::_analyzeSymbols()
         qDebug("void XDisasmView::_analyzeSymbols()");
 #endif
         DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
         dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_ALL, QVariant(), true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
@@ -2354,6 +2355,7 @@ void XDisasmView::_analyzeFunctions()
         qDebug("void XDisasmView::_analyzeFunctions()");
 #endif
         DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
         dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_FUNCTIONS, QVariant(), true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
@@ -2375,7 +2377,7 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             qint64 nViewStart = getViewOffsetStart();
 
             DialogXInfoDBTransferProcess dialogTransfer(this);
-
+            dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
             XInfoDBTransfer::OPTIONS options = {};
             options.pDevice = getXInfoDB()->getDevice();
             options.fileType = getXInfoDB()->getFileType();
@@ -2405,6 +2407,7 @@ void XDisasmView::showReferences(XADDR nAddress)
         qDebug("void XDisasmView::showReferences()");
 #endif
         DialogXSymbols dialogSymbols(this);
+        dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
         dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_REFERENCES, nAddress, true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));

@@ -257,6 +257,7 @@ void XMultiDisasmWidget::getSymbols()
 {
     if (g_pXInfoDB) {
         DialogXInfoDBTransferProcess dialogTransfer(this);
+        dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
         XInfoDBTransfer::OPTIONS options = {};
         options.pDevice = g_pXInfoDB->getDevice();
         options.fileType = g_pXInfoDB->getFileType();
