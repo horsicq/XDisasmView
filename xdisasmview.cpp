@@ -68,7 +68,7 @@ XDisasmView::~XDisasmView()
     }
 }
 
-void XDisasmView::_adjustView()
+void XDisasmView::adjustView()
 {
     setTextFontFromOptions(XOptions::ID_DISASM_FONT);
 
@@ -90,9 +90,9 @@ void XDisasmView::_adjustView()
     XCapstone::openHandle(g_options.disasmMode, &g_handle, true, g_syntax);
 }
 
-void XDisasmView::adjustView()
+void XDisasmView::_adjustView()
 {
-    _adjustView();
+    adjustView();
 
     reload(true);
 }
@@ -110,7 +110,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
         g_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
     }
 
-    _adjustView();
+    adjustView();
 
     adjustColumns();
     adjustScrollCount();
