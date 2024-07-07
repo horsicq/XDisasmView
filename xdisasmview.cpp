@@ -88,6 +88,8 @@ void XDisasmView::adjustView()
     }
 
     XCapstone::openHandle(g_options.disasmMode, &g_handle, true, g_syntax);
+
+    viewport()->update();
 }
 
 void XDisasmView::_adjustView()
