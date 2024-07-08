@@ -60,3 +60,8 @@ void DialogMultiDisasm::on_pushButtonClose_clicked()
 {
     this->close();
 }
+
+void DialogMultiDisasm::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
+}

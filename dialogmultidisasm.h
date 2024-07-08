@@ -51,10 +51,7 @@ private slots:
     void on_pushButtonClose_clicked();
 
 protected:
-    virtual void registerShortcuts(bool bState)
-    {
-        Q_UNUSED(bState)
-    }
+    virtual void registerShortcuts(bool bState);
 
 private:
     Ui::DialogMultiDisasm *ui;
