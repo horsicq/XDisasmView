@@ -36,9 +36,7 @@ public:
     explicit DialogMultiDisasm(QWidget *pParent = nullptr);
     ~DialogMultiDisasm();
 
-    virtual void adjustView()
-    {
-    }
+    virtual void adjustView();
 
     void setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
