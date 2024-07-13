@@ -39,7 +39,6 @@ DialogMultiDisasm::~DialogMultiDisasm()
 
 void DialogMultiDisasm::adjustView()
 {
-
 }
 
 void DialogMultiDisasm::setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options)
