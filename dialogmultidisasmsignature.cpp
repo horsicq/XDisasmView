@@ -381,3 +381,8 @@ void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
 
     dialogSearchSignatures.exec();
 }
+
+void DialogMultiDisasmSignature::registerShortcuts(bool bState)
+{
+     Q_UNUSED(bState)
+}
