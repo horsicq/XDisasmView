@@ -384,5 +384,5 @@ void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
 
 void DialogMultiDisasmSignature::registerShortcuts(bool bState)
 {
-     Q_UNUSED(bState)
+    Q_UNUSED(bState)
 }
