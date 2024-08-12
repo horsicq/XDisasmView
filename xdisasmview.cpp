@@ -1112,7 +1112,7 @@ XADDR XDisasmView::_getAddressByViewOffset(qint64 nViewOffset)
     return nResult;
 }
 
-XAbstractTableView::OS XDisasmView::cursorPositionToOS(XAbstractTableView::CURSOR_POSITION cursorPosition)
+XAbstractTableView::OS XDisasmView::cursorPositionToOS(const XAbstractTableView::CURSOR_POSITION &cursorPosition)
 {
     OS osResult = {};
     osResult.nViewOffset = -1;
