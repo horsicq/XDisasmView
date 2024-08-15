@@ -39,7 +39,7 @@ public:
         XADDR nStartAddress;  // For FT_REGION
         XADDR nInitAddress;
         QString sTitle;
-        bool bModeFixed; // TODO Check
+        bool bModeFixed;  // TODO Check
         QString sArch;
         bool bMenu_Hex;
         bool bHideReadOnly;
