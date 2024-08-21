@@ -36,7 +36,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_nOpcodeSize = 16;  // TODO Check
     g_nThisBaseVirtualAddress = 0;
     g_nThisBaseDeviceOffset = 0;
-    g_bIsAddressColon = false;
+    g_bIsLocationColon = false;
     g_bIsHighlight = false;
     g_syntax = XBinary::SYNTAX_DEFAULT;
     // g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
@@ -54,7 +54,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     //    setLastColumnStretch(true);
 
     setTextFont(XOptions::getMonoFont());
-    setAddressMode(LOCMODE_ADDRESS);
+    setLocationMode(LOCMODE_ADDRESS);
 
     _qTextOptions.setWrapMode(QTextOption::NoWrap);
 
@@ -74,7 +74,7 @@ void XDisasmView::adjustView()
 
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
     g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
-    g_bIsAddressColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_ADDRESSCOLON).toBool();
+    g_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
 
     g_syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
     g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
@@ -1353,7 +1353,7 @@ void XDisasmView::updateData()
                     }
                 }
 
-                if (getAddressMode() == LOCMODE_THIS) {
+                if (getlocationMode() == LOCMODE_THIS) {
                     qint64 nDelta = 0;
                     XADDR _nCurrent = 0;
 
@@ -1366,7 +1366,7 @@ void XDisasmView::updateData()
                     }
 
                     record.sLocation = XBinary::thisToString(nDelta);
-                } else if (getAddressMode() == LOCMODE_ADDRESS) {
+                } else if (getlocationMode() == LOCMODE_ADDRESS) {
                     QString sPrefix;
                     XADDR _nCurrent = record.nVirtualAddress;
 
@@ -1375,12 +1375,12 @@ void XDisasmView::updateData()
                         _nCurrent = record.nDeviceOffset;
                     }
 
-                    if (g_bIsAddressColon) {
+                    if (g_bIsLocationColon) {
                         record.sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
                     } else {
                         record.sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
                     }
-                } else if (getAddressMode() == LOCMODE_OFFSET) {
+                } else if (getlocationMode() == LOCMODE_OFFSET) {
                     QString sPrefix;
                     XADDR _nCurrent = record.nDeviceOffset;
 
@@ -1389,12 +1389,12 @@ void XDisasmView::updateData()
                         _nCurrent = record.nVirtualAddress;
                     }
 
-                    if (g_bIsAddressColon) {
+                    if (g_bIsLocationColon) {
                         record.sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
                     } else {
                         record.sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
                     }
-                } else if (getAddressMode() == LOCMODE_RELADDRESS) {
+                } else if (getlocationMode() == LOCMODE_RELADDRESS) {
                     QString sPrefix;
                     QString sSymbol;
                     XADDR _nCurrent = 0;
@@ -1413,7 +1413,7 @@ void XDisasmView::updateData()
                         }
                     }
 
-                    if (g_bIsAddressColon) {
+                    if (g_bIsLocationColon) {
                         record.sLocation = XBinary::valueToHexColon(mode, _nCurrent);
                     } else {
                         record.sLocation = XBinary::valueToHex(mode, _nCurrent);
@@ -2149,18 +2149,18 @@ void XDisasmView::registerShortcuts(bool bState)
 void XDisasmView::_headerClicked(qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
-        if (getAddressMode() == LOCMODE_ADDRESS) {
+        if (getlocationMode() == LOCMODE_ADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Offset"));
-            setAddressMode(LOCMODE_OFFSET);
-        } else if (getAddressMode() == LOCMODE_OFFSET) {
+            setLocationMode(LOCMODE_OFFSET);
+        } else if (getlocationMode() == LOCMODE_OFFSET) {
             setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
-            setAddressMode(LOCMODE_RELADDRESS);
-        } else if (getAddressMode() == LOCMODE_RELADDRESS) {
+            setLocationMode(LOCMODE_RELADDRESS);
+        } else if (getlocationMode() == LOCMODE_RELADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setAddressMode(LOCMODE_ADDRESS);
-        } else if (getAddressMode() == LOCMODE_THIS) {
+            setLocationMode(LOCMODE_ADDRESS);
+        } else if (getlocationMode() == LOCMODE_THIS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setAddressMode(LOCMODE_ADDRESS);
+            setLocationMode(LOCMODE_ADDRESS);
         }
 
         adjust(true);
@@ -2218,7 +2218,7 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
         setColumnTitle(COLUMN_LOCATION, "");
-        setAddressMode(LOCMODE_THIS);
+        setLocationMode(LOCMODE_THIS);
 
         if (nRow < g_listRecords.count()) {
             g_nThisBaseVirtualAddress = g_listRecords.at(nRow).nViewOffset;

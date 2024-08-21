@@ -268,7 +268,7 @@ private:
     XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
-    bool g_bIsAddressColon;
+    bool g_bIsLocationColon;
     bool g_bIsHighlight;
     // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;

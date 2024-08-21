@@ -53,7 +53,7 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 void XDisasmViewOptionsWidget::save()
 {
     g_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
-    g_pOptions->getCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
+    g_pOptions->getCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
     g_pOptions->getCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
     g_pOptions->getCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
 }
@@ -66,7 +66,7 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_SYNTAX, "");
     }
 
-    pOptions->addID(XOptions::ID_DISASM_ADDRESSCOLON, true);
+    pOptions->addID(XOptions::ID_DISASM_LOCATIONCOLON, true);
     pOptions->addID(XOptions::ID_DISASM_HIGHLIGHT, true);
     pOptions->addID(XOptions::ID_DISASM_UPPERCASE, false);
 
@@ -258,7 +258,7 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
 
 void XDisasmViewOptionsWidget::reload()
 {
-    g_pOptions->setCheckBox(ui->checkBoxDisasmAddressColon, XOptions::ID_DISASM_ADDRESSCOLON);
+    g_pOptions->setCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
     g_pOptions->setCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
     g_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
 

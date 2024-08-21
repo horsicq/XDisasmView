@@ -88,7 +88,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxDisasmAddressColon">
+        <widget class="QCheckBox" name="checkBoxDisasmLocationColon">
          <property name="text">
           <string>Show colons in addresses</string>
          </property>
