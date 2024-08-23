@@ -76,14 +76,14 @@ class XDisasmView : public XDeviceTableEditView {
     struct VIEWSTRUCT {
         qint64 nScrollStart;
         qint64 nScrollCount;
-        qint64 nViewOffset;
+        qint64 nViewPos;
         XADDR nAddress;
         qint64 nOffset;
         qint64 nSize;
     };
 
     struct TRANSRECORD {
-        qint64 nViewOffset;
+        qint64 nViewPos;
         XADDR nAddress;
         qint64 nOffset;
         qint64 nSize;
@@ -111,9 +111,9 @@ public:
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset = false);
-    virtual qint64 deviceOffsetToViewOffset(qint64 nOffset, bool bGlobalOffset = false);
+    virtual qint64 deviceOffsetToViewPos(qint64 nOffset, bool bGlobalOffset = false);
     virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
-    virtual qint64 viewOffsetToDeviceOffset(qint64 nViewOffset, bool bGlobalOffset = false);
+    virtual qint64 viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset = false);
     void showReferences(XADDR nAddress);
 
 private:
@@ -138,7 +138,7 @@ private:
         QString sBytes;
         QString sLabel;
         QString sComment;
-        qint64 nViewOffset;  // Line
+        qint64 nViewPos;  // Line
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XCapstone::DISASM_RESULT disasmResult;
@@ -180,7 +180,7 @@ private:
     //    };
 
     QString convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult);
-    qint64 getDisasmViewOffset(qint64 nViewOffset, qint64 nOldViewOffset);  // TODO rename
+    qint64 getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos);  // TODO rename
     MENU_STATE getMenuState();
 
     struct TEXT_OPTION {
@@ -207,16 +207,16 @@ private:
     COLOR_RECORD getOperandColor(const QString &sOperand);
 
 private:
-    RECORD _getRecordByViewOffset(QList<RECORD> *pListRecord, qint64 nViewOffset);
+    RECORD _getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos);
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
     VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
     VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
     // VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
-    VIEWSTRUCT _getViewStructByViewOffset(qint64 nViewOffset);
-    QList<TRANSRECORD> _getTransRecords(qint64 nViewOffset, qint64 nSize);
-    qint64 _getOffsetByViewOffset(qint64 nViewOffset);
-    qint64 _getViewOffsetByAddress(XADDR nAddress);
-    XADDR _getAddressByViewOffset(qint64 nViewOffset);
+    VIEWSTRUCT _getViewStructByViewPos(qint64 nViewPos);
+    QList<TRANSRECORD> _getTransRecords(qint64 nViewPos, qint64 nSize);
+    qint64 _getOffsetByViewPos(qint64 nViewPos);
+    qint64 _getViewPosByAddress(XADDR nAddress);
+    XADDR _getAddressByViewPos(qint64 nViewPos);
 
 protected:
     virtual OS cursorPositionToOS(const CURSOR_POSITION &cursorPosition);
@@ -226,16 +226,16 @@ protected:
     virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
-    virtual qint64 getCurrentViewOffsetFromScroll();
-    virtual void setCurrentViewOffsetToScroll(qint64 nViewOffset);
+    virtual qint64 getCurrentViewPosFromScroll();
+    virtual void setCurrentViewPosToScroll(qint64 nViewPos);
     virtual void adjustColumns();
     virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
-    virtual qint64 getFixViewOffset(qint64 nViewOffset);  // TODO rewrite
+    virtual qint64 getFixViewPos(qint64 nViewPos);  // TODO rewrite
     virtual void adjustScrollCount();
-    virtual qint64 getViewSizeByViewOffset(qint64 nViewOffset);  // TODO rewrite
-    virtual qint64 addressToViewOffset(XADDR nAddress);
+    virtual qint64 getViewSizeByViewPos(qint64 nViewPos);  // TODO rewrite
+    virtual qint64 addressToViewPos(XADDR nAddress);
 
 protected slots:
     void _goToEntryPointSlot();

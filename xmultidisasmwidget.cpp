@@ -78,7 +78,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 
     connect(ui->scrollAreaDisasm, SIGNAL(showOffsetHex(qint64)), this, SIGNAL(showOffsetHex(qint64)));
     connect(ui->scrollAreaDisasm, SIGNAL(errorMessage(QString)), this, SLOT(errorMessageSlot(QString)));
-    //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewOffsetChanged(qint64)),this,SLOT(cursorChanged(qint64)));
+    //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewPosChanged(qint64)),this,SLOT(cursorChanged(qint64)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
     connect(ui->scrollAreaDisasm, SIGNAL(dataChanged(qint64, qint64)), this, SIGNAL(dataChanged(qint64, qint64)));
     connect(ui->scrollAreaDisasm, SIGNAL(deviceSizeChanged(qint64, qint64)), this, SIGNAL(deviceSizeChanged(qint64, qint64)));
