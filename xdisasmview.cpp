@@ -488,6 +488,8 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
                 nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+            } else if (g_dmFamily == XBinary::DMFAMILY_M68K) {
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 2);
             } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
                 //                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
 
@@ -1693,7 +1695,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         STATE state = getState();
 
         QMenu contextMenu(this);
-        QMenu menuGoTo(tr("Go to"), this);
+        QMenu menuGoTo(this);
         QMenu menuFind(tr("Find"), this);
         QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuHex(tr("Hex"), this);
@@ -1704,8 +1706,8 @@ void XDisasmView::contextMenu(const QPoint &pos)
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
 #endif
-        QAction actionGoToAddress(tr("Address"), this);
-        QAction actionGoToOffset(tr("Offset"), this);
+        QAction actionGoToAddress(this);
+        QAction actionGoToOffset(this);
         QAction actionGoToEntryPoint("", this);
         QAction actionGoXrefRelative("", this);
         QAction actionGoXrefMemory("", this);
@@ -1739,25 +1741,13 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionBookmarkList(tr("List"), this);
 #endif
         {
-            {
-                actionGoToAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ADDRESS));
-                connect(&actionGoToAddress, SIGNAL(triggered()), this, SLOT(_goToAddressSlot()));
-                menuGoTo.addAction(&actionGoToAddress);
-            }
-            {
-                actionGoToOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_OFFSET));
-                connect(&actionGoToOffset, SIGNAL(triggered()), this, SLOT(_goToOffsetSlot()));
-                menuGoTo.addAction(&actionGoToOffset);
-            }
-            {
-                QString sEntryPointText = QString("%1(%2)").arg(tr("Entry point"), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
-                actionGoToEntryPoint.setText(sEntryPointText);
-                actionGoToEntryPoint.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_ENTRYPOINT));
-                connect(&actionGoToEntryPoint, SIGNAL(triggered()), this, SLOT(_goToEntryPointSlot()));
-                menuGoTo.addAction(&actionGoToEntryPoint);
-            }
             // TODO go to address
             XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
+
+            getShortcuts()->adjustMenu(&contextMenu, &menuGoTo, XShortcuts::GROUPID_GOTO);
+            getShortcuts()->adjustAction(&menuGoTo, &actionGoToAddress, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
+            getShortcuts()->adjustAction(&menuGoTo, &actionGoToOffset, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()));
+            getShortcuts()->adjustAction(&menuGoTo, &actionGoToEntryPoint, X_ID_DISASM_GOTO_ENTRYPOINT, this, SLOT(_goToEntryPointSlot()), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
 
             if (record.disasmResult.relType || record.disasmResult.memType) {
                 menuGoTo.addSeparator();
@@ -1783,8 +1773,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_referencesSlot()));
                 menuGoTo.addAction(&actionReferences);
             }
-
-            contextMenu.addMenu(&menuGoTo);
         }
         {
             {
