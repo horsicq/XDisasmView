@@ -26,6 +26,12 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 {
     ui->setupUi(this);
 
+    ui->comboBoxType->setToolTip(tr("Type"));
+    ui->comboBoxMode->setToolTip(tr("Mode"));
+    ui->toolButtonVisitedNext->setToolTip(tr("Next visited"));
+    ui->toolButtonVisitedPrev->setToolTip(tr("Previous visited"));
+    ui->checkBoxReadonly->setToolTip(tr("Readonly"));
+
     g_pDevice = nullptr;
     g_pXInfoDB = nullptr;
     g_options = {};
