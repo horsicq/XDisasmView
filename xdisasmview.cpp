@@ -1708,9 +1708,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
 #endif
         QAction actionGoToAddress(this);
         QAction actionGoToOffset(this);
-        QAction actionGoToEntryPoint("", this);
-        QAction actionGoXrefRelative("", this);
-        QAction actionGoXrefMemory("", this);
+        QAction actionGoToEntryPoint(this);
+        QAction actionGoXrefRelative(this);
+        QAction actionGoXrefMemory(this);
         QAction actionDumpToFile(tr("Dump to file"), this);
         QAction actionHexSignature(tr("Hex signature"), this);
         QAction actionSignature(tr("Signature"), this);
@@ -1728,7 +1728,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionCopyComment("", this);
         QAction actionHex(tr("Hex"), this);
         QAction actionEditHex(tr("Hex"), this);
-        QAction actionReferences(tr("References"), this);
+        QAction actionReferences(this);
         QAction actionAnalyzeAll(tr("All"), this);
         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
@@ -1746,32 +1746,28 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
             getShortcuts()->adjustMenu(&contextMenu, &menuGoTo, XShortcuts::GROUPID_GOTO);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToAddress, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
+            actionGoToAddress.setProperty("ADDRESS", record.disasmResult.nAddress);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToOffset, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()));
+            actionGoToOffset.setProperty("OFFSET", record.nDeviceOffset);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToEntryPoint, X_ID_DISASM_GOTO_ENTRYPOINT, this, SLOT(_goToEntryPointSlot()), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
 
             if (record.disasmResult.relType || record.disasmResult.memType) {
                 menuGoTo.addSeparator();
 
                 if (record.disasmResult.relType) {
-                    actionGoXrefRelative.setText(QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16));
+                    getShortcuts()->adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this, SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
                     actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
-                    connect(&actionGoXrefRelative, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
-                    menuGoTo.addAction(&actionGoXrefRelative);
                 }
 
                 if (record.disasmResult.memType) {
-                    actionGoXrefMemory.setText(QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16));
+                    getShortcuts()->adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this, SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
                     actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
-                    connect(&actionGoXrefMemory, SIGNAL(triggered()), this, SLOT(_goToXrefSlot()));
-                    menuGoTo.addAction(&actionGoXrefMemory);
                 }
             }
 
             if (record.bHasRefFrom) {
-                actionReferences.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_GOTO_REFERENCES));
+                getShortcuts()->adjustAction(&menuGoTo, &actionReferences, X_ID_DISASM_GOTO_REFERENCES, this, SLOT(_referencesSlot()));
                 actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
-                connect(&actionReferences, SIGNAL(triggered()), this, SLOT(_referencesSlot()));
-                menuGoTo.addAction(&actionReferences);
             }
         }
         {
