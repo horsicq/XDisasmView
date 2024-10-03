@@ -1693,24 +1693,19 @@ void XDisasmView::contextMenu(const QPoint &pos)
     if (isContextMenuEnable()) {
         MENU_STATE mstate = getMenuState();
         STATE state = getState();
+        XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
 
         QMenu contextMenu(this);
-        QMenu menuGoTo(this);
         QMenu menuFind(tr("Find"), this);
         QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuHex(tr("Hex"), this);
         QMenu menuSelect(tr("Select"), this);
-        QMenu menuCopy(tr("Copy"), this);
+
         QMenu menuFollowIn(tr("Follow in"), this);
         QMenu menuEdit(tr("Edit"), this);
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
 #endif
-        QAction actionGoToAddress(this);
-        QAction actionGoToOffset(this);
-        QAction actionGoToEntryPoint(this);
-        QAction actionGoXrefRelative(this);
-        QAction actionGoXrefMemory(this);
         QAction actionDumpToFile(tr("Dump to file"), this);
         QAction actionHexSignature(tr("Hex signature"), this);
         QAction actionSignature(tr("Signature"), this);
@@ -1719,13 +1714,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionFindValue(tr("Value"), this);
         QAction actionFindNext(tr("Find next"), this);
         QAction actionSelectAll(tr("Select all"), this);
-        QAction actionCopyAsData(tr("Data"), this);
-        QAction actionCopyCursorOffset(tr("Offset"), this);
-        QAction actionCopyCursorAddress(tr("Address"), this);
-        QAction actionCopyLocation("", this);
-        QAction actionCopyBytes("", this);
-        QAction actionCopyOpcode("", this);
-        QAction actionCopyComment("", this);
+
         QAction actionHex(tr("Hex"), this);
         QAction actionEditHex(tr("Hex"), this);
         QAction actionReferences(this);
@@ -1740,27 +1729,31 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
 #endif
+        QMenu menuGoTo(this);
+        QAction actionGoToAddress(this);
+        QAction actionGoToOffset(this);
+        QAction actionGoToEntryPoint(this);
+        QAction actionGoXrefRelative(this);
+        QAction actionGoXrefMemory(this);
         {
-            // TODO go to address
-            XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
-
             getShortcuts()->adjustMenu(&contextMenu, &menuGoTo, XShortcuts::GROUPID_GOTO);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToAddress, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
-            actionGoToAddress.setProperty("ADDRESS", record.disasmResult.nAddress);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToOffset, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()));
-            actionGoToOffset.setProperty("OFFSET", record.nDeviceOffset);
-            getShortcuts()->adjustAction(&menuGoTo, &actionGoToEntryPoint, X_ID_DISASM_GOTO_ENTRYPOINT, this, SLOT(_goToEntryPointSlot()), QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
+            getShortcuts()->adjustAction(&menuGoTo, &actionGoToEntryPoint, X_ID_DISASM_GOTO_ENTRYPOINT, this, SLOT(_goToEntryPointSlot()),
+                                         QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
 
             if (record.disasmResult.relType || record.disasmResult.memType) {
                 menuGoTo.addSeparator();
 
                 if (record.disasmResult.relType) {
-                    getShortcuts()->adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this, SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
+                    XOptions::adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this,
+                                                 SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
                     actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
                 }
 
                 if (record.disasmResult.memType) {
-                    getShortcuts()->adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this, SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
+                    XOptions::adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this,
+                                                 SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
                     actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
                 }
             }
@@ -1770,65 +1763,52 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
             }
         }
+        QMenu menuCopy(this);
+        QAction actionCopyAsData(this);
+        QAction actionCopyCursorOffset(this);
+        QAction actionCopyCursorAddress(this);
+        QAction actionCopyLocation(this);
+        QAction actionCopyBytes(this);
+        QAction actionCopyOpcode(this);
+        QAction actionCopyComment(this);
         {
-            {
-                actionCopyCursorAddress.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_ADDRESS));
-                connect(&actionCopyCursorAddress, SIGNAL(triggered()), this, SLOT(_copyAddressSlot()));
-                menuCopy.addAction(&actionCopyCursorAddress);
-            }
-            {
-                actionCopyCursorOffset.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_OFFSET));
-                connect(&actionCopyCursorOffset, SIGNAL(triggered()), this, SLOT(_copyOffsetSlot()));
-                menuCopy.addAction(&actionCopyCursorOffset);
-            }
+            getShortcuts()->adjustMenu(&contextMenu, &menuCopy, XShortcuts::GROUPID_COPY);
+            getShortcuts()->adjustAction(&menuCopy, &actionCopyCursorAddress, X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()));
+            getShortcuts()->adjustAction(&menuCopy, &actionCopyCursorOffset, X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()));
 
             if (mstate.bPhysicalSize) {
-                actionCopyAsData.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_COPY_DATA));
-                connect(&actionCopyAsData, SIGNAL(triggered()), this, SLOT(_copyDataSlot()));
-                menuCopy.addAction(&actionCopyAsData);
+                getShortcuts()->adjustAction(&menuCopy, &actionCopyAsData, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()));
             }
 
-            RECORD _record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
-
-            if ((_record.sLocation != "") || (_record.sBytes != "") || (_record.disasmResult.sMnemonic != "") || (_record.sComment != "")) {
+            if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
                 menuCopy.addSeparator();
 
-                if (_record.sLocation != "") {
-                    actionCopyLocation.setText(_record.sLocation);
-                    actionCopyLocation.setProperty("VALUE", _record.sLocation);
-                    connect(&actionCopyLocation, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-                    menuCopy.addAction(&actionCopyLocation);
+                if (record.sLocation != "") {
+                    XOptions::adjustAction(&menuCopy, &actionCopyLocation, record.sLocation, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    actionCopyLocation.setProperty("VALUE", record.sLocation);
                 }
 
-                if (_record.sBytes != "") {
-                    actionCopyBytes.setText(_record.sBytes);
-                    actionCopyBytes.setProperty("VALUE", _record.sBytes);
-                    connect(&actionCopyBytes, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-                    menuCopy.addAction(&actionCopyBytes);
+                if (record.sBytes != "") {
+                    XOptions::adjustAction(&menuCopy, &actionCopyBytes, record.sBytes, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    actionCopyBytes.setProperty("VALUE", record.sBytes);
                 }
 
-                if (_record.disasmResult.sMnemonic != "") {
-                    QString sString = _record.disasmResult.sMnemonic;
+                if (record.disasmResult.sMnemonic != "") {
+                    QString sString = record.disasmResult.sMnemonic;
 
-                    if (_record.disasmResult.sString != "") {
-                        sString.append(QString(" %1").arg(convertOpcodeString(_record.disasmResult)));
+                    if (record.disasmResult.sString != "") {
+                        sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
                     }
 
-                    actionCopyOpcode.setText(sString);
+                    XOptions::adjustAction(&menuCopy, &actionCopyOpcode, sString, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
                     actionCopyOpcode.setProperty("VALUE", sString);
-                    connect(&actionCopyOpcode, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-                    menuCopy.addAction(&actionCopyOpcode);
                 }
 
-                if (_record.sComment != "") {
-                    actionCopyComment.setText(_record.sComment);
-                    actionCopyComment.setProperty("VALUE", _record.sComment);
-                    connect(&actionCopyComment, SIGNAL(triggered()), this, SLOT(_copyValueSlot()));
-                    menuCopy.addAction(&actionCopyComment);
+                if (record.sComment != "") {
+                    XOptions::adjustAction(&menuCopy, &actionCopyComment, record.sComment, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    actionCopyComment.setProperty("VALUE", record.sBytes);
                 }
             }
-
-            contextMenu.addMenu(&menuCopy);
         }
         {
             {
