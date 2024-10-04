@@ -1696,7 +1696,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
 
         QMenu contextMenu(this);
-        QMenu menuFind(tr("Find"), this);
+
         QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuHex(tr("Hex"), this);
         QMenu menuSelect(tr("Select"), this);
@@ -1709,10 +1709,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionDumpToFile(tr("Dump to file"), this);
         QAction actionHexSignature(tr("Hex signature"), this);
         QAction actionSignature(tr("Signature"), this);
-        QAction actionFindString(tr("String"), this);
-        QAction actionFindSignature(tr("Signature"), this);
-        QAction actionFindValue(tr("Value"), this);
-        QAction actionFindNext(tr("Find next"), this);
+
         QAction actionSelectAll(tr("Select all"), this);
 
         QAction actionHex(tr("Hex"), this);
@@ -1746,14 +1743,14 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 menuGoTo.addSeparator();
 
                 if (record.disasmResult.relType) {
-                    XOptions::adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this,
-                                                 SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
+                    XOptions::adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this, SLOT(_goToXrefSlot()),
+                                           XOptions::ICONTYPE_GOTO);
                     actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
                 }
 
                 if (record.disasmResult.memType) {
-                    XOptions::adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this,
-                                                 SLOT(_goToXrefSlot()), XOptions::ICONTYPE_GOTO);
+                    XOptions::adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this, SLOT(_goToXrefSlot()),
+                                           XOptions::ICONTYPE_GOTO);
                     actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
                 }
             }
@@ -1784,12 +1781,12 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 menuCopy.addSeparator();
 
                 if (record.sLocation != "") {
-                    XOptions::adjustAction(&menuCopy, &actionCopyLocation, record.sLocation, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    XOptions::adjustAction(&menuCopy, &actionCopyLocation, record.sLocation, getShortcuts(), SLOT(copyRecord()), XOptions::ICONTYPE_COPY);
                     actionCopyLocation.setProperty("VALUE", record.sLocation);
                 }
 
                 if (record.sBytes != "") {
-                    XOptions::adjustAction(&menuCopy, &actionCopyBytes, record.sBytes, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    XOptions::adjustAction(&menuCopy, &actionCopyBytes, record.sBytes, getShortcuts(), SLOT(copyRecord()), XOptions::ICONTYPE_COPY);
                     actionCopyBytes.setProperty("VALUE", record.sBytes);
                 }
 
@@ -1800,39 +1797,29 @@ void XDisasmView::contextMenu(const QPoint &pos)
                         sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
                     }
 
-                    XOptions::adjustAction(&menuCopy, &actionCopyOpcode, sString, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    XOptions::adjustAction(&menuCopy, &actionCopyOpcode, sString, getShortcuts(), SLOT(copyRecord()), XOptions::ICONTYPE_COPY);
                     actionCopyOpcode.setProperty("VALUE", sString);
                 }
 
                 if (record.sComment != "") {
-                    XOptions::adjustAction(&menuCopy, &actionCopyComment, record.sComment, this, SLOT(_copyValueSlot()), XOptions::ICONTYPE_COPY);
+                    XOptions::adjustAction(&menuCopy, &actionCopyComment, record.sComment, getShortcuts(), SLOT(copyRecord()), XOptions::ICONTYPE_COPY);
                     actionCopyComment.setProperty("VALUE", record.sBytes);
                 }
             }
         }
-        {
-            {
-                actionFindString.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_STRING));
-                connect(&actionFindString, SIGNAL(triggered()), this, SLOT(_findStringSlot()));
-                menuFind.addAction(&actionFindString);
-            }
-            {
-                actionFindSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_SIGNATURE));
-                connect(&actionFindSignature, SIGNAL(triggered()), this, SLOT(_findSignatureSlot()));
-                menuFind.addAction(&actionFindSignature);
-            }
-            {
-                actionFindValue.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_VALUE));
-                connect(&actionFindValue, SIGNAL(triggered()), this, SLOT(_findValueSlot()));
-                menuFind.addAction(&actionFindValue);
-            }
-            {
-                actionFindNext.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FIND_NEXT));
-                connect(&actionFindNext, SIGNAL(triggered()), this, SLOT(_findNextSlot()));
-                menuFind.addAction(&actionFindNext);
-            }
 
-            contextMenu.addMenu(&menuFind);
+        QMenu menuFind(this);
+        QAction actionFindString(tr("String"), this);
+        QAction actionFindSignature(tr("Signature"), this);
+        QAction actionFindValue(tr("Value"), this);
+        QAction actionFindNext(tr("Find next"), this);
+
+        {
+            getShortcuts()->adjustMenu(&contextMenu, &menuFind, XShortcuts::GROUPID_FIND);
+            getShortcuts()->adjustAction(&menuFind, &actionFindString, X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()));
+            getShortcuts()->adjustAction(&menuFind, &actionFindSignature, X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()));
+            getShortcuts()->adjustAction(&menuFind, &actionFindValue, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()));
+            getShortcuts()->adjustAction(&menuFind, &actionFindNext, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()));
         }
 
         if (mstate.bPhysicalSize) {
