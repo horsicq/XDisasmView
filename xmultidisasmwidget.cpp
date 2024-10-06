@@ -26,8 +26,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 {
     ui->setupUi(this);
 
-    XOptions::adjustToolButton(ui->toolButtonVisitedNext, XOptions::ICONTYPE_FORWARDS, Qt::ToolButtonIconOnly);
-    XOptions::adjustToolButton(ui->toolButtonVisitedPrev, XOptions::ICONTYPE_BACKWARDS, Qt::ToolButtonIconOnly);
+    XOptions::adjustToolButton(ui->toolButtonVisitedNext, XOptions::ICONTYPE_FORWARD, Qt::ToolButtonIconOnly);
+    XOptions::adjustToolButton(ui->toolButtonVisitedPrev, XOptions::ICONTYPE_BACKWARD, Qt::ToolButtonIconOnly);
 
     ui->comboBoxType->setToolTip(tr("Type"));
     ui->comboBoxMode->setToolTip(tr("Mode"));
