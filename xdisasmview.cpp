@@ -1706,9 +1706,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
 #endif
-        QAction actionDumpToFile(tr("Dump to file"), this);
-        QAction actionHexSignature(tr("Hex signature"), this);
-        QAction actionSignature(tr("Signature"), this);
 
         QAction actionSelectAll(tr("Select all"), this);
 
@@ -1809,10 +1806,10 @@ void XDisasmView::contextMenu(const QPoint &pos)
         }
 
         QMenu menuFind(this);
-        QAction actionFindString(tr("String"), this);
-        QAction actionFindSignature(tr("Signature"), this);
-        QAction actionFindValue(tr("Value"), this);
-        QAction actionFindNext(tr("Find next"), this);
+        QAction actionFindString(this);
+        QAction actionFindSignature(this);
+        QAction actionFindValue(this);
+        QAction actionFindNext(this);
 
         {
             getShortcuts()->adjustMenu(&contextMenu, &menuFind, XShortcuts::GROUPID_FIND);
@@ -1822,18 +1819,19 @@ void XDisasmView::contextMenu(const QPoint &pos)
             getShortcuts()->adjustAction(&menuFind, &actionFindNext, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()));
         }
 
+        QAction actionDumpToFile(this);
+
         if (mstate.bPhysicalSize) {
-            {
-                actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_DUMPTOFILE));
-                connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
-                contextMenu.addAction(&actionDumpToFile);
-            }
-            {
-                actionSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SIGNATURE));
-                connect(&actionSignature, SIGNAL(triggered()), this, SLOT(_signatureSlot()));
-                contextMenu.addAction(&actionSignature);
-            }
+            getShortcuts()->adjustAction(&contextMenu, &actionDumpToFile, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()));
         }
+
+        QAction actionSignature(this);
+
+        if (mstate.bPhysicalSize) {
+            getShortcuts()->adjustAction(&contextMenu, &actionSignature, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()));
+        }
+
+        QAction actionHexSignature(tr("Hex signature"), this);
 
         if (mstate.bPhysicalSize) {
             {
