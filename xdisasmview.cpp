@@ -1698,7 +1698,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QMenu contextMenu(this);
 
         QMenu menuAnalyze(tr("Analyze"), this);
-        QMenu menuHex(tr("Hex"), this);
+
         QMenu menuSelect(tr("Select"), this);
 
         QMenu menuFollowIn(tr("Follow in"), this);
@@ -1831,16 +1831,12 @@ void XDisasmView::contextMenu(const QPoint &pos)
             getShortcuts()->adjustAction(&contextMenu, &actionSignature, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()));
         }
 
-        QAction actionHexSignature(tr("Hex signature"), this);
+        QMenu menuHex(this);
+        QAction actionHexSignature(this);
 
         if (mstate.bPhysicalSize) {
-            {
-                actionHexSignature.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_HEX_SIGNATURE));
-                connect(&actionHexSignature, SIGNAL(triggered()), this, SLOT(_hexSignatureSlot()));
-                menuHex.addAction(&actionHexSignature);
-            }
-
-            contextMenu.addMenu(&menuHex);
+            getShortcuts()->adjustMenu(&contextMenu, &menuHex, XShortcuts::GROUPID_HEX);
+            getShortcuts()->adjustAction(&menuHex, &actionHexSignature, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()));
         }
 
         if (mstate.bHex) {
