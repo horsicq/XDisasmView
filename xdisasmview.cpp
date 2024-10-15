@@ -1701,7 +1701,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QMenu menuSelect(tr("Select"), this);
 
-        QMenu menuFollowIn(tr("Follow in"), this);
         QMenu menuEdit(tr("Edit"), this);
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
@@ -1709,7 +1708,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QAction actionSelectAll(tr("Select all"), this);
 
-        QAction actionHex(tr("Hex"), this);
+
         QAction actionEditHex(tr("Hex"), this);
         QAction actionReferences(this);
         QAction actionAnalyzeAll(tr("All"), this);
@@ -1839,14 +1838,12 @@ void XDisasmView::contextMenu(const QPoint &pos)
             getShortcuts()->adjustAction(&menuHex, &actionHexSignature, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()));
         }
 
-        if (mstate.bHex) {
-            {
-                actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_FOLLOWIN_HEX));
-                connect(&actionHex, SIGNAL(triggered()), this, SLOT(_hexSlot()));
-                menuFollowIn.addAction(&actionHex);
-            }
+        QMenu menuFollowIn(this);
+        QAction actionFollowInHex(this);
 
-            contextMenu.addMenu(&menuFollowIn);
+        if (mstate.bHex) {
+            getShortcuts()->adjustMenu(&contextMenu, &menuFollowIn, XShortcuts::GROUPID_FOLLOWIN);
+            getShortcuts()->adjustAction(&menuFollowIn, &actionFollowInHex, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()));
         }
 
         if (!(g_options.bHideReadOnly)) {
@@ -2010,33 +2007,45 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
+    bool bIsAnalysed = false;
+
     if (XBinary::getWidthModeFromSize(g_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
         g_nAddressWidth = 16;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
-        //        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("00000000:00000000").width());
     } else {
         g_nAddressWidth = 8;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("0000:0000").width());
-        //        setColumnWidth(COLUMN_OFFSET,2*getCharWidth()+fm.boundingRect("0000:0000").width());
     }
 
-    QString sBytes;
+    if (bIsAnalysed) {
+        QString sBytes;
 
-    for (qint32 i = 0; i < g_nOpcodeSize; i++) {
-        sBytes += "00";
+        for (qint32 i = 0; i < g_nOpcodeSize; i++) {
+            sBytes += "00";
+        }
+
+        setColumnWidth(COLUMN_BYTES, 2 * getCharWidth() + fm.boundingRect(sBytes).width());
+        setColumnWidth(COLUMN_ARROWS, 5 * getCharWidth());
+        setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
+        setColumnWidth(COLUMN_COMMENT, 60 * getCharWidth());
+        setColumnWidth(COLUMN_LABEL, 10 * getCharWidth());
+
+        setColumnEnabled(COLUMN_LABEL, true);
+        setColumnEnabled(COLUMN_COMMENT, true);
+    } else {
+        setColumnWidth(COLUMN_BYTES, 10 * getCharWidth());
+        setColumnWidth(COLUMN_ARROWS, 2 * getCharWidth());
+        setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
+
+        setColumnEnabled(COLUMN_LABEL, false);
+        setColumnEnabled(COLUMN_COMMENT, false);
     }
 
-    setColumnWidth(COLUMN_BYTES, 2 * getCharWidth() + fm.boundingRect(sBytes).width());
-
-    //    setColumnWidth(COLUMN_BYTES,5*getCharWidth());
-
-    setColumnWidth(COLUMN_ARROWS, 5 * getCharWidth());
-    setColumnWidth(COLUMN_LABEL, 10 * getCharWidth());
-    setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
-    setColumnWidth(COLUMN_COMMENT, 60 * getCharWidth());
-    setColumnWidth(COLUMN_BREAKPOINT, 2 * getCharWidth());
 #ifndef USE_XPROCESS
     setColumnEnabled(COLUMN_BREAKPOINT, false);
+#else
+    setColumnWidth(COLUMN_BREAKPOINT, 2 * getCharWidth());
+    setColumnEnabled(COLUMN_BREAKPOINT, true);
 #endif
 }
 
