@@ -1701,15 +1701,13 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QMenu menuSelect(tr("Select"), this);
 
-        QMenu menuEdit(tr("Edit"), this);
+
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
 #endif
 
         QAction actionSelectAll(tr("Select all"), this);
 
-
-        QAction actionEditHex(tr("Hex"), this);
         QAction actionReferences(this);
         QAction actionAnalyzeAll(tr("All"), this);
         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
@@ -1846,17 +1844,14 @@ void XDisasmView::contextMenu(const QPoint &pos)
             getShortcuts()->adjustAction(&menuFollowIn, &actionFollowInHex, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()));
         }
 
+        QMenu menuEdit(this);
+        QAction actionEditHex(this);
+
         if (!(g_options.bHideReadOnly)) {
-            menuEdit.setEnabled(!isReadonly());
-
             if (mstate.bPhysicalSize) {
-                {
-                    actionEditHex.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_EDIT_HEX));
-                    connect(&actionEditHex, SIGNAL(triggered()), this, SLOT(_editHex()));
-                    menuEdit.addAction(&actionEditHex);
-                }
-
-                contextMenu.addMenu(&menuEdit);
+                menuEdit.setEnabled(!isReadonly());
+                getShortcuts()->adjustMenu(&contextMenu, &menuEdit, XShortcuts::GROUPID_EDIT);
+                getShortcuts()->adjustAction(&menuEdit, &actionEditHex, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
             }
         }
         {
