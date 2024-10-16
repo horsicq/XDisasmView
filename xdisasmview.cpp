@@ -1699,14 +1699,9 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QMenu menuAnalyze(tr("Analyze"), this);
 
-        QMenu menuSelect(tr("Select"), this);
-
-
 #ifdef QT_SQL_LIB
         QMenu menuBookmarks(tr("Bookmarks"), this);
 #endif
-
-        QAction actionSelectAll(tr("Select all"), this);
 
         QAction actionReferences(this);
         QAction actionAnalyzeAll(tr("All"), this);
@@ -1854,13 +1849,13 @@ void XDisasmView::contextMenu(const QPoint &pos)
                 getShortcuts()->adjustAction(&menuEdit, &actionEditHex, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
             }
         }
+
+        QMenu menuSelect(this);
+        QAction actionSelectAll(this);
+
         {
-            {
-                actionSelectAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_SELECT_ALL));
-                connect(&actionSelectAll, SIGNAL(triggered()), this, SLOT(_selectAllSlot()));
-                menuSelect.addAction(&actionSelectAll);  // TODO
-            }
-            contextMenu.addMenu(&menuSelect);
+            getShortcuts()->adjustMenu(&contextMenu, &menuSelect, XShortcuts::GROUPID_SELECT);
+            getShortcuts()->adjustAction(&menuSelect, &actionSelectAll, X_ID_DISASM_SELECT_ALL, this, SLOT(_selectAllSlot()));
         }
 #ifdef QT_SQL_LIB
         if ((mstate.bSize) && (getXInfoDB())) {
