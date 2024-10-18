@@ -1695,15 +1695,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
         STATE state = getState();
         XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
 
-        QMenu contextMenu(this);
-
-        QMenu menuAnalyze(tr("Analyze"), this);
+        QMenu contextMenu(this); // TODO
 
 #ifdef QT_SQL_LIB
+        QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuBookmarks(tr("Bookmarks"), this);
-#endif
-
-        QAction actionReferences(this);
         QAction actionAnalyzeAll(tr("All"), this);
         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
         QAction actionAnalyzeDisasm(tr("Disasm"), this);
@@ -1711,7 +1707,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionAnalyzeSymbols(tr("Symbols"), this);
         QAction actionAnalyzeFunctions(tr("Functions"), this);
         QAction actionAnalyzeClear(tr("Clear"), this);
-#ifdef QT_SQL_LIB
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
 #endif
@@ -1721,6 +1716,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionGoToEntryPoint(this);
         QAction actionGoXrefRelative(this);
         QAction actionGoXrefMemory(this);
+        QAction actionGoReferences(this);
         {
             getShortcuts()->adjustMenu(&contextMenu, &menuGoTo, XShortcuts::GROUPID_GOTO);
             getShortcuts()->adjustAction(&menuGoTo, &actionGoToAddress, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
@@ -1745,8 +1741,8 @@ void XDisasmView::contextMenu(const QPoint &pos)
             }
 
             if (record.bHasRefFrom) {
-                getShortcuts()->adjustAction(&menuGoTo, &actionReferences, X_ID_DISASM_GOTO_REFERENCES, this, SLOT(_referencesSlot()));
-                actionReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
+                getShortcuts()->adjustAction(&menuGoTo, &actionGoReferences, X_ID_DISASM_GOTO_REFERENCES, this, SLOT(_referencesSlot()));
+                actionGoReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
             }
         }
         QMenu menuCopy(this);
@@ -2109,7 +2105,7 @@ void XDisasmView::_headerClicked(qint32 nColumn)
 
         adjust(true);
     } else if (nColumn == COLUMN_OPCODE) {
-        // QMenu contextMenu(this);
+        // QMenu contextMenu(this); // TODO
         // QMenu menuWidth(tr("Width"), this);
 
         // QAction action8(QString("8"), this);
