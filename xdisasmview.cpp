@@ -1695,7 +1695,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         STATE state = getState();
         XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
 
-        QMenu contextMenu(this); // TODO
+        QMenu contextMenu(this);  // TODO
 
 #ifdef QT_SQL_LIB
         QMenu menuAnalyze(tr("Analyze"), this);
