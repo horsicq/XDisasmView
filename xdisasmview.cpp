@@ -1697,6 +1697,8 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QMenu contextMenu(this);  // TODO
 
+
+        // TODO
 #ifdef QT_SQL_LIB
         QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuBookmarks(tr("Bookmarks"), this);
