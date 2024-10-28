@@ -165,6 +165,11 @@ void XMultiDisasmWidget::adjustView()
 {
 }
 
+void XMultiDisasmWidget::setWidgetFocus()
+{
+    ui->scrollAreaDisasm->setFocus();
+}
+
 void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
 {
     ui->scrollAreaDisasm->setGlobal(pShortcuts, pXOptions);

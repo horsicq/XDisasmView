@@ -59,6 +59,7 @@ public:
     void goToAddress(XADDR nAddress);
     void goToOffset(qint64 nOffset);
     virtual void adjustView();
+    void setWidgetFocus();
 
 private:
     void addMode(XBinary::DM disasmMode);
