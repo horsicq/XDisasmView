@@ -1697,6 +1697,76 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
         QMenu contextMenu(this);  // TODO
 
+        QList<XShortcuts::MENUITEM> listMenuItems;
+
+        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
+        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
+
+        {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.nShortcutId = X_ID_DISASM_GOTO_ENTRYPOINT;
+            menuItem.pRecv = this;
+            menuItem.pMethod = SLOT(_goToEntryPointSlot());
+            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+            menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
+
+            listMenuItems.append(menuItem);
+        }
+
+        if (record.disasmResult.relType || record.disasmResult.memType) {
+            getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_GOTO);
+
+            if (record.disasmResult.relType) {
+                XShortcuts::MENUITEM menuItem = {};
+
+                menuItem.pRecv = this;
+                menuItem.pMethod = SLOT(_goToXrefSlot());
+                menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+                menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16);
+                menuItem.iconType = XOptions::ICONTYPE_GOTO;
+                menuItem.sPropertyName = "ADDRESS";
+                menuItem.varProperty = record.disasmResult.nXrefToRelative;
+
+                listMenuItems.append(menuItem);
+            }
+
+            if (record.disasmResult.memType) {
+                XShortcuts::MENUITEM menuItem = {};
+
+                menuItem.pRecv = this;
+                menuItem.pMethod = SLOT(_goToXrefSlot());
+                menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+                menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16);
+                menuItem.iconType = XOptions::ICONTYPE_GOTO;
+                menuItem.sPropertyName = "ADDRESS";
+                menuItem.varProperty = record.disasmResult.nXrefToMemory;
+
+                listMenuItems.append(menuItem);
+            }
+        }
+
+        if (record.bHasRefFrom) {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = this;
+            menuItem.pMethod = SLOT(_referencesSlot());
+            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+            menuItem.nShortcutId = X_ID_DISASM_GOTO_REFERENCES;
+            menuItem.sPropertyName = "ADDRESS";
+            menuItem.varProperty = record.disasmResult.nAddress;
+
+            listMenuItems.append(menuItem);
+        }
+
+        QList<QObject *> listObjects = getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
+
+        contextMenu.exec(pos);
+
+        XOptions::deleteQObjectList(&listObjects);
+
+        return;
+
         // TODO
 #ifdef QT_SQL_LIB
         QMenu menuAnalyze(tr("Analyze"), this);
@@ -1711,41 +1781,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
 #endif
-        QMenu menuGoTo(this);
-        QAction actionGoToAddress(this);
-        QAction actionGoToOffset(this);
-        QAction actionGoToEntryPoint(this);
-        QAction actionGoXrefRelative(this);
-        QAction actionGoXrefMemory(this);
-        QAction actionGoReferences(this);
-        {
-            getShortcuts()->adjustMenu(&contextMenu, &menuGoTo, XShortcuts::GROUPID_GOTO);
-            getShortcuts()->adjustAction(&menuGoTo, &actionGoToAddress, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
-            getShortcuts()->adjustAction(&menuGoTo, &actionGoToOffset, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()));
-            getShortcuts()->adjustAction(&menuGoTo, &actionGoToEntryPoint, X_ID_DISASM_GOTO_ENTRYPOINT, this, SLOT(_goToEntryPointSlot()),
-                                         QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16));
-
-            if (record.disasmResult.relType || record.disasmResult.memType) {
-                menuGoTo.addSeparator();
-
-                if (record.disasmResult.relType) {
-                    XOptions::adjustAction(&menuGoTo, &actionGoXrefRelative, QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16), this, SLOT(_goToXrefSlot()),
-                                           XOptions::ICONTYPE_GOTO);
-                    actionGoXrefRelative.setProperty("ADDRESS", record.disasmResult.nXrefToRelative);
-                }
-
-                if (record.disasmResult.memType) {
-                    XOptions::adjustAction(&menuGoTo, &actionGoXrefMemory, QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16), this, SLOT(_goToXrefSlot()),
-                                           XOptions::ICONTYPE_GOTO);
-                    actionGoXrefMemory.setProperty("ADDRESS", record.disasmResult.nXrefToMemory);
-                }
-            }
-
-            if (record.bHasRefFrom) {
-                getShortcuts()->adjustAction(&menuGoTo, &actionGoReferences, X_ID_DISASM_GOTO_REFERENCES, this, SLOT(_referencesSlot()));
-                actionGoReferences.setProperty("ADDRESS", record.disasmResult.nAddress);
-            }
-        }
         QMenu menuCopy(this);
         QAction actionCopyAsData(this);
         QAction actionCopyCursorOffset(this);
