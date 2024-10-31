@@ -1840,6 +1840,17 @@ void XDisasmView::contextMenu(const QPoint &pos)
             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
         }
 
+        if (mstate.bHex) {
+            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()), XShortcuts::GROUPID_FOLLOWIN);
+        }
+
+        if (!isReadonly()) {
+            if (mstate.bPhysicalSize) {
+                getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()), XShortcuts::GROUPID_EDIT);
+            }
+            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
+        }
+
         QList<QObject *> listObjects = getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
 
         contextMenu.exec(pos);
@@ -1862,17 +1873,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         QAction actionBookmarkNew(tr("New"), this);
         QAction actionBookmarkList(tr("List"), this);
 #endif
-
-
-
-        QMenu menuFollowIn(this);
-        QAction actionFollowInHex(this);
-
-        if (mstate.bHex) {
-            getShortcuts()->adjustMenu(&contextMenu, &menuFollowIn, XShortcuts::GROUPID_FOLLOWIN);
-            getShortcuts()->adjustAction(&menuFollowIn, &actionFollowInHex, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()));
-        }
-
         QMenu menuEdit(this);
         QAction actionEditHex(this);
 
