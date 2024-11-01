@@ -1833,7 +1833,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()), XShortcuts::GROUPID_FIND);
         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()), XShortcuts::GROUPID_FIND);
 
-
         if (mstate.bPhysicalSize) {
             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
