@@ -570,7 +570,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
 
 void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption)
 {
-    QRect rectText;
+    QRectF rectText;
 
     rectText.setLeft(nLeft + getCharWidth());
     rectText.setTop(nTop + getLineDelta());
@@ -611,7 +611,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QString &sText)
+void XDisasmView::drawAsmText(QPainter *pPainter, const QRectF &rect, const QString &sText)
 {
     QString sMnemonic = sText.section("|", 0, 0);
     QString sString = sText.section("|", 1, 1);
@@ -621,7 +621,7 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
     if (g_bIsHighlight) {
         COLOR_RECORD opcodeColorNOP = {};
 
-        QRect _rectMnemonic = rect;
+        QRectF _rectMnemonic = rect;
         _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
 
         COLOR_RECORD opcodeColor = getOpcodeColor(sMnemonic.toLower());
@@ -636,7 +636,7 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
         drawColorText(pPainter, _rectMnemonic, sMnemonic, opcodeColor);
 
         if (sString != "") {
-            QRect _rectString = rect;
+            QRectF _rectString = rect;
             _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
 
             if (bIsNOP) {
@@ -656,12 +656,12 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRect &rect, const QStri
     }
 }
 
-void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QString &sText, const COLOR_RECORD &colorRecord)
+void XDisasmView::drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const COLOR_RECORD &colorRecord)
 {
     if (colorRecord.colBackground.isValid() || colorRecord.colMain.isValid()) {
         pPainter->save();
 
-        QRect _rectString = rect;
+        QRectF _rectString = rect;
         _rectString.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sText).width());
 
         if (colorRecord.colBackground.isValid()) {
@@ -680,13 +680,13 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRect &rect, const QSt
     }
 }
 
-void XDisasmView::drawArg(QPainter *pPainter, const QRect &rect, const QString &sText)
+void XDisasmView::drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText)
 {
     QList<XCapstone::OPERANDPART> listParts = XCapstone::getOperandParts(g_dmFamily, sText, g_syntax);
 
     qint32 nNumberOfParts = listParts.count();
 
-    QRect _rect = rect;
+    QRectF _rect = rect;
 
     for (qint32 i = 0; i < nNumberOfParts; i++) {
         QString sString = listParts.at(i).sString;
