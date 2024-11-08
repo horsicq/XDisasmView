@@ -1772,7 +1772,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             if (record.sLocation != "") {
                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
+                menuItem.pRecv = getShortcuts();
                 menuItem.pMethod = SLOT(copyRecord());
                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
                 menuItem.sText = record.sLocation;
@@ -1785,7 +1785,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             if (record.sBytes != "") {
                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
+                menuItem.pRecv = getShortcuts();
                 menuItem.pMethod = SLOT(copyRecord());
                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
                 menuItem.sText = record.sBytes;
@@ -1804,7 +1804,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
 
                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
+                menuItem.pRecv = getShortcuts();
                 menuItem.pMethod = SLOT(copyRecord());
                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
                 menuItem.sText = sString;
@@ -1817,7 +1817,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
             if (record.sComment != "") {
                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
+                menuItem.pRecv = getShortcuts();
                 menuItem.pMethod = SLOT(copyRecord());
                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
                 menuItem.sText = record.sComment;
