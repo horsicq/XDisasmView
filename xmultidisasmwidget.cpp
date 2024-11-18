@@ -139,11 +139,6 @@ void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
     ui->scrollAreaDisasm->setDevice(pDevice);
 }
 
-void XMultiDisasmWidget::setBackupDevice(QIODevice *pDevice)
-{
-    ui->scrollAreaDisasm->setBackupDevice(pDevice);
-}
-
 void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
 {
     ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
