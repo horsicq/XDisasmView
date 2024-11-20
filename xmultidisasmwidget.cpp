@@ -166,6 +166,12 @@ void XMultiDisasmWidget::setWidgetFocus()
     ui->scrollAreaDisasm->setFocus();
 }
 
+void XMultiDisasmWidget::reloadData(bool bSaveSelection)
+{
+    Q_UNUSED(bSaveSelection)
+    ui->scrollAreaDisasm->reload(true);
+}
+
 void XMultiDisasmWidget::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
 {
     ui->scrollAreaDisasm->setGlobal(pShortcuts, pXOptions);

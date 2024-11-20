@@ -59,6 +59,7 @@ public:
     void goToOffset(qint64 nOffset);
     virtual void adjustView();
     void setWidgetFocus();
+    virtual void reloadData(bool bSaveSelection);
 
 private:
     void addMode(XBinary::DM disasmMode);
