@@ -52,7 +52,7 @@ public:
     void setDevice(QIODevice *pDevice);
     void setXInfoDB(XInfoDB *pXInfoDB);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
-    void setReadonly(bool bState);
+    virtual void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
     void goToAddress(XADDR nAddress);
