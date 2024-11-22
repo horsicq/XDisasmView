@@ -47,6 +47,7 @@ public:
 
     static void setDefaultValues(XOptions *pOptions, MODE mode = MODE_ALL);
     static QList<DialogViewColors::RECORD> getRecords(MODE mode = MODE_ALL);
+    virtual void reloadData(bool bSaveSelection);
 
 public slots:
     void save();

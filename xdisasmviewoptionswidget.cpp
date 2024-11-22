@@ -256,6 +256,12 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
     return listResult;
 }
 
+void XDisasmViewOptionsWidget::reloadData(bool bSaveSelection)
+{
+    Q_UNUSED(bSaveSelection)
+    reload();
+}
+
 void XDisasmViewOptionsWidget::reload()
 {
     g_pOptions->setCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
