@@ -116,6 +116,8 @@ public:
     virtual qint64 viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset = false);
     void showReferences(XADDR nAddress);
 
+    void analyzeAll();
+
 private:
     enum COLUMN {
         COLUMN_ARROWS = 0,

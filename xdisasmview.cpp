@@ -933,6 +933,11 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(const QString &sOperand)
     return result;
 }
 
+void XDisasmView::analyzeAll()
+{
+    _analyzeAll();
+}
+
 XDisasmView::RECORD XDisasmView::_getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos)
 {
     RECORD result = {};

@@ -39,49 +39,6 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     g_pXInfoDB = nullptr;
     g_options = {};
 
-    const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
-
-    addMode(XBinary::DM_X86_16);
-    addMode(XBinary::DM_X86_32);
-    addMode(XBinary::DM_X86_64);
-    addMode(XBinary::DM_ARM_LE);
-    addMode(XBinary::DM_ARM_BE);
-    addMode(XBinary::DM_ARM64_LE);
-    addMode(XBinary::DM_ARM64_BE);
-    addMode(XBinary::DM_CORTEXM);
-    addMode(XBinary::DM_THUMB_LE);
-    addMode(XBinary::DM_THUMB_BE);
-    addMode(XBinary::DM_MIPS_LE);
-    addMode(XBinary::DM_MIPS_BE);
-    addMode(XBinary::DM_MIPS64_LE);
-    addMode(XBinary::DM_MIPS64_BE);
-    addMode(XBinary::DM_PPC_LE);
-    addMode(XBinary::DM_PPC_BE);
-    addMode(XBinary::DM_PPC64_LE);
-    addMode(XBinary::DM_PPC64_BE);
-    addMode(XBinary::DM_SPARC);
-    addMode(XBinary::DM_S390X);
-    addMode(XBinary::DM_XCORE);
-    addMode(XBinary::DM_M68K);
-    addMode(XBinary::DM_M68K40);
-    addMode(XBinary::DM_TMS320C64X);
-    addMode(XBinary::DM_M6800);
-    addMode(XBinary::DM_M6801);
-    addMode(XBinary::DM_M6805);
-    addMode(XBinary::DM_M6808);
-    addMode(XBinary::DM_M6809);
-    addMode(XBinary::DM_M6811);
-    addMode(XBinary::DM_CPU12);
-    addMode(XBinary::DM_HD6301);
-    addMode(XBinary::DM_HD6309);
-    addMode(XBinary::DM_HCS08);
-    addMode(XBinary::DM_EVM);
-    addMode(XBinary::DM_MOS65XX);
-    addMode(XBinary::DM_RISKV32);
-    addMode(XBinary::DM_RISKV64);
-    addMode(XBinary::DM_RISKVC);
-    addMode(XBinary::DM_MOS65XX);
-    addMode(XBinary::DM_WASM);
     // TODO BPF
     // TODO Check more !!!
 
@@ -94,12 +51,14 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     connect(ui->scrollAreaDisasm, SIGNAL(deviceSizeChanged(qint64, qint64)), this, SIGNAL(deviceSizeChanged(qint64, qint64)));
     connect(ui->scrollAreaDisasm, SIGNAL(visitedStateChanged()), this, SLOT(adjustVisitedState()));
 
-    ui->comboBoxMode->blockSignals(bBlocked1);
-
     setReadonlyVisible(false);
     ui->checkBoxReadonly->setChecked(true);
 
     adjustVisitedState();
+
+#ifndef QT_SQL_LIB
+    ui->frameAnalize->hide();
+#endif
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -207,8 +166,6 @@ void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
 void XMultiDisasmWidget::reloadFileType()
 {
     if (g_pDevice) {
-        const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
-
         g_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
         XDisasmView::OPTIONS options = {};
@@ -233,14 +190,58 @@ void XMultiDisasmWidget::reloadFileType()
 
         XBinary::DM disasmMode = XBinary::getDisasmMode(&options.memoryMapRegion);
 
-        qint32 nCount = ui->comboBoxMode->count();
+        {
+            const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
 
-        for (qint32 i = 0; i < nCount; i++) {
-            if (ui->comboBoxMode->itemData(i).toInt() == (int)disasmMode) {
-                ui->comboBoxMode->setCurrentIndex(i);
+            ui->comboBoxMode->clear();
 
-                break;
+            if (disasmMode == XBinary::DM_UNKNOWN) {
+                addMode(XBinary::DM_X86_16);
+                addMode(XBinary::DM_X86_32);
+                addMode(XBinary::DM_X86_64);
+                addMode(XBinary::DM_ARM_LE);
+                addMode(XBinary::DM_ARM_BE);
+                addMode(XBinary::DM_ARM64_LE);
+                addMode(XBinary::DM_ARM64_BE);
+                addMode(XBinary::DM_CORTEXM);
+                addMode(XBinary::DM_THUMB_LE);
+                addMode(XBinary::DM_THUMB_BE);
+                addMode(XBinary::DM_MIPS_LE);
+                addMode(XBinary::DM_MIPS_BE);
+                addMode(XBinary::DM_MIPS64_LE);
+                addMode(XBinary::DM_MIPS64_BE);
+                addMode(XBinary::DM_PPC_LE);
+                addMode(XBinary::DM_PPC_BE);
+                addMode(XBinary::DM_PPC64_LE);
+                addMode(XBinary::DM_PPC64_BE);
+                addMode(XBinary::DM_SPARC);
+                addMode(XBinary::DM_S390X);
+                addMode(XBinary::DM_XCORE);
+                addMode(XBinary::DM_M68K);
+                addMode(XBinary::DM_M68K40);
+                addMode(XBinary::DM_TMS320C64X);
+                addMode(XBinary::DM_M6800);
+                addMode(XBinary::DM_M6801);
+                addMode(XBinary::DM_M6805);
+                addMode(XBinary::DM_M6808);
+                addMode(XBinary::DM_M6809);
+                addMode(XBinary::DM_M6811);
+                addMode(XBinary::DM_CPU12);
+                addMode(XBinary::DM_HD6301);
+                addMode(XBinary::DM_HD6309);
+                addMode(XBinary::DM_HCS08);
+                addMode(XBinary::DM_EVM);
+                addMode(XBinary::DM_MOS65XX);
+                addMode(XBinary::DM_RISKV32);
+                addMode(XBinary::DM_RISKV64);
+                addMode(XBinary::DM_RISKVC);
+                addMode(XBinary::DM_MOS65XX);
+                addMode(XBinary::DM_WASM);
+            } else {
+                ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode), disasmMode);
             }
+
+            ui->comboBoxMode->blockSignals(bBlocked1);
         }
 
         // TODO Check
@@ -251,8 +252,6 @@ void XMultiDisasmWidget::reloadFileType()
 
         ui->scrollAreaDisasm->setData(g_pDevice, options);
         ui->scrollAreaDisasm->reload(true);
-
-        ui->comboBoxMode->blockSignals(bBlocked1);
     }
 }
 
@@ -326,3 +325,9 @@ void XMultiDisasmWidget::on_toolButtonVisitedNext_clicked()
 {
     ui->scrollAreaDisasm->goToNextVisited();
 }
+
+void XMultiDisasmWidget::on_toolButtonAnalyze_clicked()
+{
+    ui->scrollAreaDisasm->analyzeAll();
+}
+

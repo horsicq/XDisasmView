@@ -74,6 +74,7 @@ private slots:
     void adjustVisitedState();
     void on_toolButtonVisitedPrev_clicked();
     void on_toolButtonVisitedNext_clicked();
+    void on_toolButtonAnalyze_clicked();
 
 protected:
     virtual void registerShortcuts(bool bState);
