@@ -1,6 +1,10 @@
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-include(${CMAKE_CURRENT_LIST_DIR}/../Formats/xformats.cmake)
+if (NOT DEFINED XFORMATS_SOURCES)
+    include(${CMAKE_CURRENT_LIST_DIR}/../Formats/xformats.cmake)
+    set(XDISASMVIEW_SOURCES ${XDISASMVIEW_SOURCES} ${XFORMATS_SOURCES})
+endif()
+
 include(${CMAKE_CURRENT_LIST_DIR}/../Controls/xabstracttableview.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XCapstone/xcapstone.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../FormatDialogs/dialoggotoaddress.cmake)
@@ -13,6 +17,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/../XSymbolsWidget/xsymbolswidget.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XDecompiler/xdecompiler.cmake)
 
 set(XDISASMVIEW_SOURCES
+    ${XDISASMVIEW_SOURCES}
     ${XFORMATS_SOURCES}
     ${XABSTRACTTABLEVIEW_SOURCES}
     ${XCAPSTONE_SOURCES}
