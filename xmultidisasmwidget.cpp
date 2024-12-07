@@ -330,4 +330,3 @@ void XMultiDisasmWidget::on_toolButtonAnalyze_clicked()
 {
     ui->scrollAreaDisasm->analyzeAll();
 }
-
