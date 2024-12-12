@@ -42,7 +42,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     // TODO BPF
     // TODO Check more !!!
 
-    connect(ui->scrollAreaDisasm, SIGNAL(showOffsetHex(qint64)), this, SIGNAL(showOffsetHex(qint64)));
+    connect(ui->scrollAreaDisasm, SIGNAL(followLocation(quint64, qint32, qint64, qint32)), this, SIGNAL(followLocation(quint64, qint32, qint64, qint32)));
     connect(ui->scrollAreaDisasm, SIGNAL(errorMessage(QString)), this, SLOT(errorMessageSlot(QString)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(cursorViewPosChanged(qint64)),this,SLOT(cursorChanged(qint64)));
     //    connect(ui->scrollAreaDisasm,SIGNAL(selectionChanged()),this,SLOT(selectionChanged()));
@@ -114,6 +114,15 @@ void XMultiDisasmWidget::goToOffset(qint64 nOffset)
 {
     ui->scrollAreaDisasm->goToOffset(nOffset);
     ui->scrollAreaDisasm->reload(true);
+}
+
+void XMultiDisasmWidget::setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize)
+{
+    if (nLocationType == XBinary::LT_ADDRESS) {
+        goToAddress(nLocation);
+    } else if (nLocationType == XBinary::LT_OFFSET) {
+        goToOffset(nLocation);
+    }
 }
 
 void XMultiDisasmWidget::adjustView()

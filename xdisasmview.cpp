@@ -2273,7 +2273,7 @@ void XDisasmView::_hexSlot()
         DEVICESTATE state = getDeviceState();
 
         if (state.nSelectionDeviceOffset != (quint64)-1) {
-            emit showOffsetHex(state.nSelectionDeviceOffset);
+            emit followLocation(state.nSelectionDeviceOffset, XBinary::LT_OFFSET, state.nSelectionSize, XOptions::WIDGETTYPE_HEX);
         }
     }
 }

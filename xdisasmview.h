@@ -254,9 +254,6 @@ protected slots:
     void _analyzeFunctions();
     void _transfer(XInfoDBTransfer::COMMAND command);
 
-signals:
-    void showOffsetHex(qint64 nOffset);  // TODO Offset/Size
-
 private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
