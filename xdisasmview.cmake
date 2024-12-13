@@ -32,8 +32,11 @@ if (NOT DEFINED SEARCHSIGNATURESWIDGET_SOURCES)
     include(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/SearchSignatures/searchsignatureswidget.cmake)
     set(XDISASMVIEW_SOURCES ${XDISASMVIEW_SOURCES} ${SEARCHSIGNATURESWIDGET_SOURCES})
 endif()
+if (NOT DEFINED XHEXEDIT_SOURCES)
+    include(${CMAKE_CURRENT_LIST_DIR}/../XHexEdit/xhexedit.cmake)
+    set(XDISASMVIEW_SOURCES ${XDISASMVIEW_SOURCES} ${XHEXEDIT_SOURCES})
+endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/../XHexEdit/xhexedit.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XSymbolsWidget/xsymbolswidget.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XDecompiler/xdecompiler.cmake)
 
