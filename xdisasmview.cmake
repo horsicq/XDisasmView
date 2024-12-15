@@ -41,7 +41,6 @@ if (NOT DEFINED XSYMBOLSWIDGET_SOURCES)
     set(XDISASMVIEW_SOURCES ${XDISASMVIEW_SOURCES} ${XSYMBOLSWIDGET_SOURCES})
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/../XSymbolsWidget/xsymbolswidget.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XDecompiler/xdecompiler.cmake)
 
 set(XDISASMVIEW_SOURCES
