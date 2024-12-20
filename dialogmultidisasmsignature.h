@@ -34,17 +34,6 @@ class DialogMultiDisasmSignature;
 class DialogMultiDisasmSignature : public XShortcutsDialog {
     Q_OBJECT
 
-    struct SIGNATURE_RECORD {
-        XADDR nAddress;
-        QString sOpcode;
-        QByteArray baOpcode;
-        qint32 nDispOffset;
-        qint32 nDispSize;
-        qint32 nImmOffset;
-        qint32 nImmSize;
-        bool bIsConst;
-    };
-
 public:
     explicit DialogMultiDisasmSignature(QWidget *pParent);
     ~DialogMultiDisasmSignature();
@@ -74,7 +63,7 @@ private:
     qint64 g_nOffset;
     XBinary::_MEMORY_MAP *g_pMemoryMap;
     csh g_handle;
-    QList<SIGNATURE_RECORD> g_listRecords;
+    QList<XCapstone::SIGNATURE_RECORD> g_listRecords;
     qint32 g_nSymbolWidth;
 };
 

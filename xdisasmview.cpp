@@ -334,13 +334,13 @@ void XDisasmView::adjustScrollCount()
         record.nScrollCount = record.nSize;
 
         bool bAdd = true;
-        // TODO XInfoDB
+        // // TODO XInfoDB
 
-        if ((getMemoryMap()->fileType == XBinary::FT_MACHO32) || (getMemoryMap()->fileType == XBinary::FT_MACHO64)) {
-            if (i == 0) {
-                bAdd = false;  // DO NOT add zeropage
-            }
-        }
+        // if ((getMemoryMap()->fileType == XBinary::FT_MACHO32) || (getMemoryMap()->fileType == XBinary::FT_MACHO64)) {
+        //     if (i == 0) {
+        //         bAdd = false;  // DO NOT add zeropage
+        //     }
+        // }
 
         if (bAdd) {
             nScrollStart += record.nScrollCount;
