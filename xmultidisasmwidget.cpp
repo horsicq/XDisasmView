@@ -210,8 +210,8 @@ void XMultiDisasmWidget::reloadFileType()
                 addMode(XBinary::DM_X86_64);
                 addMode(XBinary::DM_ARM_LE);
                 addMode(XBinary::DM_ARM_BE);
-                addMode(XBinary::DM_ARM64_LE);
-                addMode(XBinary::DM_ARM64_BE);
+                addMode(XBinary::DM_AARCH64_LE);
+                addMode(XBinary::DM_AARCH64_BE);
                 addMode(XBinary::DM_CORTEXM);
                 addMode(XBinary::DM_THUMB_LE);
                 addMode(XBinary::DM_THUMB_BE);
