@@ -227,7 +227,12 @@ void XMultiDisasmWidget::reloadFileType()
                 addMode(XBinary::DM_S390X);
                 addMode(XBinary::DM_XCORE);
                 addMode(XBinary::DM_M68K);
+                addMode(XBinary::DM_M68K00);
+                addMode(XBinary::DM_M68K10);
+                addMode(XBinary::DM_M68K20);
+                addMode(XBinary::DM_M68K30);
                 addMode(XBinary::DM_M68K40);
+                addMode(XBinary::DM_M68K60);
                 addMode(XBinary::DM_TMS320C64X);
                 addMode(XBinary::DM_M6800);
                 addMode(XBinary::DM_M6801);
