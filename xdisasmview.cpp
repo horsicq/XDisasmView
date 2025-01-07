@@ -38,7 +38,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     g_nThisBaseDeviceOffset = 0;
     g_bIsLocationColon = false;
     g_bIsHighlight = false;
-    g_syntax = XBinary::SYNTAX_DEFAULT;
     // g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
     //    g_bytesMode = BYTESMODE_RAW;
 
@@ -74,9 +73,10 @@ void XDisasmView::adjustView()
 
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
     g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
+    g_disasmOptions.syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
+    g_disasmOptions.disasmMode = g_options.disasmMode;
     g_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
 
-    g_syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
     g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
 
     g_mapColors = getColorRecordsMap();
@@ -87,7 +87,7 @@ void XDisasmView::adjustView()
         XCapstone::closeHandle(&g_handle);
     }
 
-    XCapstone::openHandle(g_options.disasmMode, &g_handle, true, g_syntax);
+    XCapstone::openHandle(g_options.disasmMode, &g_handle, true, g_disasmOptions.syntax);
 
     viewport()->update();
 }
@@ -362,7 +362,7 @@ qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
 
     QByteArray baData = read_array(nViewPos, g_nOpcodeSize);
 
-    XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baData.data(), baData.size(), 0, g_disasmOptions);
+    XCapstone::DISASM_RESULT disasmResult = XCapstone::disasm_ex(g_handle, baData.data(), baData.size(), 0, g_disasmOptions);
 
     nResult = disasmResult.nSize;
 
@@ -406,7 +406,7 @@ QString XDisasmView::convertOpcodeString(const XCapstone::DISASM_RESULT &disasmR
         //     sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
         // }
         XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-        sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
+        sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType, g_disasmOptions);
     }
 
     if (sResult == "") {
@@ -516,7 +516,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
                 XCapstone::DISASM_RESULT disasmResult =
-                    XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+                    XCapstone::disasm_ex(g_handle, baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
                 if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                     if (_nOffset == nOffset) {
@@ -628,7 +628,7 @@ void XDisasmView::drawAsmText(QPainter *pPainter, const QRectF &rect, const QStr
 
         bool bIsNOP = false;
 
-        if (XCapstone::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_syntax)) {
+        if (XCapstone::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_disasmOptions.syntax)) {
             opcodeColorNOP = opcodeColor;
             bIsNOP = true;
         }
@@ -682,7 +682,7 @@ void XDisasmView::drawColorText(QPainter *pPainter, const QRectF &rect, const QS
 
 void XDisasmView::drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText)
 {
-    QList<XCapstone::OPERANDPART> listParts = XCapstone::getOperandParts(g_dmFamily, sText, g_syntax);
+    QList<XCapstone::OPERANDPART> listParts = XCapstone::getOperandParts(g_dmFamily, sText, g_disasmOptions.syntax);
 
     qint32 nNumberOfParts = listParts.count();
 
@@ -829,23 +829,23 @@ XDisasmView::COLOR_RECORD XDisasmView::getOpcodeColor(const QString &sOpcode)
     result = g_mapColors.value(XOptions::ID_DISASM_COLOR_OPCODE);
 
     if (g_dmFamily == XBinary::DMFAMILY_X86) {
-        if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        if (XCapstone::isCallOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL);
-        } else if (XCapstone::isCondJumpOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isCondJumpOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_COND_JMP);
-        } else if (XCapstone::isRetOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isRetOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET);
-        } else if (XCapstone::isPushOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isPushOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_PUSH);
-        } else if (XCapstone::isPopOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isPopOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_POP);
-        } else if (XCapstone::isNopOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isNopOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP);
-        } else if (XCapstone::isJumpOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isJumpOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_JMP);
-        } else if (XCapstone::isInt3Opcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isInt3Opcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_INT3);
-        } else if (XCapstone::isSyscallOpcode(g_dmFamily, sOpcode, g_syntax)) {
+        } else if (XCapstone::isSyscallOpcode(g_dmFamily, sOpcode, g_disasmOptions.syntax)) {
             result = g_mapColors.value(XOptions::ID_DISASM_COLOR_X86_OPCODE_SYSCALL);
         }
     } else if ((g_dmFamily == XBinary::DMFAMILY_ARM) || (g_dmFamily == XBinary::DMFAMILY_ARM64)) {
@@ -870,25 +870,25 @@ XDisasmView::COLOR_RECORD XDisasmView::getOperandColor(const QString &sOperand)
     bool bXMMReg = false;
     bool bNumber = false;
 
-    if (XCapstone::isRef(g_dmFamily, sOperand, g_syntax)) {
+    if (XCapstone::isRef(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bRef = true;
-    } else if (XCapstone::isGeneralRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isGeneralRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bGeneralReg = true;
-    } else if (XCapstone::isStackRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isStackRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bStackReg = true;
-    } else if (XCapstone::isSegmentRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isSegmentRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bSegmentReg = true;
-    } else if (XCapstone::isDebugRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isDebugRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bDebugReg = true;
-    } else if (XCapstone::isInstructionPointerRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isInstructionPointerRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bInstructionPointerReg = true;
-    } else if (XCapstone::isFlagsRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isFlagsRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bFlagsReg = true;
-    } else if (XCapstone::isFPURegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isFPURegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bFPUReg = true;
-    } else if (XCapstone::isXMMRegister(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isXMMRegister(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bXMMReg = true;
-    } else if (XCapstone::isNumber(g_dmFamily, sOperand, g_syntax)) {
+    } else if (XCapstone::isNumber(g_dmFamily, sOperand, g_disasmOptions.syntax)) {
         bNumber = true;
     }
 
@@ -1259,7 +1259,7 @@ void XDisasmView::updateData()
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
                                 if (showRecord.recordType == XInfoDB::RT_CODE) {
-                                    XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(),
+                                    XCapstone::DISASM_RESULT _disasmResult = XCapstone::disasm_ex(g_handle, baBuffer.data(),
                                                                                                   baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
                                     record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
                                     record.disasmResult.sString = _disasmResult.sString;
@@ -1314,7 +1314,7 @@ void XDisasmView::updateData()
                             }
 
                             record.disasmResult =
-                                XCapstone::disasm_ex(g_handle, g_options.disasmMode, g_syntax, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                XCapstone::disasm_ex(g_handle, baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
 
                             nBufferSize = record.disasmResult.nSize;
                             baBuffer.resize(nBufferSize);

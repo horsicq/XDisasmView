@@ -263,7 +263,6 @@ private:
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
     QMap<XOptions::ID, COLOR_RECORD> g_mapColors;
-    XBinary::SYNTAX g_syntax;
     XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
@@ -272,7 +271,7 @@ private:
     // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
-    XCapstone::DISASM_OPTIONS g_disasmOptions;  // TODO Check remove
+    XCapstone::DISASM_OPTIONS g_disasmOptions;
     QList<VIEWSTRUCT> g_listViewStruct;
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
 };

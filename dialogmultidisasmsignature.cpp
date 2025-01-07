@@ -71,7 +71,13 @@ void DialogMultiDisasmSignature::reload()
     qint32 nCount = ui->spinBoxCount->value();
     qint32 nMethod = ui->comboBoxMethod->currentData().toInt();
 
-    g_listRecords = XCapstone::getSignatureRecords(g_handle, g_pDevice, g_pMemoryMap, g_nOffset, nCount, nMethod);
+    XCapstone::ST st = XCapstone::ST_FULL;
+
+    if (nMethod == 1) {
+        st = XCapstone::ST_REL;
+    }
+
+    g_listRecords = XCapstone::getSignatureRecords(g_handle, g_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
 
     qint32 nNumberOfRecords = g_listRecords.count();
 
