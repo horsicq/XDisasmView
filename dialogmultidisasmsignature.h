@@ -23,7 +23,7 @@
 
 #include "dialogsearchsignatures.h"
 #include "xabstracttableview.h"
-#include "xcapstone.h"
+#include "xdisasmcore.h"
 #include "xlineedithex.h"
 #include "xshortcutsdialog.h"
 
@@ -40,7 +40,7 @@ public:
 
     virtual void adjustView();
 
-    void setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle);
+    void setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, XDisasmCore *pDisasmCore);
     void reload();
 
 private slots:
@@ -62,8 +62,8 @@ private:
     QIODevice *g_pDevice;
     qint64 g_nOffset;
     XBinary::_MEMORY_MAP *g_pMemoryMap;
-    csh g_handle;
-    QList<XCapstone::SIGNATURE_RECORD> g_listRecords;
+    XDisasmCore *g_pDisasmCore;
+    QList<XDisasmCore::SIGNATURE_RECORD> g_listRecords;
     qint32 g_nSymbolWidth;
 };
 

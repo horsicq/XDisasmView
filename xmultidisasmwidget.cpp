@@ -127,6 +127,7 @@ void XMultiDisasmWidget::setLocation(quint64 nLocation, qint32 nLocationType, qi
 
 void XMultiDisasmWidget::adjustView()
 {
+    ui->scrollAreaDisasm->adjustView();
 }
 
 void XMultiDisasmWidget::setWidgetFocus()

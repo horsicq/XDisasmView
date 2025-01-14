@@ -68,11 +68,6 @@ class XDisasmView : public XDeviceTableEditView {
         // TODO more
     };
 
-    struct COLOR_RECORD {
-        QColor colMain;
-        QColor colBackground;
-    };
-
     struct VIEWSTRUCT {
         qint64 nScrollStart;
         qint64 nScrollCount;
@@ -143,7 +138,7 @@ private:
         qint64 nViewPos;  // Line
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
-        XCapstone::DISASM_RESULT disasmResult;
+        XDisasmCore::DISASM_RESULT disasmResult;
 #ifdef USE_XPROCESS
         XInfoDB::BPT breakpointType;
         bool bIsCurrentIP;
@@ -181,7 +176,7 @@ private:
     //        BYTESMODE_RAW = 0,
     //    };
 
-    QString convertOpcodeString(const XCapstone::DISASM_RESULT &disasmResult);
+    QString convertOpcodeString(const XDisasmCore::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos);  // TODO rename
     MENU_STATE getMenuState();
 
@@ -190,7 +185,7 @@ private:
         bool bIsCurrentIP;
         //        bool bIsCursor;
         bool bIsBreakpoint;
-        bool bASMHighlight;
+        bool bCodeText;
         bool bIsAnalysed;
         QColor colSelected;
         QColor colBreakpoint;
@@ -198,15 +193,15 @@ private:
     };
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
-    void drawAsmText(QPainter *pPainter, const QRectF &rect, const QString &sText);
-    void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const COLOR_RECORD &colorRecord);
+    void drawCodeText(QPainter *pPainter, const QRectF &rect, const QString &sText);
+    void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord);
     void drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText);
     void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
-    QMap<XOptions::ID, COLOR_RECORD> getColorRecordsMap();
-    COLOR_RECORD getColorRecord(XOptions::ID id);
-    COLOR_RECORD getOpcodeColor(const QString &sOpcode);
-    COLOR_RECORD getOperandColor(const QString &sOperand);
+    QMap<XDisasmCore::OG, XDisasmCore::COLOR_RECORD> getColorRecordsMap();
+    XDisasmCore::COLOR_RECORD getColorRecord(XOptions::ID id);
+    XDisasmCore::COLOR_RECORD getOpcodeColor(const QString &sOpcode);
+    XDisasmCore::COLOR_RECORD getOperandColor(const QString &sOperand);
 
 private:
     RECORD _getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos);
@@ -258,11 +253,10 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-    csh g_handle;
     QShortcut *g_shortCuts[__SC_SIZE];
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QMap<XOptions::ID, COLOR_RECORD> g_mapColors;
+    QMap<XDisasmCore::OG, XDisasmCore::COLOR_RECORD> g_mapColors;
     XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
@@ -271,9 +265,10 @@ private:
     // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
-    XCapstone::DISASM_OPTIONS g_disasmOptions;
+    XDisasmCore::DISASM_OPTIONS g_disasmOptions;
     QList<VIEWSTRUCT> g_listViewStruct;
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
+    XDisasmCore g_disasmCore;
 };
 
 #endif  // XDISASMVIEW_H

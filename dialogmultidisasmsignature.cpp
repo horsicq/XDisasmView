@@ -29,7 +29,6 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     this->g_pDevice = nullptr;
     this->g_nOffset = 0;
     this->g_pMemoryMap = nullptr;
-    this->g_handle = 0;
 
     //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XOptions::getMonoFont());
@@ -56,12 +55,12 @@ void DialogMultiDisasmSignature::adjustView()
     getGlobalOptions()->adjustTableWidget(ui->tableWidgetSignature, XOptions::ID_VIEW_FONT_TABLEVIEWS);
 }
 
-void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, csh handle)
+void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, XDisasmCore *pDisasmCore)
 {
     this->g_pDevice = pDevice;
     this->g_nOffset = nOffset;
     this->g_pMemoryMap = pMemoryMap;
-    this->g_handle = handle;
+    this->g_pDisasmCore = pDisasmCore;
 
     reload();
 }
@@ -71,13 +70,13 @@ void DialogMultiDisasmSignature::reload()
     qint32 nCount = ui->spinBoxCount->value();
     qint32 nMethod = ui->comboBoxMethod->currentData().toInt();
 
-    XCapstone::ST st = XCapstone::ST_FULL;
+    XDisasmCore::ST st = XDisasmCore::ST_FULL;
 
     if (nMethod == 1) {
-        st = XCapstone::ST_REL;
+        st = XDisasmCore::ST_REL;
     }
 
-    g_listRecords = XCapstone::getSignatureRecords(g_handle, g_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
+    g_listRecords = g_pDisasmCore->getSignatureRecords(g_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
 
     qint32 nNumberOfRecords = g_listRecords.count();
 
@@ -192,15 +191,15 @@ void DialogMultiDisasmSignature::reloadSignature()
             sRecord = g_listRecords.at(i).baOpcode.toHex().data();
 
             if (!bDisp) {
-                sRecord = XCapstone::replaceWildChar(sRecord, g_listRecords.at(i).nDispOffset, g_listRecords.at(i).nDispSize, cWild);
+                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nDispOffset, g_listRecords.at(i).nDispSize, cWild);
             }
 
             if (!bImm) {
-                sRecord = XCapstone::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, cWild);
+                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, cWild);
             }
 
             if (g_listRecords.at(i).bIsConst) {
-                sRecord = XCapstone::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, QChar('$'));
+                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, QChar('$'));
             }
         } else {
             for (qint32 j = 0; j < nSize; j++) {
