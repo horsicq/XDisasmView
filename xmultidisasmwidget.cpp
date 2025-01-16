@@ -257,6 +257,8 @@ void XMultiDisasmWidget::reloadFileType()
             }
 
             ui->comboBoxMode->blockSignals(bBlocked1);
+
+            options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
         }
 
         // TODO Check

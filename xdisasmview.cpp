@@ -28,7 +28,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     memset(g_shortCuts, 0, sizeof g_shortCuts);
 
     g_options = OPTIONS();
-    g_disasmOptions = XDisasmCore::DISASM_OPTIONS();
+    g_disasmOptions = XDisasmAbstract::DISASM_OPTIONS();
 
     g_nAddressWidth = 8;
     g_nOpcodeSize = 16;  // TODO Check
@@ -353,7 +353,7 @@ qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
 
     QByteArray baData = read_array(nViewPos, g_nOpcodeSize);
 
-    XDisasmCore::DISASM_RESULT disasmResult = g_disasmCore.disAsm(baData.data(), baData.size(), 0, g_disasmOptions);
+    XDisasmAbstract::DISASM_RESULT disasmResult = g_disasmCore.disAsm(baData.data(), baData.size(), 0, g_disasmOptions);
 
     nResult = disasmResult.nSize;
 
@@ -378,7 +378,7 @@ qint64 XDisasmView::addressToViewPos(XADDR nAddress)
     return nResult;
 }
 
-QString XDisasmView::convertOpcodeString(const XDisasmCore::DISASM_RESULT &disasmResult)
+QString XDisasmView::convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &disasmResult)
 {
     QString sResult;
 
@@ -506,7 +506,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
             while (nSize > 0) {
                 qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-                XDisasmCore::DISASM_RESULT disasmResult = g_disasmCore.disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+                XDisasmAbstract::DISASM_RESULT disasmResult = g_disasmCore.disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
                 if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                     if (_nOffset == nOffset) {
@@ -1235,7 +1235,7 @@ void XDisasmView::updateData()
                                 baBuffer = read_array(record.nDeviceOffset, qMin(nBufferSize, g_nOpcodeSize));
 
                                 if (showRecord.recordType == XInfoDB::RT_CODE) {
-                                    XDisasmCore::DISASM_RESULT _disasmResult =
+                                    XDisasmAbstract::DISASM_RESULT _disasmResult =
                                         g_disasmCore.disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
                                     record.disasmResult.sMnemonic = _disasmResult.sMnemonic;
                                     record.disasmResult.sString = _disasmResult.sString;
@@ -1508,10 +1508,10 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if ((g_listRecords.at(i).disasmResult.relType == XDisasmCore::RELTYPE_JMP) || (g_listRecords.at(i).disasmResult.relType == XDisasmCore::RELTYPE_JMP_COND) ||
-                    (g_listRecords.at(i).disasmResult.relType == XDisasmCore::RELTYPE_JMP_UNCOND)) {
+                if ((g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP) || (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND) ||
+                    (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_UNCOND)) {
                     bool bIsSelected = isViewPosSelected(g_listRecords.at(i).nViewPos);
-                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XDisasmCore::RELTYPE_JMP_COND);
+                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND);
 
                     QPointF point1;
                     point1.setX(nLeft + nWidth - nArrowDelta);

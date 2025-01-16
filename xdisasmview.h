@@ -138,7 +138,7 @@ private:
         qint64 nViewPos;  // Line
         XADDR nVirtualAddress;
         qint64 nDeviceOffset;
-        XDisasmCore::DISASM_RESULT disasmResult;
+        XDisasmAbstract::DISASM_RESULT disasmResult;
 #ifdef USE_XPROCESS
         XInfoDB::BPT breakpointType;
         bool bIsCurrentIP;
@@ -176,7 +176,7 @@ private:
     //        BYTESMODE_RAW = 0,
     //    };
 
-    QString convertOpcodeString(const XDisasmCore::DISASM_RESULT &disasmResult);
+    QString convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos);  // TODO rename
     MENU_STATE getMenuState();
 
@@ -265,7 +265,7 @@ private:
     // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
-    XDisasmCore::DISASM_OPTIONS g_disasmOptions;
+    XDisasmAbstract::DISASM_OPTIONS g_disasmOptions;
     QList<VIEWSTRUCT> g_listViewStruct;
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
     XDisasmCore g_disasmCore;
