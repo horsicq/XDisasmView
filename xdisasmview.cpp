@@ -1508,7 +1508,8 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if ((g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP) || (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND) ||
+                if ((g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP) ||
+                    (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND) ||
                     (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_UNCOND)) {
                     bool bIsSelected = isViewPosSelected(g_listRecords.at(i).nViewPos);
                     bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND);
