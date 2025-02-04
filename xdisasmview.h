@@ -38,36 +38,6 @@
 class XDisasmView : public XDeviceTableEditView {
     Q_OBJECT
 
-    enum SHORTCUT {
-        SC_GOTOADDRESS,
-        SC_GOTOOFFSET,
-        SC_GOTOENTRYPOINT,
-        SC_GOTOXREF,
-        SC_DUMPTOFILE,
-        SC_SELECTALL,
-        SC_COPYDATA,
-        SC_COPYADDRESS,
-        SC_COPYOFFSET,
-        SC_FIND_STRING,
-        SC_FIND_SIGNATURE,
-        SC_FIND_VALUE,
-        SC_FINDNEXT,
-        SC_HEXSIGNATURE,
-        SC_SIGNATURE,
-        SC_FOLLOWIN_HEX,
-        SC_EDIT_HEX,
-#ifdef QT_SQL_LIB
-        SC_ANALYZE_ALL,
-        SC_ANALYZE_ANALYZE,
-        SC_ANALYZE_DISASM,
-        SC_ANALYZE_REMOVE,
-        SC_ANALYZE_SYMBOLS,
-        SC_ANALYZE_FUNCTIONS,
-#endif
-        __SC_SIZE,
-        // TODO more
-    };
-
     struct VIEWSTRUCT {
         qint64 nScrollStart;
         qint64 nScrollCount;
@@ -226,7 +196,6 @@ protected:
     virtual qint64 getCurrentViewPosFromScroll();
     virtual void setCurrentViewPosToScroll(qint64 nViewPos);
     virtual void adjustColumns();
-    virtual void registerShortcuts(bool bState);
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
     virtual qint64 getFixViewPos(qint64 nViewPos);  // TODO rewrite
@@ -253,7 +222,6 @@ private:
     OPTIONS g_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
-    QShortcut *g_shortCuts[__SC_SIZE];
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
     QMap<XDisasmCore::OG, XDisasmCore::COLOR_RECORD> g_mapColors;
