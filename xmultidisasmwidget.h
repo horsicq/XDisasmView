@@ -50,13 +50,11 @@ public:
 
     void setData(QIODevice *pDevice, const OPTIONS &options);
     void setDevice(QIODevice *pDevice);
-    void setXInfoDB(XInfoDB *pXInfoDB);
+    void setXInfoDB(XInfoDB *pXInfoDB, QString sXInfoProfile);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     virtual void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
-    void goToAddress(XADDR nAddress);  // TODO remove use setLocation
-    void goToOffset(qint64 nOffset);   // TODO remove use setLocation
     virtual void setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize);
     virtual void adjustView();
     void setWidgetFocus();

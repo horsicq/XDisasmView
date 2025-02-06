@@ -236,7 +236,8 @@ private:
     XDisasmAbstract::DISASM_OPTIONS g_disasmOptions;
     QList<VIEWSTRUCT> g_listViewStruct;
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
-    XDisasmCore g_disasmCore;
+    XDisasmCore g_default_disasmCore;
+    XDisasmCore *g_pDisasmCore;
 };
 
 #endif  // XDISASMVIEW_H

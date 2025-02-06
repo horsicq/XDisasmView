@@ -56,9 +56,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 
     adjustVisitedState();
 
-#ifndef QT_SQL_LIB
     ui->frameAnalize->hide();
-#endif
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()
@@ -99,30 +97,14 @@ void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
     ui->scrollAreaDisasm->setDevice(pDevice);
 }
 
-void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
+void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB, QString sXInfoProfile)
 {
-    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB);
-}
-
-void XMultiDisasmWidget::goToAddress(XADDR nAddress)
-{
-    ui->scrollAreaDisasm->goToAddress(nAddress);
-    ui->scrollAreaDisasm->reload(true);
-}
-
-void XMultiDisasmWidget::goToOffset(qint64 nOffset)
-{
-    ui->scrollAreaDisasm->goToOffset(nOffset);
-    ui->scrollAreaDisasm->reload(true);
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB, sXInfoProfile);
 }
 
 void XMultiDisasmWidget::setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize)
 {
-    if (nLocationType == XBinary::LT_ADDRESS) {
-        goToAddress(nLocation);
-    } else if (nLocationType == XBinary::LT_OFFSET) {
-        goToOffset(nLocation);
-    }
+    ui->scrollAreaDisasm->setLocation(nLocation, nLocationType, nSize);
 }
 
 void XMultiDisasmWidget::adjustView()
@@ -261,11 +243,11 @@ void XMultiDisasmWidget::reloadFileType()
             options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
         }
 
-        // TODO Check
-        if (ui->scrollAreaDisasm->getXInfoDB()) {
-            ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
-            //            getSymbols();
-        }
+        // // TODO Check
+        // if (ui->scrollAreaDisasm->getXInfoDB()) {
+        //     ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+        //     //            getSymbols();
+        // }
 
         ui->scrollAreaDisasm->setData(g_pDevice, options);
         ui->scrollAreaDisasm->reload(true);
@@ -280,9 +262,9 @@ void XMultiDisasmWidget::adjustMode()
     ui->scrollAreaDisasm->setData(g_pDevice, options);
     ui->scrollAreaDisasm->reload(true);
 
-    if (ui->scrollAreaDisasm->getXInfoDB()) {
-        ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
-    }
+    // if (ui->scrollAreaDisasm->getXInfoDB()) {
+    //     ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+    // }
 }
 
 void XMultiDisasmWidget::getSymbols()
@@ -291,8 +273,8 @@ void XMultiDisasmWidget::getSymbols()
         DialogXInfoDBTransferProcess dialogTransfer(this);
         dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
         XInfoDBTransfer::OPTIONS options = {};
-        options.pDevice = g_pXInfoDB->getDevice();
-        options.fileType = g_pXInfoDB->getFileType();
+        // options.pDevice = g_pXInfoDB->getDevice();
+        // options.fileType = g_pXInfoDB->getFileType();
         options.bIsImage = false;
         options.nModuleAddress = -1;
 
