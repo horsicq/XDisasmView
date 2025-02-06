@@ -445,7 +445,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 XInfoDB::SHOWRECORD showRecord = {};
 
                 if (nAddress != (XADDR)-1) {
-                    showRecord = getXInfoDB()->getShowRecordByAddress(nAddress, true);
+                    showRecord = getXInfoDB()->getShowRecordByAddress_EX(nAddress, true);
                 }
                 // TODO offset !!!
 
@@ -1193,7 +1193,7 @@ void XDisasmView::updateData()
                     bool bSuccess = false;
 
                     if (getXInfoDB() && (record.nVirtualAddress != (XADDR)-1)) {
-                        XInfoDB::SHOWRECORD showRecord = getXInfoDB()->getShowRecordByAddress(record.nVirtualAddress, true);
+                        XInfoDB::SHOWRECORD showRecord = getXInfoDB()->getShowRecordByAddress_EX(record.nVirtualAddress, true);
 
                         if (showRecord.bValid) {
                             if (record.nVirtualAddress != showRecord.nAddress) {
