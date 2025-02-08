@@ -56,7 +56,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
 
     adjustVisitedState();
 
-    ui->frameAnalize->hide();
+    // ui->frameAnalize->hide();
 }
 
 XMultiDisasmWidget::~XMultiDisasmWidget()

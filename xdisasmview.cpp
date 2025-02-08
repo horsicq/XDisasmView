@@ -466,7 +466,8 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                         }
                     }
 
-                    bSuccess = true;
+                    //bSuccess = true;
+                    bSuccess = false;  // TODO Check
                 }
             }
         }
@@ -2295,11 +2296,13 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             DialogXInfoDBTransferProcess dialogTransfer(this);
             dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
             XInfoDBTransfer::OPTIONS options = {};
-            // options.pDevice = getXInfoDB()->getDevice();
+            options.pDevice = getDevice();
+            options.fileType = g_options.memoryMapRegion.fileType;
             // options.fileType = g_file;
             options.nAddress = nAddress;
             options.nSize = state.nSelectionViewSize;
             options.nModuleAddress = -1;
+            options.bIsImage = false;
 
             if (command == XInfoDBTransfer::COMMAND_DISASM) {
                 options.nCount = 1;
