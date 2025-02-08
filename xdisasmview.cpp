@@ -55,7 +55,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 
     setVerticalLinesVisible(false);
 
-    g_pDisasmCore = &g_default_disasmCore; // TODO Check
+    g_pDisasmCore = &g_default_disasmCore;  // TODO Check
 }
 
 XDisasmView::~XDisasmView()
@@ -466,7 +466,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                         }
                     }
 
-                    //bSuccess = true;
+                    // bSuccess = true;
                     bSuccess = false;  // TODO Check
                 }
             }
@@ -1844,7 +1844,6 @@ void XDisasmView::contextMenu(const QPoint &pos)
         XOptions::deleteQObjectList(&listObjects);
 
         return;
-
 
         QMenu menuAnalyze(tr("Analyze"), this);
         QMenu menuBookmarks(tr("Bookmarks"), this);
