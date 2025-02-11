@@ -39,8 +39,8 @@ class XDisasmView : public XDeviceTableEditView {
     Q_OBJECT
 
     struct VIEWSTRUCT {
-        qint64 nScrollStart;
-        qint64 nScrollCount;
+        // qint64 nScrollStart;
+        // qint64 nScrollCount;
         qint64 nViewPos;
         XADDR nAddress;
         qint64 nOffset;

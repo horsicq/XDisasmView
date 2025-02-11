@@ -324,9 +324,9 @@ void XDisasmView::adjustScrollCount()
         record.nAddress = getMemoryMap()->listRecords.at(i).nAddress;
         record.nOffset = getMemoryMap()->listRecords.at(i).nOffset;
         record.nSize = getMemoryMap()->listRecords.at(i).nSize;
-        record.nScrollStart = nScrollStart;
+        // record.nScrollStart = nScrollStart;
         record.nViewPos = nViewPos;
-        record.nScrollCount = record.nSize;
+        // record.nScrollCount = record.nSize;
 
         bool bAdd = true;
         // // TODO XInfoDB
@@ -338,7 +338,7 @@ void XDisasmView::adjustScrollCount()
         // }
 
         if (bAdd) {
-            nScrollStart += record.nScrollCount;
+            nScrollStart += record.nSize;
             nViewPos += record.nSize;
 
             g_listViewStruct.append(record);
@@ -353,13 +353,13 @@ qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
 {
     // TODO
     // Check always return 1
-    qint64 nResult = 0;
+    qint64 nResult = 1;
 
-    QByteArray baData = read_array(nViewPos, g_nOpcodeSize);
+    // QByteArray baData = read_array(nViewPos, g_nOpcodeSize);
 
-    XDisasmAbstract::DISASM_RESULT disasmResult = g_pDisasmCore->disAsm(baData.data(), baData.size(), 0, g_disasmOptions);
+    // XDisasmAbstract::DISASM_RESULT disasmResult = g_pDisasmCore->disAsm(baData.data(), baData.size(), 0, g_disasmOptions);
 
-    nResult = disasmResult.nSize;
+    // nResult = disasmResult.nSize;
 
     return nResult;
 }
@@ -448,26 +448,29 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
 
         if (!bSuccess) {
             if (getXInfoDB()) {
-                XInfoDB::SHOWRECORD showRecord = {};
+                XInfoDB::XRECORD record = {};
 
                 if (nAddress != (XADDR)-1) {
-                    showRecord = getXInfoDB()->getShowRecordByAddress_EX(nAddress, true);
+                    record = getXInfoDB()->getRecordByAddress(getXInfoProfile(), nAddress);
                 }
                 // TODO offset !!!
 
-                if (showRecord.bValid) {
+                if (record.nSize) {
+                    // TODO
+                    XADDR _nAddress = getXInfoDB()->segmentRelOffsetToAddress(getXInfoProfile(), record.nSegment, record.nRelOffset);
+
                     if (nViewPos > nOldViewPos) {
                         if (nAddress != (XADDR)-1) {
-                            nResult = _getViewPosByAddress(showRecord.nAddress + showRecord.nSize);
+                            nResult = _getViewPosByAddress(_nAddress + record.nSize);
                         }
                     } else {
                         if (nAddress != (XADDR)-1) {
-                            nResult = _getViewPosByAddress(showRecord.nAddress);
+                            nResult = _getViewPosByAddress(_nAddress);
                         }
                     }
 
-                    // bSuccess = true;
-                    bSuccess = false;  // TODO Check
+                    bSuccess = true;
+                    //bSuccess = false;  // TODO Check
                 }
             }
         }
@@ -2302,6 +2305,7 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             options.nSize = state.nSelectionViewSize;
             options.nModuleAddress = -1;
             options.bIsImage = false;
+            options.sProfile = getXInfoProfile();
 
             if (command == XInfoDBTransfer::COMMAND_DISASM) {
                 options.nCount = 1;
