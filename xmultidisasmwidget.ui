@@ -93,6 +93,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QComboBox" name="comboBoxView">
+          <property name="minimumSize">
+           <size>
+            <width>120</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
@@ -136,6 +146,16 @@
        <widget class="QToolButton" name="toolButtonAnalyze">
         <property name="text">
          <string>Analyze</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBoxMethod">
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>0</height>
+         </size>
         </property>
        </widget>
       </item>

@@ -55,6 +55,16 @@ class XDisasmView : public XDeviceTableEditView {
     };
 
 public:
+    enum VIEWMETHOD {
+        VIEWMETHOD_NONE = 0,
+        VIEWMETHOD_ANALYZED
+    };
+
+    enum VIEWDISASM {
+        VIEWDISASM_COMPACT = 0,
+        VIEWDISASM_FULL
+    };
+
     struct OPTIONS {
         XADDR nInitAddress;
         XADDR nEntryPointAddress;  // TODO move to xdb
@@ -71,6 +81,8 @@ public:
     void _adjustView();
     virtual void adjustView();
     void setData(QIODevice *pDevice, const OPTIONS &options, bool bReload = true);
+    void setViewMethod(VIEWMETHOD viewMethod);
+    void setViewDisasm(VIEWDISASM viewDisasm);
     OPTIONS getOptions();
     XBinary::DM getDisasmMode();
     XADDR getSelectionInitAddress();
@@ -238,6 +250,8 @@ private:
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
     XDisasmCore g_default_disasmCore;
     XDisasmCore *g_pDisasmCore;
+    VIEWMETHOD g_viewMethod;
+    VIEWDISASM g_viewDisasm;
 };
 
 #endif  // XDISASMVIEW_H

@@ -34,6 +34,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->toolButtonVisitedNext->setToolTip(tr("Next visited"));
     ui->toolButtonVisitedPrev->setToolTip(tr("Previous visited"));
     ui->checkBoxReadonly->setToolTip(tr("Readonly"));
+    ui->comboBoxMethod->setToolTip(tr("Method"));
+    ui->comboBoxView->setToolTip(tr("View"));
 
     g_pDevice = nullptr;
     g_pXInfoDB = nullptr;
@@ -55,6 +57,9 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->checkBoxReadonly->setChecked(true);
 
     adjustVisitedState();
+
+    ui->comboBoxView->addItem(tr("Compact"), XDisasmView::VIEWDISASM_COMPACT);
+    ui->comboBoxView->addItem(tr("Full"), XDisasmView::VIEWDISASM_FULL);
 
     // ui->frameAnalize->hide();
 }
@@ -251,7 +256,18 @@ void XMultiDisasmWidget::reloadFileType()
 
         ui->scrollAreaDisasm->setData(g_pDevice, options);
         ui->scrollAreaDisasm->reload(true);
+        reloadMethod();
     }
+}
+
+void XMultiDisasmWidget::reloadMethod()
+{
+    const bool bBlocked1 = ui->comboBoxMethod->blockSignals(true);
+    ui->comboBoxMethod->clear();
+    ui->comboBoxMethod->addItem("", XDisasmView::VIEWMETHOD_NONE);
+    ui->comboBoxMethod->addItem(tr("Analyzed"), XDisasmView::VIEWMETHOD_ANALYZED);
+
+    ui->comboBoxMethod->blockSignals(bBlocked1);
 }
 
 void XMultiDisasmWidget::adjustMode()
@@ -328,4 +344,18 @@ void XMultiDisasmWidget::on_toolButtonVisitedNext_clicked()
 void XMultiDisasmWidget::on_toolButtonAnalyze_clicked()
 {
     ui->scrollAreaDisasm->analyzeAll();
+}
+
+void XMultiDisasmWidget::on_comboBoxMethod_currentIndexChanged(int nIndex)
+{
+    Q_UNUSED(nIndex)
+
+    ui->scrollAreaDisasm->setViewMethod((XDisasmView::VIEWMETHOD)(ui->comboBoxMethod->currentData().toInt()));
+}
+
+void XMultiDisasmWidget::on_comboBoxView_currentIndexChanged(int nIndex)
+{
+    Q_UNUSED(nIndex)
+
+    ui->scrollAreaDisasm->setViewDisasm((XDisasmView::VIEWDISASM)(ui->comboBoxView->currentData().toInt()));
 }
