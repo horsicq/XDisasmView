@@ -334,11 +334,9 @@ void XDisasmView::adjustScrollCount()
             bool bAdd = true;
             // // TODO XInfoDB
 
-            // if ((getMemoryMap()->fileType == XBinary::FT_MACHO32) || (getMemoryMap()->fileType == XBinary::FT_MACHO64)) {
-            //     if (i == 0) {
-            //         bAdd = false;  // DO NOT add zeropage
-            //     }
-            // }
+            if (getMemoryMap()->listRecords.at(i).bIsInvisible) {
+                bAdd = false;
+            }
 
             if (bAdd) {
                 nScrollStart += record.nSize;
@@ -1932,7 +1930,8 @@ qint64 XDisasmView::getCurrentViewPosFromScroll()
         nResult = (qint64)nValue * g_nBytesProLine;
     }
 
-    qint64 _nResult = getDisasmViewPos(nResult, getViewPosStart());  // TODO Convert
+    qint64 _nViewPosStart = getViewPosStart();
+    qint64 _nResult = getDisasmViewPos(nResult, _nViewPosStart);  // TODO Convert
 
     if (_nResult != nResult) {
         nResult = _nResult;
