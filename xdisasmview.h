@@ -167,7 +167,6 @@ private:
         bool bIsCurrentIP;
         //        bool bIsCursor;
         bool bIsBreakpoint;
-        bool bCodeText;
         bool bIsAnalysed;
         QColor colSelected;
         QColor colBreakpoint;
@@ -175,6 +174,7 @@ private:
     };
 
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
+    void drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult, TEXT_OPTION *pTextOption);
     void drawCodeText(QPainter *pPainter, const QRectF &rect, const QString &sText);
     void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord);
     void drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText);

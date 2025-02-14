@@ -70,7 +70,7 @@ void XDisasmView::adjustView()
 
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
     g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
-    XBinary::SYNTAX syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
+    // XBinary::SYNTAX syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
     XBinary::DM disasmMode = g_options.disasmMode;
     g_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
 
@@ -80,11 +80,11 @@ void XDisasmView::adjustView()
 
     // TODO BP color
 
-    // if (getXInfoDB()) {
-    //     g_pDisasmCore = getXInfoDB()->getDisasmCore();
-    // }
+    if (getXInfoDB()) {
+        g_pDisasmCore = &(getXInfoDB()->getState(getXInfoProfile())->disasmCore);
+    }
 
-    g_pDisasmCore->setMode(disasmMode, syntax);
+    g_pDisasmCore->setMode(disasmMode);
 
     viewport()->update();
 }
@@ -557,14 +557,29 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
         pPainter->setPen(viewport()->palette().color(QPalette::Base));
     }*/
 
-    if (pTextOption->bCodeText) {
-        drawCodeText(pPainter, rectText, sText);
-    } else {
-        pPainter->drawText(rectText, sText, _qTextOptions);
-    }
+    pPainter->drawText(rectText, sText, _qTextOptions);
 
     if (bSave) {
         pPainter->restore();
+    }
+}
+
+void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult, TEXT_OPTION *pTextOption)
+{
+    QRectF rectText;
+
+    rectText.setLeft(nLeft + getCharWidth());
+    rectText.setTop(nTop + getLineDelta());
+    rectText.setWidth(nWidth);
+    rectText.setHeight(nHeight - getLineDelta());
+
+    QString sText = XDisasmAbstract::getOpcodeFullString(disasmResult);
+
+    if (g_bIsHighlight) {
+        drawText(pPainter, nLeft, nTop, nWidth, nHeight, sText, pTextOption);
+        // TODO
+    } else {
+        drawText(pPainter, nLeft, nTop, nWidth, nHeight, sText, pTextOption);
     }
 }
 
@@ -1619,10 +1634,8 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
         } else if (nColumn == COLUMN_OPCODE) {
-            QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
-
-            textOption.bCodeText = true;
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, sOpcode, &textOption);
+            // QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
+            drawDisasmText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).disasmResult, &textOption);
         } else if (nColumn == COLUMN_COMMENT) {
             drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sComment, &textOption);
         }
