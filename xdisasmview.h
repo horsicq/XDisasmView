@@ -78,7 +78,6 @@ public:
     explicit XDisasmView(QWidget *pParent = nullptr);
     ~XDisasmView();
 
-    void _adjustView();
     virtual void adjustView();
     void setData(QIODevice *pDevice, const OPTIONS &options, bool bReload = true);
     void setViewMethod(VIEWMETHOD viewMethod);
@@ -180,8 +179,6 @@ private:
     void drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText);
     void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
-    QMap<XDisasmCore::OG, XDisasmCore::COLOR_RECORD> getColorRecordsMap();
-    XDisasmCore::COLOR_RECORD getColorRecord(XOptions::ID id);
     XDisasmCore::COLOR_RECORD getOpcodeColor(const QString &sOpcode);
     XDisasmCore::COLOR_RECORD getOperandColor(const QString &sOperand);
 
@@ -236,7 +233,6 @@ private:
     QList<RECORD> g_listRecords;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    QMap<XDisasmCore::OG, XDisasmCore::COLOR_RECORD> g_mapColors;
     XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
