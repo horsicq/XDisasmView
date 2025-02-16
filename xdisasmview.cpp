@@ -557,7 +557,8 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     }
 }
 
-void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult, TEXT_OPTION *pTextOption)
+void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult,
+                                 TEXT_OPTION *pTextOption)
 {
     if (g_bIsHighlight) {
         if (pTextOption->bIsSelected) {
