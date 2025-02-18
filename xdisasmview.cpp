@@ -594,10 +594,10 @@ void XDisasmView::drawCodeText(QPainter *pPainter, const QRectF &rect, const QSt
 
         bool bIsNOP = false;
 
-        if (XDisasmAbstract::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_pDisasmCore->getSyntax())) {
-            opcodeColorNOP = opcodeColor;
-            bIsNOP = true;
-        }
+        // if (XDisasmAbstract::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_pDisasmCore->getSyntax())) {
+        //     opcodeColorNOP = opcodeColor;
+        //     bIsNOP = true;
+        // }
 
         drawColorText(pPainter, _rectMnemonic, sMnemonic, opcodeColor);
 
@@ -729,26 +729,6 @@ void XDisasmView::drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF 
 XDisasmCore::COLOR_RECORD XDisasmView::getOpcodeColor(const QString &sOpcode)
 {
     XDisasmCore::COLOR_RECORD result = {};
-
-    if (XDisasmAbstract::isCallOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_CALL);
-    } else if (XDisasmAbstract::isCondJumpOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_CONDJMP);
-    } else if (XDisasmAbstract::isRetOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_RET);
-    } else if (XDisasmAbstract::isPushOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_PUSH);
-    } else if (XDisasmAbstract::isPopOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_POP);
-    } else if (XDisasmAbstract::isNopOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_NOP);
-    } else if (XDisasmAbstract::isJumpOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_JMP);
-    } else if (XDisasmAbstract::isInt3Opcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_INT3);
-    } else if (XDisasmAbstract::isSyscallOpcode(g_dmFamily, sOpcode, g_pDisasmCore->getSyntax())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE_SYSCALL);
-    }
 
     if ((!result.colMain.isValid()) && (!result.colBackground.isValid())) {
         result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE);

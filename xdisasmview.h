@@ -176,7 +176,7 @@ private:
     void drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult,
                         TEXT_OPTION *pTextOption);
     void drawCodeText(QPainter *pPainter, const QRectF &rect, const QString &sText);
-    void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord);
+    void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord); // TODO remove
     void drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText);
     void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
