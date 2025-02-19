@@ -579,49 +579,6 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, 
     }
 }
 
-void XDisasmView::drawCodeText(QPainter *pPainter, const QRectF &rect, const QString &sText)
-{
-    QString sMnemonic = sText.section("|", 0, 0);
-    QString sString = sText.section("|", 1, 1);
-
-    if (g_bIsHighlight) {
-        XDisasmCore::COLOR_RECORD opcodeColorNOP = {};
-
-        QRectF _rectMnemonic = rect;
-        _rectMnemonic.setWidth(QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic).width());
-
-        XDisasmCore::COLOR_RECORD opcodeColor = getOpcodeColor(sMnemonic.toLower());
-
-        bool bIsNOP = false;
-
-        // if (XDisasmAbstract::isNopOpcode(g_dmFamily, sMnemonic.toLower(), g_pDisasmCore->getSyntax())) {
-        //     opcodeColorNOP = opcodeColor;
-        //     bIsNOP = true;
-        // }
-
-        drawColorText(pPainter, _rectMnemonic, sMnemonic, opcodeColor);
-
-        if (sString != "") {
-            QRectF _rectString = rect;
-            _rectString.setX(rect.x() + QFontMetrics(pPainter->font()).size(Qt::TextSingleLine, sMnemonic + " ").width());
-
-            if (bIsNOP) {
-                drawColorText(pPainter, _rectString, sString, opcodeColorNOP);
-            } else {
-                drawArg(pPainter, _rectString, sString);
-            }
-        }
-    } else {
-        QString sOpcode = sMnemonic;
-
-        if (sString != "") {
-            sOpcode += QString(" %1").arg(sString);
-        }
-        // TODO
-        pPainter->drawText(rect, sOpcode, _qTextOptions);
-    }
-}
-
 void XDisasmView::drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord)
 {
     if (colorRecord.colBackground.isValid() || colorRecord.colMain.isValid()) {
@@ -724,17 +681,6 @@ void XDisasmView::drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF 
     pPainter->drawLine(pointStart, pointEnd);
 
     pPainter->restore();
-}
-
-XDisasmCore::COLOR_RECORD XDisasmView::getOpcodeColor(const QString &sOpcode)
-{
-    XDisasmCore::COLOR_RECORD result = {};
-
-    if ((!result.colMain.isValid()) && (!result.colBackground.isValid())) {
-        result = g_pDisasmCore->getColorRecord(XDisasmCore::OG_OPCODE);
-    }
-
-    return result;
 }
 
 XDisasmCore::COLOR_RECORD XDisasmView::getOperandColor(const QString &sOperand)
