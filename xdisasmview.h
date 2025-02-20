@@ -146,17 +146,6 @@ private:
         bool bHex;
     };
 
-    // enum OPCODEMODE {
-    //     OPCODEMODE_ORIGINAL = 0,
-    //     OPCODEMODE_SYMBOLADDRESS,
-    //     OPCODEMODE_SYMBOL,
-    //     OPCODEMODE_ADDRESS,
-    // };
-
-    //    enum BYTESMODE {
-    //        BYTESMODE_RAW = 0,
-    //    };
-
     QString convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &disasmResult);
     qint64 getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos);  // TODO rename
     MENU_STATE getMenuState();
@@ -175,11 +164,8 @@ private:
     void drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const QString &sText, TEXT_OPTION *pTextOption);
     void drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult,
                         TEXT_OPTION *pTextOption);
-    void drawColorText(QPainter *pPainter, const QRectF &rect, const QString &sText, const XDisasmCore::COLOR_RECORD &colorRecord); // TODO remove
-    void drawArg(QPainter *pPainter, const QRectF &rect, const QString &sText);
     void drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
     void drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF pointEnd, bool bIsSelected, bool bIsCond);
-    XDisasmCore::COLOR_RECORD getOperandColor(const QString &sOperand);
 
 private:
     RECORD _getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos);
@@ -192,6 +178,9 @@ private:
     qint64 _getOffsetByViewPos(qint64 nViewPos);
     qint64 _getViewPosByAddress(XADDR nAddress);
     XADDR _getAddressByViewPos(qint64 nViewPos);
+    void getRecords();
+    void updateArrows();
+    void updateLocations();
 
 protected:
     virtual OS cursorPositionToOS(const CURSOR_POSITION &cursorPosition);
