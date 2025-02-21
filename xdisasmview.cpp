@@ -307,52 +307,39 @@ qint64 XDisasmView::viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset)
 
 void XDisasmView::adjustScrollCount()
 {
-    if (g_viewMethod == VIEWMETHOD_NONE) {
-        g_listViewStruct.clear();
+    g_listViewStruct.clear();
 
-        qint32 nNumberOfRecords = getMemoryMap()->listRecords.count();
+    qint32 nNumberOfRecords = getMemoryMap()->listRecords.count();
 
-        qint64 nScrollStart = 0;
-        qint64 nViewPos = 0;
+    qint64 nScrollStart = 0;
+    qint64 nViewPos = 0;
 
-        for (qint32 i = 0; i < nNumberOfRecords; i++) {
-            VIEWSTRUCT record = {};
-            record.nAddress = getMemoryMap()->listRecords.at(i).nAddress;
-            record.nOffset = getMemoryMap()->listRecords.at(i).nOffset;
-            record.nSize = getMemoryMap()->listRecords.at(i).nSize;
-            // record.nScrollStart = nScrollStart;
-            record.nViewPos = nViewPos;
-            // record.nScrollCount = record.nSize;
+    for (qint32 i = 0; i < nNumberOfRecords; i++) {
+        VIEWSTRUCT record = {};
+        record.nAddress = getMemoryMap()->listRecords.at(i).nAddress;
+        record.nOffset = getMemoryMap()->listRecords.at(i).nOffset;
+        record.nSize = getMemoryMap()->listRecords.at(i).nSize;
+        // record.nScrollStart = nScrollStart;
+        record.nViewPos = nViewPos;
+        // record.nScrollCount = record.nSize;
 
-            bool bAdd = true;
-            // // TODO XInfoDB
+        bool bAdd = true;
+        // // TODO XInfoDB
 
-            if (getMemoryMap()->listRecords.at(i).bIsInvisible) {
-                bAdd = false;
-            }
-
-            if (bAdd) {
-                nScrollStart += record.nSize;
-                nViewPos += record.nSize;
-
-                g_listViewStruct.append(record);
-            }
+        if (getMemoryMap()->listRecords.at(i).bIsInvisible) {
+            bAdd = false;
         }
 
-        setViewSize(nViewPos);
-        setTotalScrollCount(nScrollStart);
-    } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
-        if (getXInfoDB()) {
-            qint32 nViewSize = getXInfoDB()->getRecordsCount(getXInfoProfile());
+        if (bAdd) {
+            nScrollStart += record.nSize;
+            nViewPos += record.nSize;
 
-            if (nViewSize > 0) {
-                nViewSize--;
-            }
-
-            setViewSize(nViewSize);
-            setTotalScrollCount(nViewSize);
+            g_listViewStruct.append(record);
         }
     }
+
+    setViewSize(nViewPos);
+    setTotalScrollCount(nScrollStart);
 }
 
 qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
@@ -416,75 +403,73 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
             nOldViewPos = nViewPos;
         }
 
-        if (g_viewMethod == VIEWMETHOD_NONE) {
-            bool bSuccess = false;
+        bool bSuccess = false;
 
-            VIEWSTRUCT viewStruct = _getViewStructByViewPos(nViewPos);
-            qint64 nOffset = 0;
+        VIEWSTRUCT viewStruct = _getViewStructByViewPos(nViewPos);
+        qint64 nOffset = 0;
 
-            if (viewStruct.nOffset != -1) {
-                nOffset = viewStruct.nOffset + (nViewPos - viewStruct.nViewPos);
+        if (viewStruct.nOffset != -1) {
+            nOffset = viewStruct.nOffset + (nViewPos - viewStruct.nViewPos);
+        }
+
+        if ((!bSuccess) && (nOffset != -1)) {
+            qint64 nStartOffset = 0;
+            qint64 nEndOffset = 0;
+
+            nStartOffset = nOffset - 5 * g_nOpcodeSize;
+            nEndOffset = nOffset + 5 * g_nOpcodeSize;
+
+            if (g_dmFamily == XBinary::DMFAMILY_ARM)  // TODO Check
+            {
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+            } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+            } else if (g_dmFamily == XBinary::DMFAMILY_M68K) {
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 2);
+            } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
+                //                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
+
+                //                if (*((quint16 *)_baData.data()) == 0)  // 0000
+                //                {
+                //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
+                //                }
+                nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
             }
 
-            if ((!bSuccess) && (nOffset != -1)) {
-                qint64 nStartOffset = 0;
-                qint64 nEndOffset = 0;
+            nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
+            nEndOffset = qMin(nEndOffset, viewStruct.nOffset + viewStruct.nSize);
 
-                nStartOffset = nOffset - 5 * g_nOpcodeSize;
-                nEndOffset = nOffset + 5 * g_nOpcodeSize;
+            qint32 nSize = nEndOffset - nStartOffset;
 
-                if (g_dmFamily == XBinary::DMFAMILY_ARM)  // TODO Check
-                {
-                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                } else if (g_dmFamily == XBinary::DMFAMILY_ARM64) {
-                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                } else if (g_dmFamily == XBinary::DMFAMILY_M68K) {
-                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 2);
-                } else if (g_dmFamily == XBinary::DMFAMILY_X86) {
-                    //                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
+            QByteArray baData = read_array(nStartOffset, nSize);
 
-                    //                if (*((quint16 *)_baData.data()) == 0)  // 0000
-                    //                {
-                    //                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                    //                }
-                    nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                }
+            nSize = baData.size();
 
-                nStartOffset = qMax(nStartOffset, viewStruct.nOffset);
-                nEndOffset = qMin(nEndOffset, viewStruct.nOffset + viewStruct.nSize);
+            qint64 _nCurrentOffset = 0;
+            qint64 _nResult = 0;
 
-                qint32 nSize = nEndOffset - nStartOffset;
+            while (nSize > 0) {
+                qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-                QByteArray baData = read_array(nStartOffset, nSize);
+                XDisasmAbstract::DISASM_RESULT disasmResult = g_pDisasmCore->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
 
-                nSize = baData.size();
-
-                qint64 _nCurrentOffset = 0;
-                qint64 _nResult = 0;
-
-                while (nSize > 0) {
-                    qint64 _nOffset = nStartOffset + _nCurrentOffset;
-
-                    XDisasmAbstract::DISASM_RESULT disasmResult = g_pDisasmCore->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
-
-                    if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
-                        if (_nOffset == nOffset) {
-                            _nResult = _nOffset;
+                if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
+                    if (_nOffset == nOffset) {
+                        _nResult = _nOffset;
+                    } else {
+                        if (nViewPos > nOldViewPos) {
+                            _nResult = _nOffset + disasmResult.nSize;
                         } else {
-                            if (nViewPos > nOldViewPos) {
-                                _nResult = _nOffset + disasmResult.nSize;
-                            } else {
-                                _nResult = _nOffset;
-                            }
+                            _nResult = _nOffset;
                         }
-                        nResult = viewStruct.nViewPos + (_nResult - viewStruct.nOffset);
-
-                        break;
                     }
+                    nResult = viewStruct.nViewPos + (_nResult - viewStruct.nOffset);
 
-                    _nCurrentOffset += disasmResult.nSize;
-                    nSize -= disasmResult.nSize;
+                    break;
                 }
+
+                _nCurrentOffset += disasmResult.nSize;
+                nSize -= disasmResult.nSize;
             }
         }
     }
@@ -826,7 +811,7 @@ void XDisasmView::getRecords()
 
     XInfoDB::STATE *pState = 0;
 
-    if (getXInfoDB()) {
+    if (getXInfoDB() && (g_viewMethod == VIEWMETHOD_ANALYZED)) {
         pState = getXInfoDB()->getState(getXInfoProfile());
     }
 
@@ -841,30 +826,26 @@ void XDisasmView::getRecords()
             RECORD record = {};
             record.nViewPos = nCurrentViewPos;
 
-            if (g_viewMethod == VIEWMETHOD_NONE) {
-                qint32 nBufferSize = 0;
-                QByteArray baBuffer;  // mb TODO fix buffer
-                VIEWSTRUCT viewStruct = _getViewStructByViewPos(nCurrentViewPos);
+            qint32 nBufferSize = 0;
+            QByteArray baBuffer;  // mb TODO fix buffer
+            VIEWSTRUCT viewStruct = _getViewStructByViewPos(nCurrentViewPos);
 
-                if (viewStruct.nSize) {
-                    if (viewStruct.nOffset != -1) {
-                        record.nDeviceOffset = viewStruct.nOffset + (nCurrentViewPos - viewStruct.nViewPos);
-                    } else {
-                        record.nDeviceOffset = -1;
-                    }
+            if (viewStruct.nSize) {
+                if (viewStruct.nOffset != -1) {
+                    record.nDeviceOffset = viewStruct.nOffset + (nCurrentViewPos - viewStruct.nViewPos);
+                } else {
+                    record.nDeviceOffset = -1;
+                }
 
-                    if (viewStruct.nAddress != (XADDR)-1) {
-                        record.nVirtualAddress = viewStruct.nAddress + (nCurrentViewPos - viewStruct.nViewPos);
-                    } else {
-                        record.nVirtualAddress = -1;
-                    }
+                if (viewStruct.nAddress != (XADDR)-1) {
+                    record.nVirtualAddress = viewStruct.nAddress + (nCurrentViewPos - viewStruct.nViewPos);
+                } else {
+                    record.nVirtualAddress = -1;
+                }
 
-                    if (record.nDeviceOffset != -1) {
+                if (record.nDeviceOffset != -1) {
+                    if (g_viewMethod == VIEWMETHOD_NONE) {
                         nBufferSize = qMin(g_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
-
-                        // if ((g_options.nEntryPointAddress > record.nVirtualAddress) && (g_options.nEntryPointAddress < (record.nVirtualAddress + nBufferSize))) {
-                        //     nBufferSize = g_options.nEntryPointAddress - record.nVirtualAddress;
-                        // }
 
                         baBuffer = read_array(record.nDeviceOffset, nBufferSize);
                         nBufferSize = baBuffer.size();
@@ -877,45 +858,60 @@ void XDisasmView::getRecords()
 
                         nBufferSize = record.disasmResult.nSize;
                         baBuffer.resize(nBufferSize);
+                        record.sBytes = baBuffer.toHex().data();
 
                         nDataSize = nBufferSize;
+                    } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
+                        if (pState) {
+                            qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, record.nVirtualAddress);
 
-                        record.sBytes = baBuffer.toHex().data();
-                    } else {
-                        nDataSize = 1;
-                        record.sBytes = "?";
-                        record.disasmResult.bIsValid = true;
-                        record.disasmResult.nAddress = record.nVirtualAddress;
-                        record.disasmResult.nSize = 1;
-                        record.disasmResult.sMnemonic = "db";
-                        record.disasmResult.sOperands = "1 dup(?)";
+                            if (nIndex != -1) {
+                                XInfoDB::XRECORD showRecord = pState->listRecords.at(nIndex);
+                                record.nVirtualAddress = XInfoDB::getAddress( pState, showRecord.nSegment, showRecord.nRelOffset);
+                                record.nDeviceOffset = XInfoDB::getOffset( pState, showRecord.nSegment, showRecord.nRelOffset);
 
-                        if (g_disasmOptions.bIsUppercase) {
-                            record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
-                            record.disasmResult.sOperands = record.disasmResult.sOperands.toUpper();
+                                if ((record.nDeviceOffset != -1) && (record.nVirtualAddress != -1)) {
+                                    if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
+                                        QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
+                                        record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                        record.sBytes = baBuffer.toHex().data();
+                                        record.sBytes = baBuffer.toHex().data();
+
+                                        nDataSize = showRecord.nSize;
+                                    }
+                                }
+                            } else {
+                                nDataSize = 1;
+                                record.sBytes = "?";
+                                record.disasmResult.bIsValid = true;
+                                record.disasmResult.nAddress = record.nVirtualAddress;
+                                record.disasmResult.nSize = 1;
+                                record.disasmResult.sMnemonic = "db";
+                                record.disasmResult.sOperands = "1 dup(?)";
+
+                                if (g_disasmOptions.bIsUppercase) {
+                                    record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+                                    record.disasmResult.sOperands = record.disasmResult.sOperands.toUpper();
+                                }
+                            }
                         }
                     }
                 } else {
-                    nDataSize = 0;
-                }
-            } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
-                if (pState) {
-                    if (nCurrentViewPos < pState->listRecords.count()) {
-                        XInfoDB::XRECORD showRecord = pState->listRecords.at(nCurrentViewPos);
-                        record.nVirtualAddress = XInfoDB::getAddress( pState, showRecord.nSegment, showRecord.nRelOffset);
-                        record.nDeviceOffset = XInfoDB::getOffset( pState, showRecord.nSegment, showRecord.nRelOffset);
+                    nDataSize = 1;
+                    record.sBytes = "?";
+                    record.disasmResult.bIsValid = true;
+                    record.disasmResult.nAddress = record.nVirtualAddress;
+                    record.disasmResult.nSize = 1;
+                    record.disasmResult.sMnemonic = "db";
+                    record.disasmResult.sOperands = "1 dup(?)";
 
-                        if ((record.nDeviceOffset != -1) && (record.nVirtualAddress != -1)) {
-                            if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
-                                QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
-                                record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
-                                record.sBytes = baBuffer.toHex().data();
-                            }
-                        }
-
-                        nDataSize = showRecord.nSize;
+                    if (g_disasmOptions.bIsUppercase) {
+                        record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
+                        record.disasmResult.sOperands = record.disasmResult.sOperands.toUpper();
                     }
                 }
+            } else {
+                nDataSize = 0;
             }
 
             if (nDataSize == 0) {
@@ -952,11 +948,7 @@ void XDisasmView::getRecords()
 
             g_listRecords.append(record);
 
-            if (pState) {
-                nCurrentViewPos++;
-            } else {
-                nCurrentViewPos += nDataSize;
-            }
+            nCurrentViewPos += nDataSize;
         } else {
             break;
         }
@@ -1121,11 +1113,13 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(const XAbstractTableView:
             qint64 nBlockOffset = g_listRecords.at(cursorPosition.nRow).nViewPos;
             qint64 nBlockSize = 0;
 
-            if (g_viewMethod == VIEWMETHOD_NONE) {
-                nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
-            } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
-                nBlockSize = 1;
-            }
+            // if (g_viewMethod == VIEWMETHOD_NONE) {
+            //     nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            // } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
+            //     nBlockSize = 1;
+            // }
+            nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            // nBlockSize = 1;
 
             osResult.nViewPos = nBlockOffset;
             osResult.nSize = nBlockSize;
