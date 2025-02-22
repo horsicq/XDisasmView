@@ -894,27 +894,27 @@ void XDisasmView::getRecords()
 
                             if (nIndex != -1) {
                                 XInfoDB::XRECORD showRecord = pState->listRecords.at(nIndex);
-                                record.nVirtualAddress = XInfoDB::getAddress( pState, showRecord.nSegment, showRecord.nRelOffset);
-                                record.nDeviceOffset = XInfoDB::getOffset( pState, showRecord.nSegment, showRecord.nRelOffset);
+                                record.nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nSegment, showRecord.nRelOffset);
+                                record.nDeviceOffset = XInfoDB::getOffset(pState, showRecord.nSegment, showRecord.nRelOffset);
 
                                 if ((record.nDeviceOffset != -1) && (record.nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
                                         QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
                                         record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
-                                        record.sBytes = baBuffer.toHex().data();
 
                                         nDataSize = showRecord.nSize;
                                     }
                                 }
                             } else {
+                                QByteArray baBuffer = read_array(record.nDeviceOffset, 1);
                                 nDataSize = 1;
-                                record.sBytes = "?";
+                                record.sBytes = baBuffer.toHex().data();
                                 record.disasmResult.bIsValid = true;
                                 record.disasmResult.nAddress = record.nVirtualAddress;
                                 record.disasmResult.nSize = 1;
                                 record.disasmResult.sMnemonic = "db";
-                                record.disasmResult.sOperands = "1 dup(?)";
+                                record.disasmResult.sOperands = record.sBytes;
 
                                 if (g_disasmOptions.bIsUppercase) {
                                     record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
