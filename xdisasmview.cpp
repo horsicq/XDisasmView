@@ -945,33 +945,33 @@ void XDisasmView::getRecords()
                 break;
             }
 
-//             if (getXInfoDB()) {
-// #ifdef USE_XPROCESS
-//                 record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
-//                 // TODO different colors
-//                 record.breakpointType = getXInfoDB()->findBreakPointByRegion(record.nVirtualAddress, record.disasmResult.nSize).bpType;
-// #endif
-//             }
+            //             if (getXInfoDB()) {
+            // #ifdef USE_XPROCESS
+            //                 record.bIsCurrentIP = (record.nVirtualAddress == nCurrentIP);
+            //                 // TODO different colors
+            //                 record.breakpointType = getXInfoDB()->findBreakPointByRegion(record.nVirtualAddress, record.disasmResult.nSize).bpType;
+            // #endif
+            //             }
 
-//             if (record.nVirtualAddress != (XADDR)-1) {
-//                 if (getXInfoDB()) {
-//                     record.sLabel = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
-//                 }
-//             }
+            //             if (record.nVirtualAddress != (XADDR)-1) {
+            //                 if (getXInfoDB()) {
+            //                     record.sLabel = getXInfoDB()->getSymbolStringByAddress(record.nVirtualAddress);
+            //                 }
+            //             }
 
-//             QList<HIGHLIGHTREGION> listHighLightRegions;
+            //             QList<HIGHLIGHTREGION> listHighLightRegions;
 
-//             if (record.nDeviceOffset != -1) {
-//                 listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XBinary::LT_OFFSET);
-//             }
+            //             if (record.nDeviceOffset != -1) {
+            //                 listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XBinary::LT_OFFSET);
+            //             }
 
-//             if (listHighLightRegions.count()) {
-//                 record.bIsBytesHighlighted = true;
-//                 record.colBytesBackground = listHighLightRegions.at(0).colBackground;
-//                 record.colBytesBackgroundSelected = listHighLightRegions.at(0).colBackgroundSelected;
-//             } else {
-//                 record.colBytesBackgroundSelected = getColor(TCLOLOR_SELECTED);
-//             }
+            //             if (listHighLightRegions.count()) {
+            //                 record.bIsBytesHighlighted = true;
+            //                 record.colBytesBackground = listHighLightRegions.at(0).colBackground;
+            //                 record.colBytesBackgroundSelected = listHighLightRegions.at(0).colBackgroundSelected;
+            //             } else {
+            //                 record.colBytesBackgroundSelected = getColor(TCLOLOR_SELECTED);
+            //             }
 
             g_listRecords.append(record);
 
@@ -1005,8 +1005,7 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j >= nStart; j--) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) &&
-                        (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nStart = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
@@ -1024,8 +1023,7 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j <= nEnd; j++) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) &&
-                        (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nEnd = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
@@ -1163,7 +1161,6 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(const XAbstractTableView:
 
 void XDisasmView::updateData()
 {
-
     //    g_listArrows.clear();
 
     if (getDevice()) {
