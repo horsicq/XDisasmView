@@ -484,7 +484,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                     XInfoDB::STATE *pState = getXInfoDB()->getState(getXInfoProfile());
 
                     if (pState) {
-                        qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nAddress);
+                        qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nAddress, true);
 
                         if (nIndex != -1) {
                             XInfoDB::XRECORD record = pState->listRecords.at(nIndex);
@@ -890,7 +890,7 @@ void XDisasmView::getRecords()
                         nDataSize = nBufferSize;
                     } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
                         if (pState) {
-                            qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, record.nVirtualAddress);
+                            qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, record.nVirtualAddress, false);
 
                             if (nIndex != -1) {
                                 XInfoDB::XRECORD showRecord = pState->listRecords.at(nIndex);
