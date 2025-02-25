@@ -22,6 +22,21 @@
 
 XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
 {
+    addShortcut(X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()));
+    addShortcut(X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()));
+    addShortcut(X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()));
+    addShortcut(X_ID_DISASM_SELECT_ALL, this, SLOT(_selectAllSlot()));
+    addShortcut(X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()));
+    addShortcut(X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()));
+    addShortcut(X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()));
+    addShortcut(X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()));
+    addShortcut(X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()));
+    addShortcut(X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()));
+    addShortcut(X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()));
+    addShortcut(X_ID_DISASM_SIGNATURE, this, SLOT(_hexSignatureSlot()));
+    addShortcut(X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_mainHexSlot()));
+    addShortcut(X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
+
     // TODO click on Address -> Offset
     g_nBytesProLine = 1;
 
@@ -1521,7 +1536,7 @@ void XDisasmView::contextMenu(const QPoint &pos)
         if (mstate.bPhysicalSize) {
             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
+            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_DISASM);
         }
 
         if (mstate.bHex) {
@@ -1623,11 +1638,11 @@ void XDisasmView::contextMenu(const QPoint &pos)
             contextMenu.addMenu(&menuAnalyze);
 
             {
-                actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_HEX_BOOKMARKS_NEW));
+                actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_NEW));
                 connect(&actionBookmarkNew, SIGNAL(triggered()), this, SLOT(_bookmarkNew()));
             }
             {
-                actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_HEX_BOOKMARKS_LIST));
+                actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_LIST));
                 if (getViewWidgetState(VIEWWIDGET_BOOKMARKS)) {
                     actionBookmarkList.setCheckable(true);
                     actionBookmarkList.setChecked(true);
@@ -1951,7 +1966,7 @@ void XDisasmView::_analyzeSymbols()
 #endif
         DialogXSymbols dialogSymbols(this);
         dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
-        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_ALL, QVariant(), true);
+        // dialogSymbols.setData(getXInfoDB(), getXInfoProfile(), XSymbolsWidget::MODE_ALL, true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
@@ -1969,7 +1984,7 @@ void XDisasmView::_analyzeFunctions()
 #endif
         DialogXSymbols dialogSymbols(this);
         dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
-        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_FUNCTIONS, QVariant(), true);
+        // dialogSymbols.setData(getXInfoDB(), getXInfoProfile(), XSymbolsWidget::MODE_FUNCTIONS, true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
@@ -2024,7 +2039,7 @@ void XDisasmView::showReferences(XADDR nAddress)
 #endif
         DialogXSymbols dialogSymbols(this);
         dialogSymbols.setGlobal(getShortcuts(), getGlobalOptions());
-        dialogSymbols.setData(getXInfoDB(), XSymbolsWidget::MODE_REFERENCES, nAddress, true);
+        // dialogSymbols.setData(getXInfoDB(), getXInfoProfile(), XSymbolsWidget::MODE_REFERENCES, true);
 
         connect(&dialogSymbols, SIGNAL(currentSymbolChanged(XADDR, qint64)), this, SLOT(goToAddressSlot(XADDR, qint64)));
 
