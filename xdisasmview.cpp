@@ -909,8 +909,8 @@ void XDisasmView::getRecords()
 
                             if (nIndex != -1) {
                                 XInfoDB::XRECORD showRecord = pState->listRecords.at(nIndex);
-                                record.nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nSegment, showRecord.nRelOffset);
-                                record.nDeviceOffset = XInfoDB::getOffset(pState, showRecord.nSegment, showRecord.nRelOffset);
+                                record.nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
+                                record.nDeviceOffset = XInfoDB::getOffset(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
 
                                 if ((record.nDeviceOffset != -1) && (record.nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
