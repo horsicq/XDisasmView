@@ -145,6 +145,14 @@ void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 {
     g_viewMethod = viewMethod;
 
+    if (viewMethod == VIEWMETHOD_ANALYZED) {
+        if (getXInfoDB()) {
+            if (!getXInfoDB()->isAnalyzed(getXInfoProfile())) {
+                analyzeAll();
+            }
+        }
+    }
+
     adjustAfterAnalysis();
 }
 

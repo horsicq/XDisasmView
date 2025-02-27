@@ -24,7 +24,7 @@
 #include <QTextDocument>
 
 #include "dialoghexedit.h"
-#include "dialogmultidisasmsignature.h"
+#include "Widgets/dialogmultidisasmsignature.h"
 #include "xcapstone.h"
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"

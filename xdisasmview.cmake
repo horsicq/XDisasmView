@@ -50,9 +50,9 @@ set(XDISASMVIEW_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.h
     ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasm.ui
-    ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.h
-    ${CMAKE_CURRENT_LIST_DIR}/dialogmultidisasmsignature.ui
+    ${CMAKE_CURRENT_LIST_DIR}/Widgets/dialogmultidisasmsignature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Widgets/dialogmultidisasmsignature.h
+    ${CMAKE_CURRENT_LIST_DIR}/Widgets/dialogmultidisasmsignature.ui
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmview.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xdisasmview.h
     ${CMAKE_CURRENT_LIST_DIR}/xmultidisasmwidget.cpp

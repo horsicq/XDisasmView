@@ -3,21 +3,21 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     $$PWD/dialogmultidisasm.h \
-    $$PWD/dialogmultidisasmsignature.h \
+    $$PWD/Widgets/dialogmultidisasmsignature.h \
     $$PWD/xdisasmview.h \
     $$PWD/xdisasmviewoptionswidget.h \
     $$PWD/xmultidisasmwidget.h
 
 SOURCES += \
     $$PWD/dialogmultidisasm.cpp \
-    $$PWD/dialogmultidisasmsignature.cpp \
+    $$PWD/Widgets/dialogmultidisasmsignature.cpp \
     $$PWD/xdisasmview.cpp \
     $$PWD/xdisasmviewoptionswidget.cpp \
     $$PWD/xmultidisasmwidget.cpp
 
 FORMS += \
     $$PWD/dialogmultidisasm.ui \
-    $$PWD/dialogmultidisasmsignature.ui \
+    $$PWD/Widgets/dialogmultidisasmsignature.ui \
     $$PWD/xdisasmviewoptionswidget.ui \
     $$PWD/xmultidisasmwidget.ui
 
