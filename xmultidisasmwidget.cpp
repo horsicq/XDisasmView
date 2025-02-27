@@ -102,9 +102,9 @@ void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
     ui->scrollAreaDisasm->setDevice(pDevice);
 }
 
-void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB, QString sXInfoProfile)
+void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB, XInfoDB::PROFILE profile)
 {
-    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB, sXInfoProfile);
+    ui->scrollAreaDisasm->setXInfoDB(pXInfoDB, profile);
 }
 
 void XMultiDisasmWidget::setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize)

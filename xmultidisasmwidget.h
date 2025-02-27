@@ -50,7 +50,7 @@ public:
 
     void setData(QIODevice *pDevice, const OPTIONS &options);
     void setDevice(QIODevice *pDevice);
-    void setXInfoDB(XInfoDB *pXInfoDB, QString sXInfoProfile);
+    void setXInfoDB(XInfoDB *pXInfoDB, XInfoDB::PROFILE profile);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     virtual void setReadonly(bool bState);
     void setReadonlyVisible(bool bState);

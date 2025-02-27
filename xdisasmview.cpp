@@ -34,7 +34,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     addShortcut(X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()));
     addShortcut(X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()));
     addShortcut(X_ID_DISASM_SIGNATURE, this, SLOT(_hexSignatureSlot()));
-    addShortcut(X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_mainHexSlot()));
+    // addShortcut(X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_mainHexSlot()));
     addShortcut(X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
 
     // TODO click on Address -> Offset
@@ -2014,7 +2014,7 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             options.nSize = state.nSelectionViewSize;
             options.nModuleAddress = -1;
             options.bIsImage = false;
-            options.sProfile = getXInfoProfile();
+            options.profile = getXInfoProfile();
 
             if (command == XInfoDBTransfer::COMMAND_DISASM) {
                 options.nCount = 1;
