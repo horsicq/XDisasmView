@@ -80,18 +80,6 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
         ui->scrollAreaDisasm->setDevice(nullptr);
     }
 
-    //    if (g_pXInfoDB) {
-    //        g_pXInfoDB->setAnalyzed(g_pXInfoDB->isShowRecordsPresent());  // TODO Check mb remove
-
-    //        //        if (!(g_pXInfoDB->isAnalyzed())) {
-
-    //        //            if (QMessageBox::question(this,tr("Information"), tr("Make an analysis of this module?"), QMessageBox::Yes|QMessageBox::No) ==
-    //        QMessageBox::Yes) {
-    //        //                analyze();
-    //        //            }
-    //        //        }
-    //    }
-
     adjustVisitedState();
 
     reloadFileType();
@@ -155,11 +143,6 @@ void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
     //    emit changed();
 }
 
-void XMultiDisasmWidget::addMode(XBinary::DM disasmMode)
-{
-    ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode), disasmMode);
-}
-
 void XMultiDisasmWidget::reloadFileType()
 {
     if (g_pDevice) {
@@ -187,66 +170,9 @@ void XMultiDisasmWidget::reloadFileType()
 
         XBinary::DM disasmMode = XBinary::getDisasmMode(&options.memoryMapRegion);
 
-        {
-            const bool bBlocked1 = ui->comboBoxMode->blockSignals(true);
+        XFormats::setDisasmModeComboBox(disasmMode, ui->comboBoxMode);
 
-            ui->comboBoxMode->clear();
-
-            if (disasmMode == XBinary::DM_UNKNOWN) {
-                addMode(XBinary::DM_X86_16);
-                addMode(XBinary::DM_X86_32);
-                addMode(XBinary::DM_X86_64);
-                addMode(XBinary::DM_ARM_LE);
-                addMode(XBinary::DM_ARM_BE);
-                addMode(XBinary::DM_AARCH64_LE);
-                addMode(XBinary::DM_AARCH64_BE);
-                addMode(XBinary::DM_CORTEXM);
-                addMode(XBinary::DM_THUMB_LE);
-                addMode(XBinary::DM_THUMB_BE);
-                addMode(XBinary::DM_MIPS_LE);
-                addMode(XBinary::DM_MIPS_BE);
-                addMode(XBinary::DM_MIPS64_LE);
-                addMode(XBinary::DM_MIPS64_BE);
-                addMode(XBinary::DM_PPC_LE);
-                addMode(XBinary::DM_PPC_BE);
-                addMode(XBinary::DM_PPC64_LE);
-                addMode(XBinary::DM_PPC64_BE);
-                addMode(XBinary::DM_SPARC);
-                addMode(XBinary::DM_S390X);
-                addMode(XBinary::DM_XCORE);
-                addMode(XBinary::DM_M68K);
-                addMode(XBinary::DM_M68K00);
-                addMode(XBinary::DM_M68K10);
-                addMode(XBinary::DM_M68K20);
-                addMode(XBinary::DM_M68K30);
-                addMode(XBinary::DM_M68K40);
-                addMode(XBinary::DM_M68K60);
-                addMode(XBinary::DM_TMS320C64X);
-                addMode(XBinary::DM_M6800);
-                addMode(XBinary::DM_M6801);
-                addMode(XBinary::DM_M6805);
-                addMode(XBinary::DM_M6808);
-                addMode(XBinary::DM_M6809);
-                addMode(XBinary::DM_M6811);
-                addMode(XBinary::DM_CPU12);
-                addMode(XBinary::DM_HD6301);
-                addMode(XBinary::DM_HD6309);
-                addMode(XBinary::DM_HCS08);
-                addMode(XBinary::DM_EVM);
-                addMode(XBinary::DM_MOS65XX);
-                addMode(XBinary::DM_RISKV32);
-                addMode(XBinary::DM_RISKV64);
-                addMode(XBinary::DM_RISKVC);
-                addMode(XBinary::DM_MOS65XX);
-                addMode(XBinary::DM_WASM);
-            } else {
-                ui->comboBoxMode->addItem(XBinary::disasmIdToString(disasmMode), disasmMode);
-            }
-
-            ui->comboBoxMode->blockSignals(bBlocked1);
-
-            options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
-        }
+        options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
         // // TODO Check
         // if (ui->scrollAreaDisasm->getXInfoDB()) {
@@ -339,11 +265,6 @@ void XMultiDisasmWidget::on_toolButtonVisitedPrev_clicked()
 void XMultiDisasmWidget::on_toolButtonVisitedNext_clicked()
 {
     ui->scrollAreaDisasm->goToNextVisited();
-}
-
-void XMultiDisasmWidget::on_toolButtonAnalyze_clicked()
-{
-    ui->scrollAreaDisasm->analyzeAll();
 }
 
 void XMultiDisasmWidget::on_comboBoxMethod_currentIndexChanged(int nIndex)

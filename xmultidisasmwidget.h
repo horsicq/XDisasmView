@@ -61,7 +61,6 @@ public:
     virtual void reloadData(bool bSaveSelection);
 
 private:
-    void addMode(XBinary::DM disasmMode);
     void reloadFileType();
     void reloadMethod();
     void adjustMode();
@@ -74,7 +73,6 @@ private slots:
     void adjustVisitedState();
     void on_toolButtonVisitedPrev_clicked();
     void on_toolButtonVisitedNext_clicked();
-    void on_toolButtonAnalyze_clicked();
     void on_comboBoxMethod_currentIndexChanged(int nIndex);
     void on_comboBoxView_currentIndexChanged(int nIndex);
 
