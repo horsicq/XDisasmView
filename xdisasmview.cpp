@@ -929,6 +929,8 @@ void XDisasmView::getRecords()
                                         nDataSize = showRecord.nSize;
                                     }
                                 }
+
+                                record.sLabel = QString::number(showRecord.nBranch);
                             } else {
                                 QByteArray baBuffer = read_array(record.nDeviceOffset, 1);
                                 nDataSize = 1;
