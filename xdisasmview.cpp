@@ -94,7 +94,7 @@ void XDisasmView::adjustView()
     // TODO BP color
 
     if (getXInfoDB()) {
-        g_pDisasmCore = &(getXInfoDB()->getState(getXInfoProfile())->disasmCore);
+        g_pDisasmCore = &(getXInfoDB()->getState(g_options.memoryMapRegion.fileType)->disasmCore);
     }
 
     g_pDisasmCore->setMode(disasmMode);
@@ -147,7 +147,7 @@ void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 
     if (viewMethod == VIEWMETHOD_ANALYZED) {
         if (getXInfoDB()) {
-            if (!getXInfoDB()->isAnalyzed(getXInfoProfile())) {
+            if (!getXInfoDB()->isAnalyzed(g_options.memoryMapRegion.fileType)) {
                 analyzeAll();
             }
         }
@@ -504,7 +504,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
 
             if (nAddress != -1) {
                 if (getXInfoDB()) {
-                    XInfoDB::STATE *pState = getXInfoDB()->getState(getXInfoProfile());
+                    XInfoDB::STATE *pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
 
                     if (pState) {
                         qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nAddress, true);
@@ -862,7 +862,7 @@ void XDisasmView::getRecords()
     XInfoDB::STATE *pState = 0;
 
     if (getXInfoDB() && (g_viewMethod == VIEWMETHOD_ANALYZED)) {
-        pState = getXInfoDB()->getState(getXInfoProfile());
+        pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
     }
 
     qint64 nViewPosStart = getViewPosStart();
@@ -2024,7 +2024,6 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             options.nSize = state.nSelectionViewSize;
             options.nModuleAddress = -1;
             options.bIsImage = false;
-            options.profile = getXInfoProfile();
 
             if (command == XInfoDBTransfer::COMMAND_DISASM) {
                 options.nCount = 1;
