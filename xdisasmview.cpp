@@ -1130,11 +1130,11 @@ void XDisasmView::updateLocations()
                 _nCurrent = g_listRecords.at(i).nVirtualAddress;
             }
 
-            if (g_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
-                if (getXInfoDB()) {
-                    sSymbol = getXInfoDB()->getSymbolStringByAddress(g_listRecords.at(i).nVirtualAddress);
-                }
-            }
+            // if (g_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
+            //     if (getXInfoDB()) {
+            //         sSymbol = getXInfoDB()->getSymbolStringByAddress(g_listRecords.at(i).nVirtualAddress);
+            //     }
+            // }
 
             if (g_bIsLocationColon) {
                 g_listRecords[i].sLocation = XBinary::valueToHexColon(mode, _nCurrent);
