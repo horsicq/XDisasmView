@@ -68,7 +68,7 @@ public:
     struct OPTIONS {
         XADDR nInitAddress;
         XADDR nEntryPointAddress;  // TODO move to xdb
-        XBinary::_MEMORY_MAP memoryMapRegion;
+        XBinary::FT fileType;
         XBinary::DM disasmMode;
         bool bAprox;
         bool bMenu_Hex;
@@ -83,7 +83,7 @@ public:
     void setViewMethod(VIEWMETHOD viewMethod);
     void setViewDisasm(VIEWDISASM viewDisasm);
     OPTIONS getOptions();
-    XBinary::DM getDisasmMode();
+    XBinary::DM getDisasmMode(); // TODO Check -> remove
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset = false);
@@ -117,7 +117,6 @@ private:
         QString sLabel;
         QString sComment;
         qint64 nViewPos;  // Line
-        XADDR nVirtualAddress;
         qint64 nDeviceOffset;
         XDisasmAbstract::DISASM_RESULT disasmResult;
 #ifdef USE_XPROCESS

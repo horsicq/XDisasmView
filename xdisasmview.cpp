@@ -93,12 +93,12 @@ void XDisasmView::adjustView()
 
     // TODO BP color
 
-    if (getXInfoDB()) {
-        g_pDisasmCore = &(getXInfoDB()->getState(g_options.memoryMapRegion.fileType)->disasmCore);
-    }
+    // if (getXInfoDB()) {
+    //     g_pDisasmCore = &(getXInfoDB()->getState(g_options.memoryMapRegion.fileType)->disasmCore);
+    // }
 
-    g_pDisasmCore->setMode(disasmMode);
-    g_pDisasmCore->setOptions(getGlobalOptions());
+    // g_pDisasmCore->setMode(disasmMode);
+    // g_pDisasmCore->setOptions(getGlobalOptions());
 
     reload(true);
     viewport()->update();
@@ -111,7 +111,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
     g_listRecords.clear();
 
     setDevice(pDevice);
-    setMemoryMap(g_options.memoryMapRegion);
+    // setMemoryMap(g_options.memoryMapRegion);
 
     if (g_options.disasmMode == XBinary::DM_UNKNOWN) {
         g_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
@@ -147,9 +147,9 @@ void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 
     if (viewMethod == VIEWMETHOD_ANALYZED) {
         if (getXInfoDB()) {
-            if (!getXInfoDB()->isAnalyzed(g_options.memoryMapRegion.fileType)) {
-                analyzeAll();
-            }
+            // if (!getXInfoDB()->isAnalyzed(g_options.memoryMapRegion.fileType)) {
+            //     analyzeAll();
+            // }
         }
     }
 
@@ -504,21 +504,21 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
 
             if (nAddress != -1) {
                 if (getXInfoDB()) {
-                    XInfoDB::STATE *pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
+                    // XInfoDB::STATE *pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
 
-                    if (pState) {
-                        qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nAddress, true);
+                    // if (pState) {
+                    //     qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nAddress, true);
 
-                        if (nIndex != -1) {
-                            XInfoDB::XRECORD record = pState->listRecords.at(nIndex);
+                    //     if (nIndex != -1) {
+                    //         XInfoDB::XRECORD record = pState->listRecords.at(nIndex);
 
-                            if (nViewPos > nOldViewPos) {
-                                nResult = viewStruct.nViewPos + record.nRelOffset + record.nSize;
-                            } else {
-                                nResult = viewStruct.nViewPos + record.nRelOffset;
-                            }
-                        }
-                    }
+                    //         if (nViewPos > nOldViewPos) {
+                    //             nResult = viewStruct.nViewPos + record.nRelOffset + record.nSize;
+                    //         } else {
+                    //             nResult = viewStruct.nViewPos + record.nRelOffset;
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
@@ -698,7 +698,7 @@ XDisasmView::RECORD XDisasmView::_getRecordByVirtualAddress(QList<RECORD> *pList
     qint32 nNumberOfRecords = pListRecord->count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if (pListRecord->at(i).nVirtualAddress == nVirtualAddress) {
+        if (pListRecord->at(i).disasmResult.nAddress == nVirtualAddress) {
             result = pListRecord->at(i);
 
             break;
@@ -861,9 +861,9 @@ void XDisasmView::getRecords()
 
     XInfoDB::STATE *pState = 0;
 
-    if (getXInfoDB() && (g_viewMethod == VIEWMETHOD_ANALYZED)) {
-        pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
-    }
+    // if (getXInfoDB() && (g_viewMethod == VIEWMETHOD_ANALYZED)) {
+    //     pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
+    // }
 
     qint64 nViewPosStart = getViewPosStart();
     qint32 nNumberLinesProPage = getLinesProPage();
@@ -887,10 +887,12 @@ void XDisasmView::getRecords()
                     record.nDeviceOffset = -1;
                 }
 
+                XADDR nVirtualAddress = 0;
+
                 if (viewStruct.nAddress != (XADDR)-1) {
-                    record.nVirtualAddress = viewStruct.nAddress + (nCurrentViewPos - viewStruct.nViewPos);
+                    nVirtualAddress = viewStruct.nAddress + (nCurrentViewPos - viewStruct.nViewPos);
                 } else {
-                    record.nVirtualAddress = -1;
+                    nVirtualAddress = -1;
                 }
 
                 if (record.nDeviceOffset != -1) {
@@ -904,7 +906,7 @@ void XDisasmView::getRecords()
                             break;
                         }
 
-                        record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                        record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, g_disasmOptions);
 
                         nBufferSize = record.disasmResult.nSize;
                         baBuffer.resize(nBufferSize);
@@ -913,17 +915,17 @@ void XDisasmView::getRecords()
                         nDataSize = nBufferSize;
                     } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
                         if (pState) {
-                            qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, record.nVirtualAddress, false);
+                            qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nVirtualAddress, false);
 
                             if (nIndex != -1) {
                                 XInfoDB::XRECORD showRecord = pState->listRecords.at(nIndex);
-                                record.nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
+                                nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
                                 record.nDeviceOffset = XInfoDB::getOffset(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
 
-                                if ((record.nDeviceOffset != -1) && (record.nVirtualAddress != -1)) {
+                                if ((record.nDeviceOffset != -1) && (nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
                                         QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
-                                        record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), record.nVirtualAddress, g_disasmOptions);
+                                        record.disasmResult = g_pDisasmCore->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, g_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
 
                                         nDataSize = showRecord.nSize;
@@ -936,7 +938,7 @@ void XDisasmView::getRecords()
                                 nDataSize = 1;
                                 record.sBytes = baBuffer.toHex().data();
                                 record.disasmResult.bIsValid = true;
-                                record.disasmResult.nAddress = record.nVirtualAddress;
+                                record.disasmResult.nAddress = nVirtualAddress;
                                 record.disasmResult.nSize = 1;
                                 record.disasmResult.sMnemonic = "db";
                                 record.disasmResult.sOperands = record.sBytes;
@@ -952,7 +954,7 @@ void XDisasmView::getRecords()
                     nDataSize = 1;
                     record.sBytes = "?";
                     record.disasmResult.bIsValid = true;
-                    record.disasmResult.nAddress = record.nVirtualAddress;
+                    record.disasmResult.nAddress = nVirtualAddress;
                     record.disasmResult.nSize = 1;
                     record.disasmResult.sMnemonic = "db";
                     record.disasmResult.sOperands = "1 dup(?)";
@@ -1016,7 +1018,7 @@ void XDisasmView::updateArrows()
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         if (g_listRecords.at(i).disasmResult.relType) {
             XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefToRelative;
-            XADDR nCurrentAddress = g_listRecords.at(i).nVirtualAddress;
+            XADDR nCurrentAddress = g_listRecords.at(i).disasmResult.nAddress;
 
             qint32 nStart = 0;
             qint32 nEnd = nNumberOfRecords - 1;
@@ -1030,7 +1032,7 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j >= nStart; j--) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) && (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nStart = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
@@ -1048,7 +1050,7 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j <= nEnd; j++) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).nVirtualAddress) && (nXrefTo < (g_listRecords.at(j).nVirtualAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) && (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nEnd = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
@@ -1081,7 +1083,7 @@ void XDisasmView::updateLocations()
             XADDR _nCurrent = 0;
 
             if (g_nThisBaseVirtualAddress != (XADDR)-1) {
-                _nCurrent = g_listRecords.at(i).nVirtualAddress;
+                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
                 nDelta = (qint64)_nCurrent - (qint64)g_nThisBaseVirtualAddress;
             } else if (g_nThisBaseDeviceOffset != -1) {
                 _nCurrent = g_listRecords.at(i).nDeviceOffset;
@@ -1091,7 +1093,7 @@ void XDisasmView::updateLocations()
             g_listRecords[i].sLocation = XBinary::thisToString(nDelta);
         } else if (getlocationMode() == LOCMODE_ADDRESS) {
             QString sPrefix;
-            XADDR _nCurrent = g_listRecords.at(i).nVirtualAddress;
+            XADDR _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
 
             if (_nCurrent == (XADDR)-1) {
                 sPrefix = QString("%1: ").arg(tr("Offset"));
@@ -1109,7 +1111,7 @@ void XDisasmView::updateLocations()
 
             if (_nCurrent == (XADDR)-1) {
                 sPrefix = QString("%1: ").arg(tr("Address"));
-                _nCurrent = g_listRecords.at(i).nVirtualAddress;
+                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
             }
 
             if (g_bIsLocationColon) {
@@ -1125,9 +1127,9 @@ void XDisasmView::updateLocations()
             if (g_listRecords.at(i).nDeviceOffset != -1) {
                 sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), g_listRecords.at(i).nDeviceOffset);
                 _nCurrent = g_listRecords.at(i).nDeviceOffset;
-            } else if (g_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
-                sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), g_listRecords.at(i).nVirtualAddress);
-                _nCurrent = g_listRecords.at(i).nVirtualAddress;
+            } else if (g_listRecords.at(i).disasmResult.nAddress != (XADDR)-1) {
+                sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), g_listRecords.at(i).disasmResult.nAddress);
+                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
             }
 
             // if (g_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
@@ -2018,7 +2020,8 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
             XInfoDBTransfer::OPTIONS options = {};
             options.pDevice = getDevice();
-            options.fileType = g_options.memoryMapRegion.fileType;
+            // options.fileType = g_options.memoryMapRegion.fileType;
+            // options.disasmMode = XBinary::getDisasmMode(&g_options.memoryMapRegion);
             // options.fileType = g_file;
             options.nAddress = nAddress;
             options.nSize = state.nSelectionViewSize;

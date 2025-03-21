@@ -154,21 +154,24 @@ void XMultiDisasmWidget::reloadFileType()
         options.bMenu_Hex = g_options.bMenu_Hex;
         options.bHideReadOnly = g_options.bHideReadOnly;
 
+        XBinary::FILEFORMATINFO fileFormatInfo = {};
+
         if (g_options.fileType == XBinary::FT_REGION) {
-            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, XBinary::MAPMODE_UNKNOWN, g_pDevice, true, g_options.nStartAddress);
+            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, g_pDevice, true, g_options.nStartAddress);
         } else {
-            options.memoryMapRegion = XFormats::getMemoryMap(g_options.fileType, XBinary::MAPMODE_UNKNOWN, g_pDevice);
+            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, g_pDevice);
         }
 
-        if (g_options.sArch != "") {
-            options.memoryMapRegion.sArch = g_options.sArch;
-        }
+        // if (g_options.sArch != "") {
+        //     options.memoryMapRegion.sArch = g_options.sArch;
+        // }
 
         ui->comboBoxMode->setEnabled(!g_options.bModeFixed);
 
         // ui->scrollAreaDisasm->setData(g_pDevice, options);
 
-        XBinary::DM disasmMode = XBinary::getDisasmMode(&options.memoryMapRegion);
+
+        XBinary::DM disasmMode = XBinary::getDisasmMode(&fileFormatInfo);
 
         XFormats::setDisasmModeComboBox(disasmMode, ui->comboBoxMode);
 
