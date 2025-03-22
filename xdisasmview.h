@@ -38,15 +38,6 @@
 class XDisasmView : public XDeviceTableEditView {
     Q_OBJECT
 
-    struct VIEWSTRUCT {
-        // qint64 nScrollStart;
-        // qint64 nScrollCount;
-        qint64 nViewPos;
-        XADDR nAddress;
-        qint64 nOffset;
-        qint64 nSize;
-    };
-
     struct TRANSRECORD {
         qint64 nViewPos;
         XADDR nAddress;
@@ -87,9 +78,9 @@ public:
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset = false);
-    virtual qint64 deviceOffsetToViewPos(qint64 nOffset, bool bGlobalOffset = false);
-    virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
-    virtual qint64 viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset = false);
+    // virtual qint64 deviceOffsetToViewPos(qint64 nOffset, bool bGlobalOffset = false);
+    // virtual qint64 deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset = false);
+    // virtual qint64 viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset = false);
     void showReferences(XADDR nAddress);
 
     void analyzeAll();
@@ -169,14 +160,8 @@ private:
 private:
     RECORD _getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos);
     RECORD _getRecordByVirtualAddress(QList<RECORD> *pListRecord, XADDR nVirtualAddress);
-    VIEWSTRUCT _getViewStructByOffset(qint64 nOffset);
-    VIEWSTRUCT _getViewStructByAddress(XADDR nAddress);
-    // VIEWSTRUCT _getViewStructByScroll(qint64 nValue);
-    VIEWSTRUCT _getViewStructByViewPos(qint64 nViewPos);
+
     QList<TRANSRECORD> _getTransRecords(qint64 nViewPos, qint64 nSize);
-    qint64 _getOffsetByViewPos(qint64 nViewPos);
-    qint64 _getViewPosByAddress(XADDR nAddress);
-    XADDR _getAddressByViewPos(qint64 nViewPos);
     void getRecords();
     void updateArrows();
     void updateLocations();
@@ -197,7 +182,6 @@ protected:
     virtual qint64 getFixViewPos(qint64 nViewPos);  // TODO rewrite
     virtual void adjustScrollCount();
     virtual qint64 getViewSizeByViewPos(qint64 nViewPos);  // TODO rewrite
-    virtual qint64 addressToViewPos(XADDR nAddress);
 
 protected slots:
     void _goToEntryPointSlot();
@@ -229,7 +213,7 @@ private:
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
     XDisasmAbstract::DISASM_OPTIONS g_disasmOptions;
-    QList<VIEWSTRUCT> g_listViewStruct;
+
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
     XDisasmCore g_default_disasmCore;
     XDisasmCore *g_pDisasmCore;

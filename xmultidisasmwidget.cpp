@@ -77,7 +77,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
     if (pDevice) {
         XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_EXECUTABLE);
     } else {
-        ui->scrollAreaDisasm->setDevice(nullptr);
+        ui->scrollAreaDisasm->setDevice(nullptr, 0, -1);
     }
 
     adjustVisitedState();
@@ -87,7 +87,7 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
 
 void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
 {
-    ui->scrollAreaDisasm->setDevice(pDevice);
+    ui->scrollAreaDisasm->setDevice(pDevice, 0, -1);
 }
 
 void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
@@ -210,24 +210,6 @@ void XMultiDisasmWidget::adjustMode()
     // if (ui->scrollAreaDisasm->getXInfoDB()) {
     //     ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
     // }
-}
-
-void XMultiDisasmWidget::getSymbols()
-{
-    if (g_pXInfoDB) {
-        DialogXInfoDBTransferProcess dialogTransfer(this);
-        dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
-        XInfoDBTransfer::OPTIONS options = {};
-        // options.pDevice = g_pXInfoDB->getDevice();
-        // options.fileType = g_pXInfoDB->getFileType();
-        options.bIsImage = false;
-        options.nModuleAddress = -1;
-
-        dialogTransfer.setData(g_pXInfoDB, XInfoDBTransfer::COMMAND_SYMBOLS, options);
-
-        dialogTransfer.showDialogDelay();
-        // TODO mn reload
-    }
 }
 
 void XMultiDisasmWidget::on_comboBoxMode_currentIndexChanged(int nIndex)

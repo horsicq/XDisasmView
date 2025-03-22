@@ -64,7 +64,6 @@ private:
     void reloadFileType();
     void reloadMethod();
     void adjustMode();
-    void getSymbols();
 
 private slots:
     void on_comboBoxMode_currentIndexChanged(int nIndex);
