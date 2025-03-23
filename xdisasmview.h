@@ -74,7 +74,7 @@ public:
     void setViewMethod(VIEWMETHOD viewMethod);
     void setViewDisasm(VIEWDISASM viewDisasm);
     OPTIONS getOptions();
-    XBinary::DM getDisasmMode(); // TODO Check -> remove
+    XBinary::DM getDisasmMode();  // TODO Check -> remove
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
     void setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset = false);

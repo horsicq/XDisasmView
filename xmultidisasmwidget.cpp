@@ -170,7 +170,6 @@ void XMultiDisasmWidget::reloadFileType()
 
         // ui->scrollAreaDisasm->setData(g_pDevice, options);
 
-
         XBinary::DM disasmMode = XBinary::getDisasmMode(&fileFormatInfo);
 
         XFormats::setDisasmModeComboBox(disasmMode, ui->comboBoxMode);

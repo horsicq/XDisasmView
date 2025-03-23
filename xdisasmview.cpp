@@ -110,7 +110,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
 
     g_listRecords.clear();
 
-    setDevice(pDevice, 0, -1); // TODO
+    setDevice(pDevice, 0, -1);  // TODO
     // setMemoryMap(g_options.memoryMapRegion);
 
     if (g_options.disasmMode == XBinary::DM_UNKNOWN) {
@@ -912,7 +912,8 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j >= nStart; j--) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) && (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) &&
+                        (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nStart = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
@@ -930,7 +931,8 @@ void XDisasmView::updateArrows()
                 for (qint32 j = i; j <= nEnd; j++) {
                     nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) && (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) &&
+                        (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
                         nEnd = j;
                         g_listRecords[i].nArraySize = nEnd - nStart;
                         g_listRecords[i].bIsEnd = true;
