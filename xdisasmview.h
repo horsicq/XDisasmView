@@ -25,7 +25,6 @@
 
 #include "dialoghexedit.h"
 #include "Widgets/dialogmultidisasmsignature.h"
-#include "xcapstone.h"
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"
 #include "dialogxinfodbtransferprocess.h"
@@ -204,7 +203,6 @@ private:
     QList<RECORD> g_listRecords;
     qint32 g_nAddressWidth;
     qint32 g_nOpcodeSize;
-    XBinary::DMFAMILY g_dmFamily;
     XADDR g_nThisBaseVirtualAddress;
     qint64 g_nThisBaseDeviceOffset;
     bool g_bIsLocationColon;
@@ -215,8 +213,6 @@ private:
     XDisasmAbstract::DISASM_OPTIONS g_disasmOptions;
 
     QList<HIGHLIGHTREGION> g_listHighlightsRegion;
-    XDisasmCore g_default_disasmCore;
-    XDisasmCore *g_pDisasmCore;
     VIEWMETHOD g_viewMethod;
     VIEWDISASM g_viewDisasm;
 };
