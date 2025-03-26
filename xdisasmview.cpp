@@ -328,39 +328,7 @@ void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOff
 
 void XDisasmView::adjustScrollCount()
 {
-    // g_listViewStruct.clear();
-
-    // qint32 nNumberOfRecords = getMemoryMap()->listRecords.count();
-
-    qint64 nScrollStart = 0;
-    qint64 nViewPos = 0;
-
-    // for (qint32 i = 0; i < nNumberOfRecords; i++) {
-    //     VIEWSTRUCT record = {};
-    //     record.nAddress = getMemoryMap()->listRecords.at(i).nAddress;
-    //     record.nOffset = getMemoryMap()->listRecords.at(i).nOffset;
-    //     record.nSize = getMemoryMap()->listRecords.at(i).nSize;
-    //     // record.nScrollStart = nScrollStart;
-    //     record.nViewPos = nViewPos;
-    //     // record.nScrollCount = record.nSize;
-
-    //     bool bAdd = true;
-    //     // // TODO XInfoDB
-
-    //     if (getMemoryMap()->listRecords.at(i).bIsInvisible) {
-    //         bAdd = false;
-    //     }
-
-    //     if (bAdd) {
-    //         nScrollStart += record.nSize;
-    //         nViewPos += record.nSize;
-
-    //         g_listViewStruct.append(record);
-    //     }
-    // }
-
-    setViewSize(nViewPos);
-    setTotalScrollCount(nScrollStart);
+    setTotalScrollCount(getViewSize());
 }
 
 qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
