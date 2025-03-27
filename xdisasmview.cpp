@@ -84,7 +84,7 @@ void XDisasmView::adjustView()
     g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
     g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
     // XBinary::SYNTAX syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
-    XBinary::DM disasmMode = g_options.disasmMode;
+    // XBinary::DM disasmMode = g_options.disasmMode;
     g_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
 
     // g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
@@ -96,7 +96,7 @@ void XDisasmView::adjustView()
     // }
 
     // g_pDisasmCore->setMode(disasmMode);
-    // g_pDisasmCore->setOptions(getGlobalOptions());
+    getDisasmCore()->setOptions(getGlobalOptions());
 
     reload(true);
     viewport()->update();
@@ -109,6 +109,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
     g_listRecords.clear();
 
     setDevice(pDevice, 0, -1);  // TODO
+    setMode(options.fileType, options.disasmMode, true);
     // setMemoryMap(g_options.memoryMapRegion);
 
     if (g_options.disasmMode == XBinary::DM_UNKNOWN) {

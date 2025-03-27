@@ -174,6 +174,7 @@ void XMultiDisasmWidget::reloadFileType()
 
         XFormats::setDisasmModeComboBox(disasmMode, ui->comboBoxMode);
 
+        options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
         options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
         // // TODO Check
