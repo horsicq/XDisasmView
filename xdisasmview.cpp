@@ -1804,21 +1804,6 @@ void XDisasmView::_analyzeAnalyze()
     _transfer(XInfoDBTransfer::COMMAND_ANALYZE);
 }
 
-void XDisasmView::_analyzeDisasm()
-{
-    _transfer(XInfoDBTransfer::COMMAND_DISASM);
-}
-
-void XDisasmView::_analyzeRemove()
-{
-    _transfer(XInfoDBTransfer::COMMAND_REMOVE);
-}
-
-void XDisasmView::_analyzeClear()
-{
-    _transfer(XInfoDBTransfer::COMMAND_CLEAR);
-}
-
 void XDisasmView::_analyzeSymbols()
 {
     if (getXInfoDB()) {
@@ -1870,17 +1855,6 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
             XInfoDBTransfer::OPTIONS options = {};
             options.pDevice = getDevice();
-            // options.fileType = g_options.memoryMapRegion.fileType;
-            // options.disasmMode = XBinary::getDisasmMode(&g_options.memoryMapRegion);
-            // options.fileType = g_file;
-            options.nAddress = nAddress;
-            options.nSize = state.nSelectionViewSize;
-            // options.nModuleAddress = -1;
-            // options.bIsImage = false;
-
-            if (command == XInfoDBTransfer::COMMAND_DISASM) {
-                options.nCount = 1;
-            }
 
             dialogTransfer.setData(getXInfoDB(), command, options);
 

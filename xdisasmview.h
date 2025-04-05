@@ -190,9 +190,6 @@ protected slots:
     void _referencesSlot();
     void _analyzeAll();
     void _analyzeAnalyze();
-    void _analyzeDisasm();
-    void _analyzeRemove();
-    void _analyzeClear();
     void _analyzeSymbols();
     void _analyzeFunctions();
     void _transfer(XInfoDBTransfer::COMMAND command);
