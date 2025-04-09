@@ -339,22 +339,10 @@ qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
 
 QString XDisasmView::convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &disasmResult)
 {
+    // TODO remove, move to XInfoDB
     QString sResult;
 
     if (getXInfoDB()) {
-        // if ((g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) || (g_opcodeMode == OPCODEMODE_SYMBOL) || (g_opcodeMode == OPCODEMODE_ADDRESS)) {
-        //     XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-
-        //     if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
-        //         riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-        //     } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
-        //         riType = XInfoDB::RI_TYPE_SYMBOL;
-        //     } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
-        //         riType = XInfoDB::RI_TYPE_ADDRESS;
-        //     }
-
-        //     sResult = getXInfoDB()->convertOpcodeString(disasmResult, g_options.disasmMode, g_syntax, riType, g_disasmOptions);
-        // }
         XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
         sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType, g_disasmOptions);
     }
