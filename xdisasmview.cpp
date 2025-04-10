@@ -558,9 +558,9 @@ void XDisasmView::drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF 
     QPen pen;
 
     if (bIsSelected) {
-        pen.setColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).colMain);
+        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
     } else {
-        pen.setColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).colMain);
+        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
     }
 
     pPainter->setPen(pen);
@@ -591,9 +591,9 @@ void XDisasmView::drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF 
     QPen pen;
 
     if (bIsSelected) {
-        pen.setColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).colMain);
+        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
     } else {
-        pen.setColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).colMain);
+        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
     }
 
     if (bIsCond) {
