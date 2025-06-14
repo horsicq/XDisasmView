@@ -27,7 +27,7 @@
 #include "Widgets/dialogmultidisasmsignature.h"
 #include "xdevicetableeditview.h"
 #include "dialogxsymbols.h"
-#include "dialogxinfodbtransferprocess.h"
+#include "xdialogprocess.h"
 
 // TODO AbstractQuery
 // Load symbols Save db

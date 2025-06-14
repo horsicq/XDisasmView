@@ -1839,14 +1839,16 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
         if (nAddress != (XADDR)-1) {
             qint64 nViewStart = getViewPosStart();
 
-            DialogXInfoDBTransferProcess dialogTransfer(this);
-            dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
             XInfoDBTransfer::OPTIONS options = {};
             options.pDevice = getDevice();
 
-            dialogTransfer.setData(getXInfoDB(), command, options);
-
+            XInfoDBTransfer infoTransfer;
+            XDialogProcess dialogTransfer(this, &infoTransfer);
+            dialogTransfer.setGlobal(getShortcuts(), getGlobalOptions());
+            infoTransfer.setData(getXInfoDB(), command, options, dialogTransfer.getPdStruct());
+            dialogTransfer.start();
             dialogTransfer.showDialogDelay();
+
             adjustAfterAnalysis();
 
             setState(state);
