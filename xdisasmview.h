@@ -84,6 +84,8 @@ public:
 
     void analyzeAll();
 
+    virtual QList<XShortcuts::MENUITEM> getMenuItems();
+
 private:
     enum COLUMN {
         COLUMN_ARROWS = 0,
@@ -170,7 +172,6 @@ protected:
     virtual void updateData();
     virtual void paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight);
     virtual void paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight);
-    virtual void contextMenu(const QPoint &pos);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
     virtual qint64 getCurrentViewPosFromScroll();

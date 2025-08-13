@@ -611,6 +611,168 @@ void XDisasmView::analyzeAll()
     _analyzeAll();
 }
 
+QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
+{
+    QList<XShortcuts::MENUITEM> listResult;
+
+    MENU_STATE mstate = getMenuState();
+    STATE state = getState();
+    XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
+
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
+
+    {
+        XShortcuts::MENUITEM menuItem = {};
+
+        menuItem.nShortcutId = X_ID_DISASM_GOTO_ENTRYPOINT;
+        menuItem.pRecv = this;
+        menuItem.pMethod = SLOT(_goToEntryPointSlot());
+        menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+        menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
+
+        listResult.append(menuItem);
+    }
+
+    if (record.disasmResult.relType || record.disasmResult.memType) {
+        getShortcuts()->_addMenuSeparator(&listResult, XShortcuts::GROUPID_GOTO);
+
+        if (record.disasmResult.relType) {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = this;
+            menuItem.pMethod = SLOT(_goToXrefSlot());
+            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+            menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16);
+            menuItem.iconType = XOptions::ICONTYPE_GOTO;
+            menuItem.sPropertyName = "ADDRESS";
+            menuItem.varProperty = record.disasmResult.nXrefToRelative;
+
+            listResult.append(menuItem);
+        }
+
+        if (record.disasmResult.memType) {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = this;
+            menuItem.pMethod = SLOT(_goToXrefSlot());
+            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+            menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16);
+            menuItem.iconType = XOptions::ICONTYPE_GOTO;
+            menuItem.sPropertyName = "ADDRESS";
+            menuItem.varProperty = record.disasmResult.nXrefToMemory;
+
+            listResult.append(menuItem);
+        }
+    }
+
+    if (record.bHasRefFrom) {
+        XShortcuts::MENUITEM menuItem = {};
+
+        menuItem.pRecv = this;
+        menuItem.pMethod = SLOT(_referencesSlot());
+        menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+        menuItem.nShortcutId = X_ID_DISASM_GOTO_REFERENCES;
+        menuItem.sPropertyName = "ADDRESS";
+        menuItem.varProperty = record.disasmResult.nAddress;
+
+        listResult.append(menuItem);
+    }
+
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()), XShortcuts::GROUPID_COPY);
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()), XShortcuts::GROUPID_COPY);
+
+    if (mstate.bPhysicalSize) {
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()), XShortcuts::GROUPID_COPY);
+    }
+
+    if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
+        getShortcuts()->_addMenuSeparator(&listResult, XShortcuts::GROUPID_COPY);
+
+        if (record.sLocation != "") {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = getShortcuts();
+            menuItem.pMethod = SLOT(copyRecord());
+            menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+            menuItem.sText = record.sLocation;
+            menuItem.sPropertyName = "VALUE";
+            menuItem.varProperty = record.sLocation;
+
+            listResult.append(menuItem);
+        }
+
+        if (record.sBytes != "") {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = getShortcuts();
+            menuItem.pMethod = SLOT(copyRecord());
+            menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+            menuItem.sText = record.sBytes;
+            menuItem.sPropertyName = "VALUE";
+            menuItem.varProperty = record.sBytes;
+
+            listResult.append(menuItem);
+        }
+
+        if (record.disasmResult.sMnemonic != "") {
+            QString sString = record.disasmResult.sMnemonic;
+
+            if (record.disasmResult.sOperands != "") {
+                sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
+            }
+
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = getShortcuts();
+            menuItem.pMethod = SLOT(copyRecord());
+            menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+            menuItem.sText = sString;
+            menuItem.sPropertyName = "VALUE";
+            menuItem.varProperty = sString;
+
+            listResult.append(menuItem);
+        }
+
+        if (record.sComment != "") {
+            XShortcuts::MENUITEM menuItem = {};
+
+            menuItem.pRecv = getShortcuts();
+            menuItem.pMethod = SLOT(copyRecord());
+            menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+            menuItem.sText = record.sComment;
+            menuItem.sPropertyName = "VALUE";
+            menuItem.varProperty = record.sComment;
+
+            listResult.append(menuItem);
+        }
+    }
+
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()), XShortcuts::GROUPID_FIND);
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()), XShortcuts::GROUPID_FIND);
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()), XShortcuts::GROUPID_FIND);
+    getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()), XShortcuts::GROUPID_FIND);
+
+    if (mstate.bPhysicalSize) {
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
+    }
+
+    if (mstate.bHex) {
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()), XShortcuts::GROUPID_FOLLOWIN);
+    }
+
+    if (!isReadonly()) {
+        if (mstate.bPhysicalSize) {
+            getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()), XShortcuts::GROUPID_EDIT);
+        }
+        getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
+    }
+
+    return listResult;
+}
+
 XDisasmView::RECORD XDisasmView::_getRecordByViewPos(QList<RECORD> *pListRecord, qint64 nViewPos)
 {
     RECORD result = {};
@@ -1237,278 +1399,278 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
     }
 }
 
-void XDisasmView::contextMenu(const QPoint &pos)
-{
-    if (isContextMenuEnable()) {
-        MENU_STATE mstate = getMenuState();
-        STATE state = getState();
-        XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
+// void XDisasmView::contextMenu(const QPoint &pos)
+// {
+//     if (isContextMenuEnable()) {
+//         MENU_STATE mstate = getMenuState();
+//         STATE state = getState();
+//         XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
 
-        QMenu contextMenu(this);  // TODO
+//         QMenu contextMenu(this);  // TODO
 
-        QList<XShortcuts::MENUITEM> listMenuItems;
+//         QList<XShortcuts::MENUITEM> listMenuItems;
 
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
 
-        {
-            XShortcuts::MENUITEM menuItem = {};
+//         {
+//             XShortcuts::MENUITEM menuItem = {};
 
-            menuItem.nShortcutId = X_ID_DISASM_GOTO_ENTRYPOINT;
-            menuItem.pRecv = this;
-            menuItem.pMethod = SLOT(_goToEntryPointSlot());
-            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-            menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
+//             menuItem.nShortcutId = X_ID_DISASM_GOTO_ENTRYPOINT;
+//             menuItem.pRecv = this;
+//             menuItem.pMethod = SLOT(_goToEntryPointSlot());
+//             menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+//             menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
 
-            listMenuItems.append(menuItem);
-        }
+//             listMenuItems.append(menuItem);
+//         }
 
-        if (record.disasmResult.relType || record.disasmResult.memType) {
-            getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_GOTO);
+//         if (record.disasmResult.relType || record.disasmResult.memType) {
+//             getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_GOTO);
 
-            if (record.disasmResult.relType) {
-                XShortcuts::MENUITEM menuItem = {};
+//             if (record.disasmResult.relType) {
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
-                menuItem.pMethod = SLOT(_goToXrefSlot());
-                menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-                menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16);
-                menuItem.iconType = XOptions::ICONTYPE_GOTO;
-                menuItem.sPropertyName = "ADDRESS";
-                menuItem.varProperty = record.disasmResult.nXrefToRelative;
+//                 menuItem.pRecv = this;
+//                 menuItem.pMethod = SLOT(_goToXrefSlot());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+//                 menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16);
+//                 menuItem.iconType = XOptions::ICONTYPE_GOTO;
+//                 menuItem.sPropertyName = "ADDRESS";
+//                 menuItem.varProperty = record.disasmResult.nXrefToRelative;
 
-                listMenuItems.append(menuItem);
-            }
+//                 listMenuItems.append(menuItem);
+//             }
 
-            if (record.disasmResult.memType) {
-                XShortcuts::MENUITEM menuItem = {};
+//             if (record.disasmResult.memType) {
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = this;
-                menuItem.pMethod = SLOT(_goToXrefSlot());
-                menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-                menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16);
-                menuItem.iconType = XOptions::ICONTYPE_GOTO;
-                menuItem.sPropertyName = "ADDRESS";
-                menuItem.varProperty = record.disasmResult.nXrefToMemory;
+//                 menuItem.pRecv = this;
+//                 menuItem.pMethod = SLOT(_goToXrefSlot());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+//                 menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16);
+//                 menuItem.iconType = XOptions::ICONTYPE_GOTO;
+//                 menuItem.sPropertyName = "ADDRESS";
+//                 menuItem.varProperty = record.disasmResult.nXrefToMemory;
 
-                listMenuItems.append(menuItem);
-            }
-        }
+//                 listMenuItems.append(menuItem);
+//             }
+//         }
 
-        if (record.bHasRefFrom) {
-            XShortcuts::MENUITEM menuItem = {};
+//         if (record.bHasRefFrom) {
+//             XShortcuts::MENUITEM menuItem = {};
 
-            menuItem.pRecv = this;
-            menuItem.pMethod = SLOT(_referencesSlot());
-            menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-            menuItem.nShortcutId = X_ID_DISASM_GOTO_REFERENCES;
-            menuItem.sPropertyName = "ADDRESS";
-            menuItem.varProperty = record.disasmResult.nAddress;
+//             menuItem.pRecv = this;
+//             menuItem.pMethod = SLOT(_referencesSlot());
+//             menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
+//             menuItem.nShortcutId = X_ID_DISASM_GOTO_REFERENCES;
+//             menuItem.sPropertyName = "ADDRESS";
+//             menuItem.varProperty = record.disasmResult.nAddress;
 
-            listMenuItems.append(menuItem);
-        }
+//             listMenuItems.append(menuItem);
+//         }
 
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()), XShortcuts::GROUPID_COPY);
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()), XShortcuts::GROUPID_COPY);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()), XShortcuts::GROUPID_COPY);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()), XShortcuts::GROUPID_COPY);
 
-        if (mstate.bPhysicalSize) {
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()), XShortcuts::GROUPID_COPY);
-        }
+//         if (mstate.bPhysicalSize) {
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()), XShortcuts::GROUPID_COPY);
+//         }
 
-        if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
-            getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_COPY);
+//         if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
+//             getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_COPY);
 
-            if (record.sLocation != "") {
-                XShortcuts::MENUITEM menuItem = {};
+//             if (record.sLocation != "") {
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = getShortcuts();
-                menuItem.pMethod = SLOT(copyRecord());
-                menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-                menuItem.sText = record.sLocation;
-                menuItem.sPropertyName = "VALUE";
-                menuItem.varProperty = record.sLocation;
+//                 menuItem.pRecv = getShortcuts();
+//                 menuItem.pMethod = SLOT(copyRecord());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+//                 menuItem.sText = record.sLocation;
+//                 menuItem.sPropertyName = "VALUE";
+//                 menuItem.varProperty = record.sLocation;
 
-                listMenuItems.append(menuItem);
-            }
+//                 listMenuItems.append(menuItem);
+//             }
 
-            if (record.sBytes != "") {
-                XShortcuts::MENUITEM menuItem = {};
+//             if (record.sBytes != "") {
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = getShortcuts();
-                menuItem.pMethod = SLOT(copyRecord());
-                menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-                menuItem.sText = record.sBytes;
-                menuItem.sPropertyName = "VALUE";
-                menuItem.varProperty = record.sBytes;
+//                 menuItem.pRecv = getShortcuts();
+//                 menuItem.pMethod = SLOT(copyRecord());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+//                 menuItem.sText = record.sBytes;
+//                 menuItem.sPropertyName = "VALUE";
+//                 menuItem.varProperty = record.sBytes;
 
-                listMenuItems.append(menuItem);
-            }
+//                 listMenuItems.append(menuItem);
+//             }
 
-            if (record.disasmResult.sMnemonic != "") {
-                QString sString = record.disasmResult.sMnemonic;
+//             if (record.disasmResult.sMnemonic != "") {
+//                 QString sString = record.disasmResult.sMnemonic;
 
-                if (record.disasmResult.sOperands != "") {
-                    sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
-                }
+//                 if (record.disasmResult.sOperands != "") {
+//                     sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
+//                 }
 
-                XShortcuts::MENUITEM menuItem = {};
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = getShortcuts();
-                menuItem.pMethod = SLOT(copyRecord());
-                menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-                menuItem.sText = sString;
-                menuItem.sPropertyName = "VALUE";
-                menuItem.varProperty = sString;
+//                 menuItem.pRecv = getShortcuts();
+//                 menuItem.pMethod = SLOT(copyRecord());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+//                 menuItem.sText = sString;
+//                 menuItem.sPropertyName = "VALUE";
+//                 menuItem.varProperty = sString;
 
-                listMenuItems.append(menuItem);
-            }
+//                 listMenuItems.append(menuItem);
+//             }
 
-            if (record.sComment != "") {
-                XShortcuts::MENUITEM menuItem = {};
+//             if (record.sComment != "") {
+//                 XShortcuts::MENUITEM menuItem = {};
 
-                menuItem.pRecv = getShortcuts();
-                menuItem.pMethod = SLOT(copyRecord());
-                menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-                menuItem.sText = record.sComment;
-                menuItem.sPropertyName = "VALUE";
-                menuItem.varProperty = record.sComment;
+//                 menuItem.pRecv = getShortcuts();
+//                 menuItem.pMethod = SLOT(copyRecord());
+//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
+//                 menuItem.sText = record.sComment;
+//                 menuItem.sPropertyName = "VALUE";
+//                 menuItem.varProperty = record.sComment;
 
-                listMenuItems.append(menuItem);
-            }
-        }
+//                 listMenuItems.append(menuItem);
+//             }
+//         }
 
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()), XShortcuts::GROUPID_FIND);
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()), XShortcuts::GROUPID_FIND);
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()), XShortcuts::GROUPID_FIND);
-        getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()), XShortcuts::GROUPID_FIND);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()), XShortcuts::GROUPID_FIND);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()), XShortcuts::GROUPID_FIND);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()), XShortcuts::GROUPID_FIND);
+//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()), XShortcuts::GROUPID_FIND);
 
-        if (mstate.bPhysicalSize) {
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
-        }
+//         if (mstate.bPhysicalSize) {
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
+//         }
 
-        if (mstate.bHex) {
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()), XShortcuts::GROUPID_FOLLOWIN);
-        }
+//         if (mstate.bHex) {
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()), XShortcuts::GROUPID_FOLLOWIN);
+//         }
 
-        if (!isReadonly()) {
-            if (mstate.bPhysicalSize) {
-                getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()), XShortcuts::GROUPID_EDIT);
-            }
-            getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
-        }
+//         if (!isReadonly()) {
+//             if (mstate.bPhysicalSize) {
+//                 getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()), XShortcuts::GROUPID_EDIT);
+//             }
+//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
+//         }
 
-        QList<QObject *> listObjects = getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
+//         QList<QObject *> listObjects = getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
 
-        contextMenu.exec(pos);
+//         contextMenu.exec(pos);
 
-        XOptions::deleteQObjectList(&listObjects);
+//         XOptions::deleteQObjectList(&listObjects);
 
-        return;
+//         return;
 
-        QMenu menuAnalyze(tr("Analyze"), this);
-        QMenu menuBookmarks(tr("Bookmarks"), this);
-        QAction actionAnalyzeAll(tr("All"), this);
-        QAction actionAnalyzeAnalyze(tr("Analyze"), this);
-        QAction actionAnalyzeDisasm(tr("Disasm"), this);
-        QAction actionAnalyzeRemove(tr("Remove"), this);
-        QAction actionAnalyzeSymbols(tr("Symbols"), this);
-        QAction actionAnalyzeFunctions(tr("Functions"), this);
-        QAction actionAnalyzeClear(tr("Clear"), this);
-        QAction actionBookmarkNew(tr("New"), this);
-        QAction actionBookmarkList(tr("List"), this);
+//         QMenu menuAnalyze(tr("Analyze"), this);
+//         QMenu menuBookmarks(tr("Bookmarks"), this);
+//         QAction actionAnalyzeAll(tr("All"), this);
+//         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
+//         QAction actionAnalyzeDisasm(tr("Disasm"), this);
+//         QAction actionAnalyzeRemove(tr("Remove"), this);
+//         QAction actionAnalyzeSymbols(tr("Symbols"), this);
+//         QAction actionAnalyzeFunctions(tr("Functions"), this);
+//         QAction actionAnalyzeClear(tr("Clear"), this);
+//         QAction actionBookmarkNew(tr("New"), this);
+//         QAction actionBookmarkList(tr("List"), this);
 
-        QMenu menuEdit(this);
-        QAction actionEditHex(this);
+//         QMenu menuEdit(this);
+//         QAction actionEditHex(this);
 
-        if (!(g_options.bHideReadOnly)) {
-            if (mstate.bPhysicalSize) {
-                menuEdit.setEnabled(!isReadonly());
-                getShortcuts()->adjustMenu(&contextMenu, &menuEdit, XShortcuts::GROUPID_EDIT);
-                getShortcuts()->adjustAction(&menuEdit, &actionEditHex, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
-            }
-        }
+//         if (!(g_options.bHideReadOnly)) {
+//             if (mstate.bPhysicalSize) {
+//                 menuEdit.setEnabled(!isReadonly());
+//                 getShortcuts()->adjustMenu(&contextMenu, &menuEdit, XShortcuts::GROUPID_EDIT);
+//                 getShortcuts()->adjustAction(&menuEdit, &actionEditHex, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
+//             }
+//         }
 
-        QMenu menuSelect(this);
-        QAction actionSelectAll(this);
+//         QMenu menuSelect(this);
+//         QAction actionSelectAll(this);
 
-        {
-            getShortcuts()->adjustMenu(&contextMenu, &menuSelect, XShortcuts::GROUPID_SELECT);
-            getShortcuts()->adjustAction(&menuSelect, &actionSelectAll, X_ID_DISASM_SELECT_ALL, this, SLOT(_selectAllSlot()));
-        }
+//         {
+//             getShortcuts()->adjustMenu(&contextMenu, &menuSelect, XShortcuts::GROUPID_SELECT);
+//             getShortcuts()->adjustAction(&menuSelect, &actionSelectAll, X_ID_DISASM_SELECT_ALL, this, SLOT(_selectAllSlot()));
+//         }
 
-        if ((mstate.bSize) && (getXInfoDB())) {
-            {
-                actionAnalyzeAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL));
-                connect(&actionAnalyzeAll, SIGNAL(triggered()), this, SLOT(_analyzeAll()));
-                menuAnalyze.addAction(&actionAnalyzeAll);
-            }
-            {
-                menuAnalyze.addSeparator();
-            }
-            {
-                actionAnalyzeAnalyze.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE));
-                connect(&actionAnalyzeAnalyze, SIGNAL(triggered()), this, SLOT(_analyzeAnalyze()));
-                menuAnalyze.addAction(&actionAnalyzeAnalyze);
-            }
-            {
-                actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
-                connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
-                menuAnalyze.addAction(&actionAnalyzeDisasm);
-            }
-            {
-                actionAnalyzeRemove.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE));
-                connect(&actionAnalyzeRemove, SIGNAL(triggered()), this, SLOT(_analyzeRemove()));
-                menuAnalyze.addAction(&actionAnalyzeRemove);
-            }
-            {
-                menuAnalyze.addSeparator();
-            }
-            {
-                actionAnalyzeSymbols.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS));
-                connect(&actionAnalyzeSymbols, SIGNAL(triggered()), this, SLOT(_analyzeSymbols()));
-                menuAnalyze.addAction(&actionAnalyzeSymbols);
-            }
-            {
-                actionAnalyzeFunctions.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS));
-                connect(&actionAnalyzeFunctions, SIGNAL(triggered()), this, SLOT(_analyzeFunctions()));
-                menuAnalyze.addAction(&actionAnalyzeFunctions);
-            }
-            {
-                menuAnalyze.addSeparator();
-            }
-            {
-                actionAnalyzeClear.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_CLEAR));
-                connect(&actionAnalyzeClear, SIGNAL(triggered()), this, SLOT(_analyzeClear()));
-                menuAnalyze.addAction(&actionAnalyzeClear);
-            }
+//         if ((mstate.bSize) && (getXInfoDB())) {
+//             {
+//                 actionAnalyzeAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL));
+//                 connect(&actionAnalyzeAll, SIGNAL(triggered()), this, SLOT(_analyzeAll()));
+//                 menuAnalyze.addAction(&actionAnalyzeAll);
+//             }
+//             {
+//                 menuAnalyze.addSeparator();
+//             }
+//             {
+//                 actionAnalyzeAnalyze.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE));
+//                 connect(&actionAnalyzeAnalyze, SIGNAL(triggered()), this, SLOT(_analyzeAnalyze()));
+//                 menuAnalyze.addAction(&actionAnalyzeAnalyze);
+//             }
+//             {
+//                 actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
+//                 connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
+//                 menuAnalyze.addAction(&actionAnalyzeDisasm);
+//             }
+//             {
+//                 actionAnalyzeRemove.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE));
+//                 connect(&actionAnalyzeRemove, SIGNAL(triggered()), this, SLOT(_analyzeRemove()));
+//                 menuAnalyze.addAction(&actionAnalyzeRemove);
+//             }
+//             {
+//                 menuAnalyze.addSeparator();
+//             }
+//             {
+//                 actionAnalyzeSymbols.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS));
+//                 connect(&actionAnalyzeSymbols, SIGNAL(triggered()), this, SLOT(_analyzeSymbols()));
+//                 menuAnalyze.addAction(&actionAnalyzeSymbols);
+//             }
+//             {
+//                 actionAnalyzeFunctions.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS));
+//                 connect(&actionAnalyzeFunctions, SIGNAL(triggered()), this, SLOT(_analyzeFunctions()));
+//                 menuAnalyze.addAction(&actionAnalyzeFunctions);
+//             }
+//             {
+//                 menuAnalyze.addSeparator();
+//             }
+//             {
+//                 actionAnalyzeClear.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_CLEAR));
+//                 connect(&actionAnalyzeClear, SIGNAL(triggered()), this, SLOT(_analyzeClear()));
+//                 menuAnalyze.addAction(&actionAnalyzeClear);
+//             }
 
-            contextMenu.addMenu(&menuAnalyze);
+//             contextMenu.addMenu(&menuAnalyze);
 
-            {
-                actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_NEW));
-                connect(&actionBookmarkNew, SIGNAL(triggered()), this, SLOT(_bookmarkNew()));
-            }
-            {
-                actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_LIST));
-                if (getViewWidgetState(VIEWWIDGET_BOOKMARKS)) {
-                    actionBookmarkList.setCheckable(true);
-                    actionBookmarkList.setChecked(true);
-                }
-                connect(&actionBookmarkList, SIGNAL(triggered()), this, SLOT(_bookmarkList()));
-            }
+//             {
+//                 actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_NEW));
+//                 connect(&actionBookmarkNew, SIGNAL(triggered()), this, SLOT(_bookmarkNew()));
+//             }
+//             {
+//                 actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_LIST));
+//                 if (getViewWidgetState(VIEWWIDGET_BOOKMARKS)) {
+//                     actionBookmarkList.setCheckable(true);
+//                     actionBookmarkList.setChecked(true);
+//                 }
+//                 connect(&actionBookmarkList, SIGNAL(triggered()), this, SLOT(_bookmarkList()));
+//             }
 
-            menuBookmarks.addAction(&actionBookmarkNew);
-            menuBookmarks.addAction(&actionBookmarkList);
-            contextMenu.addMenu(&menuBookmarks);
-        }
+//             menuBookmarks.addAction(&actionBookmarkNew);
+//             menuBookmarks.addAction(&actionBookmarkList);
+//             contextMenu.addMenu(&menuBookmarks);
+//         }
 
-        // TODO reset select
+//         // TODO reset select
 
-        contextMenu.exec(pos);
-    }
-}
+//         contextMenu.exec(pos);
+//     }
+// }
 
 void XDisasmView::wheelEvent(QWheelEvent *pEvent)
 {
