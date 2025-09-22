@@ -196,7 +196,7 @@ protected slots:
     void _transfer(XInfoDBTransfer::COMMAND command);
 
 private:
-    OPTIONS g_options;
+    OPTIONS m_options;
     qint32 g_nBytesProLine;
     QList<RECORD> g_listRecords;
     qint32 g_nAddressWidth;

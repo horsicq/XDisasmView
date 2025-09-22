@@ -40,7 +40,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     // TODO click on Address -> Offset
     g_nBytesProLine = 1;
 
-    g_options = OPTIONS();
+    m_options = OPTIONS();
     g_disasmOptions = XDisasmAbstract::DISASM_OPTIONS();
     g_viewMethod = VIEWMETHOD_NONE;
     g_viewDisasm = VIEWDISASM_COMPACT;
@@ -104,7 +104,7 @@ void XDisasmView::adjustView()
 
 void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bReload)
 {
-    g_options = options;
+    m_options = options;
 
     g_listRecords.clear();
 
@@ -112,8 +112,8 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
     setMode(options.fileType, options.disasmMode, true);
     // setMemoryMap(g_options.memoryMapRegion);
 
-    if (g_options.disasmMode == XBinary::DM_UNKNOWN) {
-        g_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
+    if (m_options.disasmMode == XBinary::DM_UNKNOWN) {
+        m_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
     }
 
     adjustView();
@@ -166,12 +166,12 @@ void XDisasmView::setViewDisasm(VIEWDISASM viewDisasm)
 
 XDisasmView::OPTIONS XDisasmView::getOptions()
 {
-    return g_options;
+    return m_options;
 }
 
 XBinary::DM XDisasmView::getDisasmMode()
 {
-    return g_options.disasmMode;
+    return m_options.disasmMode;
 }
 
 XADDR XDisasmView::getSelectionInitAddress()
@@ -483,7 +483,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
         result.bSize = true;
     }
 
-    if (g_options.bMenu_Hex) {
+    if (m_options.bMenu_Hex) {
         result.bHex = true;
     }
 
@@ -629,7 +629,7 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
         menuItem.pRecv = this;
         menuItem.pMethod = SLOT(_goToEntryPointSlot());
         menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-        menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
+        menuItem.sText = QString("0x%1").arg(m_options.nEntryPointAddress, 0, 16);
 
         listResult.append(menuItem);
     }
@@ -1739,7 +1739,7 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
-    if (XBinary::getWidthModeFromSize(g_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
+    if (XBinary::getWidthModeFromSize(m_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
         g_nAddressWidth = 16;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
     } else {
@@ -1887,7 +1887,7 @@ qint64 XDisasmView::getFixViewPos(qint64 nViewPos)
 
 void XDisasmView::_goToEntryPointSlot()
 {
-    goToAddress(g_options.nEntryPointAddress, false, false, true);
+    goToAddress(m_options.nEntryPointAddress, false, false, true);
     setFocus();
     viewport()->update();
 }
@@ -1920,7 +1920,7 @@ void XDisasmView::_signatureSlot()
 
 void XDisasmView::_hexSlot()
 {
-    if (g_options.bMenu_Hex) {
+    if (m_options.bMenu_Hex) {
         DEVICESTATE state = getDeviceState();
 
         if (state.nSelectionDeviceOffset != (quint64)-1) {
