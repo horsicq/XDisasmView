@@ -59,7 +59,7 @@ protected:
 
 private:
     Ui::DialogMultiDisasmSignature *ui;
-    QIODevice *g_pDevice;
+    QIODevice *m_pDevice;
     qint64 g_nOffset;
     XBinary::_MEMORY_MAP *g_pMemoryMap;
     XDisasmCore *g_pDisasmCore;

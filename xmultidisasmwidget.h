@@ -84,7 +84,7 @@ signals:
 
 private:
     Ui::XMultiDisasmWidget *ui;
-    QIODevice *g_pDevice;
+    QIODevice *m_pDevice;
     XInfoDB *g_pXInfoDB;
     OPTIONS g_options;
 };

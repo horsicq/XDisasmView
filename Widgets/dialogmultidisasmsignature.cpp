@@ -26,7 +26,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
 {
     ui->setupUi(this);
 
-    this->g_pDevice = nullptr;
+    this->m_pDevice = nullptr;
     this->g_nOffset = 0;
     this->g_pMemoryMap = nullptr;
 
@@ -57,7 +57,7 @@ void DialogMultiDisasmSignature::adjustView()
 
 void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, XDisasmCore *pDisasmCore)
 {
-    this->g_pDevice = pDevice;
+    this->m_pDevice = pDevice;
     this->g_nOffset = nOffset;
     this->g_pMemoryMap = pMemoryMap;
     this->g_pDisasmCore = pDisasmCore;
@@ -76,7 +76,7 @@ void DialogMultiDisasmSignature::reload()
         st = XDisasmCore::ST_REL;
     }
 
-    g_listRecords = g_pDisasmCore->getSignatureRecords(g_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
+    g_listRecords = g_pDisasmCore->getSignatureRecords(m_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
 
     qint32 nNumberOfRecords = g_listRecords.count();
 
@@ -293,7 +293,7 @@ void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
 
     DialogSearchValues dialogSearchValues(this);
     dialogSearchValues.setGlobal(getShortcuts(), getGlobalOptions());
-    dialogSearchValues.setData(g_pDevice, options);
+    dialogSearchValues.setData(m_pDevice, options);
 
     dialogSearchValues.exec();
 }

@@ -37,7 +37,7 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->comboBoxMethod->setToolTip(tr("Method"));
     ui->comboBoxView->setToolTip(tr("View"));
 
-    g_pDevice = nullptr;
+    m_pDevice = nullptr;
     g_pXInfoDB = nullptr;
     g_options = {};
 
@@ -71,7 +71,7 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 
 void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
 {
-    g_pDevice = pDevice;
+    m_pDevice = pDevice;
     g_options = options;
 
     if (pDevice) {
@@ -145,21 +145,21 @@ void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-    if (g_pDevice) {
+    if (m_pDevice) {
         g_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
         XDisasmView::OPTIONS options = {};
         options.nInitAddress = g_options.nInitAddress;
-        options.nEntryPointAddress = XFormats::getEntryPointAddress(g_options.fileType, g_pDevice);
+        options.nEntryPointAddress = XFormats::getEntryPointAddress(g_options.fileType, m_pDevice);
         options.bMenu_Hex = g_options.bMenu_Hex;
         options.bHideReadOnly = g_options.bHideReadOnly;
 
         XBinary::FILEFORMATINFO fileFormatInfo = {};
 
         if (g_options.fileType == XBinary::FT_REGION) {
-            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, g_pDevice, true, g_options.nStartAddress);
+            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, m_pDevice, true, g_options.nStartAddress);
         } else {
-            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, g_pDevice);
+            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, m_pDevice);
         }
 
         // if (g_options.sArch != "") {
@@ -168,7 +168,7 @@ void XMultiDisasmWidget::reloadFileType()
 
         ui->comboBoxMode->setEnabled(!g_options.bModeFixed);
 
-        // ui->scrollAreaDisasm->setData(g_pDevice, options);
+        // ui->scrollAreaDisasm->setData(m_pDevice, options);
 
         XBinary::DM disasmMode = XBinary::getDisasmMode(&fileFormatInfo);
 
@@ -179,11 +179,11 @@ void XMultiDisasmWidget::reloadFileType()
 
         // // TODO Check
         // if (ui->scrollAreaDisasm->getXInfoDB()) {
-        //     ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+        //     ui->scrollAreaDisasm->getXInfoDB()->setData(m_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
         //     //            getSymbols();
         // }
 
-        ui->scrollAreaDisasm->setData(g_pDevice, options);
+        ui->scrollAreaDisasm->setData(m_pDevice, options);
         ui->scrollAreaDisasm->reload(true);
         reloadMethod();
     }
@@ -204,11 +204,11 @@ void XMultiDisasmWidget::adjustMode()
     XDisasmView::OPTIONS options = ui->scrollAreaDisasm->getOptions();
     options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
-    ui->scrollAreaDisasm->setData(g_pDevice, options);
+    ui->scrollAreaDisasm->setData(m_pDevice, options);
     ui->scrollAreaDisasm->reload(true);
 
     // if (ui->scrollAreaDisasm->getXInfoDB()) {
-    //     ui->scrollAreaDisasm->getXInfoDB()->setData(g_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
+    //     ui->scrollAreaDisasm->getXInfoDB()->setData(m_pDevice, options.memoryMapRegion.fileType, options.disasmMode);
     // }
 }
 
