@@ -27,7 +27,7 @@ XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : XShortcut
     ui->setupUi(this);
 
     g_pOptions = nullptr;
-    g_mode = MODE_ALL;
+    m_mode = MODE_ALL;
 
     setProperty("GROUPID", XOptions::GROUPID_DISASM);
 }
@@ -45,7 +45,7 @@ void XDisasmViewOptionsWidget::adjustView()
 void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 {
     g_pOptions = pOptions;
-    g_mode = mode;
+    m_mode = mode;
 
     reload();
 }
@@ -268,7 +268,7 @@ void XDisasmViewOptionsWidget::reload()
     g_pOptions->setCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
     g_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
 
-    if ((g_mode == MODE_ALL) || (g_mode == MODE_X86)) {
+    if ((m_mode == MODE_ALL) || (m_mode == MODE_X86)) {
         g_pOptions->setComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
     } else {
         ui->groupBoxDisasmSyntax->hide();
@@ -280,7 +280,7 @@ void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
     DialogViewColors dialogColors(this);
     dialogColors.setGlobal(getShortcuts(), getGlobalOptions());
 
-    QList<DialogViewColors::RECORD> listRecords = getRecords(g_mode);
+    QList<DialogViewColors::RECORD> listRecords = getRecords(m_mode);
 
     dialogColors.setOptions(g_pOptions, listRecords, tr("Colors"));
 

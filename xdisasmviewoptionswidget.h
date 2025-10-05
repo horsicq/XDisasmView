@@ -62,7 +62,7 @@ protected:
 private:
     Ui::XDisasmViewOptionsWidget *ui;
     XOptions *g_pOptions;
-    MODE g_mode;
+    MODE m_mode;
 };
 
 #endif  // XDISASMVIEWOPTIONSWIDGET_H
