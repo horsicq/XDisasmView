@@ -1561,7 +1561,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 //             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
 //         }
 
-//         QList<QObject *> listObjects = getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
+//         getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
 
 //         contextMenu.exec(pos);
 
