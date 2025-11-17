@@ -85,8 +85,8 @@ signals:
 private:
     Ui::XMultiDisasmWidget *ui;
     QIODevice *m_pDevice;
-    XInfoDB *g_pXInfoDB;
-    OPTIONS g_options;
+    XInfoDB *m_pXInfoDB;
+    OPTIONS m_options;
 };
 
 #endif  // XMULTIDISASMWIDGET_H

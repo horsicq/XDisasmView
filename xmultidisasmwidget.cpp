@@ -38,8 +38,8 @@ XMultiDisasmWidget::XMultiDisasmWidget(QWidget *pParent) : XShortcutsWidget(pPar
     ui->comboBoxView->setToolTip(tr("View"));
 
     m_pDevice = nullptr;
-    g_pXInfoDB = nullptr;
-    g_options = {};
+    m_pXInfoDB = nullptr;
+    m_options = {};
 
     // TODO BPF
     // TODO Check more !!!
@@ -72,7 +72,7 @@ XMultiDisasmWidget::~XMultiDisasmWidget()
 void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
 {
     m_pDevice = pDevice;
-    g_options = options;
+    m_options = options;
 
     if (pDevice) {
         XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_EXECUTABLE);
@@ -146,27 +146,27 @@ void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
 void XMultiDisasmWidget::reloadFileType()
 {
     if (m_pDevice) {
-        g_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
+        m_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
         XDisasmView::OPTIONS options = {};
-        options.nInitAddress = g_options.nInitAddress;
-        options.nEntryPointAddress = XFormats::getEntryPointAddress(g_options.fileType, m_pDevice);
-        options.bMenu_Hex = g_options.bMenu_Hex;
-        options.bHideReadOnly = g_options.bHideReadOnly;
+        options.nInitAddress = m_options.nInitAddress;
+        options.nEntryPointAddress = XFormats::getEntryPointAddress(m_options.fileType, m_pDevice);
+        options.bMenu_Hex = m_options.bMenu_Hex;
+        options.bHideReadOnly = m_options.bHideReadOnly;
 
         XBinary::FILEFORMATINFO fileFormatInfo = {};
 
-        if (g_options.fileType == XBinary::FT_REGION) {
-            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, m_pDevice, true, g_options.nStartAddress);
+        if (m_options.fileType == XBinary::FT_REGION) {
+            fileFormatInfo = XFormats::getFileFormatInfo(m_options.fileType, m_pDevice, true, m_options.nStartAddress);
         } else {
-            fileFormatInfo = XFormats::getFileFormatInfo(g_options.fileType, m_pDevice);
+            fileFormatInfo = XFormats::getFileFormatInfo(m_options.fileType, m_pDevice);
         }
 
-        // if (g_options.sArch != "") {
-        //     options.memoryMapRegion.sArch = g_options.sArch;
+        // if (m_options.sArch != "") {
+        //     options.memoryMapRegion.sArch = m_options.sArch;
         // }
 
-        ui->comboBoxMode->setEnabled(!g_options.bModeFixed);
+        ui->comboBoxMode->setEnabled(!m_options.bModeFixed);
 
         // ui->scrollAreaDisasm->setData(m_pDevice, options);
 
