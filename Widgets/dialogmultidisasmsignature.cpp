@@ -27,8 +27,8 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     ui->setupUi(this);
 
     this->m_pDevice = nullptr;
-    this->g_nOffset = 0;
-    this->g_pMemoryMap = nullptr;
+    this->m_nOffset = 0;
+    this->m_pMemoryMap = nullptr;
 
     //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XOptions::getMonoFont());
@@ -39,7 +39,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     ui->comboBoxMethod->addItem("", 0);
     ui->comboBoxMethod->addItem(tr("Relative virtual address"), 1);
 
-    g_nSymbolWidth = XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
+    m_nSymbolWidth = XLineEditHEX::getSymbolWidth(ui->tableWidgetSignature);
 
     ui->spinBoxCount->blockSignals(bBlocked1);
     ui->comboBoxMethod->blockSignals(bBlocked2);
@@ -58,9 +58,9 @@ void DialogMultiDisasmSignature::adjustView()
 void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBinary::_MEMORY_MAP *pMemoryMap, XDisasmCore *pDisasmCore)
 {
     this->m_pDevice = pDevice;
-    this->g_nOffset = nOffset;
-    this->g_pMemoryMap = pMemoryMap;
-    this->g_pDisasmCore = pDisasmCore;
+    this->m_nOffset = nOffset;
+    this->m_pMemoryMap = pMemoryMap;
+    this->m_pDisasmCore = pDisasmCore;
 
     reload();
 }
@@ -76,9 +76,9 @@ void DialogMultiDisasmSignature::reload()
         st = XDisasmCore::ST_REL;
     }
 
-    g_listRecords = g_pDisasmCore->getSignatureRecords(m_pDevice, g_pMemoryMap, g_nOffset, nCount, st);
+    m_listRecords = m_pDisasmCore->getSignatureRecords(m_pDevice, m_pMemoryMap, m_nOffset, nCount, st);
 
-    qint32 nNumberOfRecords = g_listRecords.count();
+    qint32 nNumberOfRecords = m_listRecords.count();
 
     ui->tableWidgetSignature->clear();
 
@@ -95,46 +95,46 @@ void DialogMultiDisasmSignature::reload()
     ui->tableWidgetSignature->setHorizontalHeaderLabels(listHeaders);
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        ui->tableWidgetSignature->setItem(i, 0, new QTableWidgetItem(XBinary::valueToHex(g_listRecords.at(i).nAddress)));
-        ui->tableWidgetSignature->setItem(i, 1, new QTableWidgetItem(g_listRecords.at(i).baOpcode.toHex().data()));
+        ui->tableWidgetSignature->setItem(i, 0, new QTableWidgetItem(XBinary::valueToHex(m_listRecords.at(i).nAddress)));
+        ui->tableWidgetSignature->setItem(i, 1, new QTableWidgetItem(m_listRecords.at(i).baOpcode.toHex().data()));
 
-        if (!g_listRecords.at(i).bIsConst) {
+        if (!m_listRecords.at(i).bIsConst) {
             QPushButton *pUseSignatureButton = new QPushButton(this);
-            pUseSignatureButton->setText(g_listRecords.at(i).sOpcode);
+            pUseSignatureButton->setText(m_listRecords.at(i).sOpcode);
             pUseSignatureButton->setCheckable(true);
             connect(pUseSignatureButton, SIGNAL(clicked()), this, SLOT(reloadSignature()));
 
             ui->tableWidgetSignature->setCellWidget(i, 2, pUseSignatureButton);
 
-            if (g_listRecords.at(i).nDispSize) {
+            if (m_listRecords.at(i).nDispSize) {
                 QPushButton *pDispButton = new QPushButton(this);
                 pDispButton->setText(QString("d"));
                 pDispButton->setCheckable(true);
-                pDispButton->setMaximumWidth(g_nSymbolWidth * 6);
+                pDispButton->setMaximumWidth(m_nSymbolWidth * 6);
                 connect(pDispButton, SIGNAL(clicked()), this, SLOT(reloadSignature()));
 
                 ui->tableWidgetSignature->setCellWidget(i, 3, pDispButton);
             }
 
-            if (g_listRecords.at(i).nImmSize) {
+            if (m_listRecords.at(i).nImmSize) {
                 QPushButton *pImmButton = new QPushButton(this);
                 pImmButton->setText(QString("i"));
                 pImmButton->setCheckable(true);
-                pImmButton->setMaximumWidth(g_nSymbolWidth * 6);
+                pImmButton->setMaximumWidth(m_nSymbolWidth * 6);
                 connect(pImmButton, SIGNAL(clicked()), this, SLOT(reloadSignature()));
 
                 ui->tableWidgetSignature->setCellWidget(i, 4, pImmButton);
             }
         } else {
-            ui->tableWidgetSignature->setItem(i, 2, new QTableWidgetItem(g_listRecords.at(i).sOpcode));
+            ui->tableWidgetSignature->setItem(i, 2, new QTableWidgetItem(m_listRecords.at(i).sOpcode));
         }
     }
 
-    ui->tableWidgetSignature->setColumnWidth(0, g_nSymbolWidth * 12);
-    ui->tableWidgetSignature->setColumnWidth(1, g_nSymbolWidth * 20);
-    ui->tableWidgetSignature->setColumnWidth(2, g_nSymbolWidth * 20);
-    ui->tableWidgetSignature->setColumnWidth(3, g_nSymbolWidth * 6);
-    ui->tableWidgetSignature->setColumnWidth(4, g_nSymbolWidth * 6);
+    ui->tableWidgetSignature->setColumnWidth(0, m_nSymbolWidth * 12);
+    ui->tableWidgetSignature->setColumnWidth(1, m_nSymbolWidth * 20);
+    ui->tableWidgetSignature->setColumnWidth(2, m_nSymbolWidth * 20);
+    ui->tableWidgetSignature->setColumnWidth(3, m_nSymbolWidth * 6);
+    ui->tableWidgetSignature->setColumnWidth(4, m_nSymbolWidth * 6);
 
     ui->tableWidgetSignature->horizontalHeader()->setVisible(true);
 
@@ -158,7 +158,7 @@ void DialogMultiDisasmSignature::reloadSignature()
         cWild = _sWild.at(0);
     }
 
-    qint32 nNumberOfRecords = g_listRecords.count();
+    qint32 nNumberOfRecords = m_listRecords.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         bool bUse = true;
@@ -183,23 +183,23 @@ void DialogMultiDisasmSignature::reloadSignature()
             bImm = !(pImmButton->isChecked());
         }
 
-        qint32 nSize = g_listRecords.at(i).baOpcode.size();
+        qint32 nSize = m_listRecords.at(i).baOpcode.size();
 
         QString sRecord;
 
         if (bUse) {
-            sRecord = g_listRecords.at(i).baOpcode.toHex().data();
+            sRecord = m_listRecords.at(i).baOpcode.toHex().data();
 
             if (!bDisp) {
-                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nDispOffset, g_listRecords.at(i).nDispSize, cWild);
+                sRecord = XDisasmCore::replaceWildChar(sRecord, m_listRecords.at(i).nDispOffset, m_listRecords.at(i).nDispSize, cWild);
             }
 
             if (!bImm) {
-                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, cWild);
+                sRecord = XDisasmCore::replaceWildChar(sRecord, m_listRecords.at(i).nImmOffset, m_listRecords.at(i).nImmSize, cWild);
             }
 
-            if (g_listRecords.at(i).bIsConst) {
-                sRecord = XDisasmCore::replaceWildChar(sRecord, g_listRecords.at(i).nImmOffset, g_listRecords.at(i).nImmSize, QChar('$'));
+            if (m_listRecords.at(i).bIsConst) {
+                sRecord = XDisasmCore::replaceWildChar(sRecord, m_listRecords.at(i).nImmOffset, m_listRecords.at(i).nImmSize, QChar('$'));
             }
         } else {
             for (qint32 j = 0; j < nSize; j++) {
@@ -285,9 +285,9 @@ void DialogMultiDisasmSignature::on_comboBoxMethod_currentIndexChanged(int nInde
 void DialogMultiDisasmSignature::on_pushButtonScan_clicked()
 {
     SearchValuesWidget::OPTIONS options = {};
-    options.fileType = g_pMemoryMap->fileType;
+    options.fileType = m_pMemoryMap->fileType;
     options.valueType = XBinary::VT_SIGNATURE;
-    options.endian = g_pMemoryMap->endian;
+    options.endian = m_pMemoryMap->endian;
     options.varValue = ui->textEditSignature->toPlainText();
     options.bScan = true;
 

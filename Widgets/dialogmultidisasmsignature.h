@@ -60,11 +60,11 @@ protected:
 private:
     Ui::DialogMultiDisasmSignature *ui;
     QIODevice *m_pDevice;
-    qint64 g_nOffset;
-    XBinary::_MEMORY_MAP *g_pMemoryMap;
-    XDisasmCore *g_pDisasmCore;
-    QList<XDisasmCore::SIGNATURE_RECORD> g_listRecords;
-    qint32 g_nSymbolWidth;
+    qint64 m_nOffset;
+    XBinary::_MEMORY_MAP *m_pMemoryMap;
+    XDisasmCore *m_pDisasmCore;
+    QList<XDisasmCore::SIGNATURE_RECORD> m_listRecords;
+    qint32 m_nSymbolWidth;
 };
 
 #endif  // DIALOGMULTIDISASMSIGNATURE_H
