@@ -197,22 +197,22 @@ protected slots:
 
 private:
     OPTIONS m_options;
-    qint32 g_nBytesProLine;
-    QList<RECORD> g_listRecords;
-    qint32 g_nAddressWidth;
-    qint32 g_nOpcodeSize;
-    XADDR g_nThisBaseVirtualAddress;
-    qint64 g_nThisBaseDeviceOffset;
-    bool g_bIsLocationColon;
-    bool g_bIsHighlight;
+    qint32 m_nBytesProLine;
+    QList<RECORD> m_listRecords;
+    qint32 m_nAddressWidth;
+    qint32 m_nOpcodeSize;
+    XADDR m_nThisBaseVirtualAddress;
+    qint64 m_nThisBaseDeviceOffset;
+    bool m_bIsLocationColon;
+    bool m_bIsHighlight;
     // OPCODEMODE g_opcodeMode;
     //    BYTESMODE g_bytesMode;
     QTextOption _qTextOptions;
-    XDisasmAbstract::DISASM_OPTIONS g_disasmOptions;
+    XDisasmAbstract::DISASM_OPTIONS m_disasmOptions;
 
-    QList<HIGHLIGHTREGION> g_listHighlightsRegion;
-    VIEWMETHOD g_viewMethod;
-    VIEWDISASM g_viewDisasm;
+    QList<HIGHLIGHTREGION> m_listHighlightsRegion;
+    VIEWMETHOD m_viewMethod;
+    VIEWDISASM m_viewDisasm;
 };
 
 #endif  // XDISASMVIEW_H

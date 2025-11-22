@@ -38,19 +38,19 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     addShortcut(X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
 
     // TODO click on Address -> Offset
-    g_nBytesProLine = 1;
+    m_nBytesProLine = 1;
 
     m_options = OPTIONS();
-    g_disasmOptions = XDisasmAbstract::DISASM_OPTIONS();
-    g_viewMethod = VIEWMETHOD_NONE;
-    g_viewDisasm = VIEWDISASM_COMPACT;
+    m_disasmOptions = XDisasmAbstract::DISASM_OPTIONS();
+    m_viewMethod = VIEWMETHOD_NONE;
+    m_viewDisasm = VIEWDISASM_COMPACT;
 
-    g_nAddressWidth = 8;
-    g_nOpcodeSize = 16;  // TODO Check
-    g_nThisBaseVirtualAddress = 0;
-    g_nThisBaseDeviceOffset = 0;
-    g_bIsLocationColon = false;
-    g_bIsHighlight = false;
+    m_nAddressWidth = 8;
+    m_nOpcodeSize = 16;  // TODO Check
+    m_nThisBaseVirtualAddress = 0;
+    m_nThisBaseDeviceOffset = 0;
+    m_bIsLocationColon = false;
+    m_bIsHighlight = false;
     // g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
     //    g_bytesMode = BYTESMODE_RAW;
 
@@ -81,11 +81,11 @@ void XDisasmView::adjustView()
 {
     setTextFontFromOptions(XOptions::ID_DISASM_FONT);
 
-    g_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
-    g_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
+    m_bIsHighlight = getGlobalOptions()->getValue(XOptions::ID_DISASM_HIGHLIGHT).toBool();
+    m_disasmOptions.bIsUppercase = getGlobalOptions()->getValue(XOptions::ID_DISASM_UPPERCASE).toBool();
     // XBinary::SYNTAX syntax = XBinary::stringToSyntaxId(getGlobalOptions()->getValue(XOptions::ID_DISASM_SYNTAX).toString());
     // XBinary::DM disasmMode = g_options.disasmMode;
-    g_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
+    m_bIsLocationColon = getGlobalOptions()->getValue(XOptions::ID_DISASM_LOCATIONCOLON).toBool();
 
     // g_dmFamily = XBinary::getDisasmFamily(g_options.disasmMode);
 
@@ -106,7 +106,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
 {
     m_options = options;
 
-    g_listRecords.clear();
+    m_listRecords.clear();
 
     setDevice(pDevice, 0, -1);  // TODO
     setMode(options.fileType, options.disasmMode, true);
@@ -142,7 +142,7 @@ void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bRelo
 
 void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 {
-    g_viewMethod = viewMethod;
+    m_viewMethod = viewMethod;
 
     if (viewMethod == VIEWMETHOD_ANALYZED) {
         if (getXInfoDB()) {
@@ -157,7 +157,7 @@ void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 
 void XDisasmView::setViewDisasm(VIEWDISASM viewDisasm)
 {
-    g_viewDisasm = viewDisasm;
+    m_viewDisasm = viewDisasm;
 
     adjustColumns();
     adjust();
@@ -344,7 +344,7 @@ QString XDisasmView::convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &d
 
     if (getXInfoDB()) {
         XInfoDB::RI_TYPE riType = XInfoDB::RI_TYPE_SYMBOLADDRESS;
-        sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType, g_disasmOptions);
+        sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType, m_disasmOptions);
     }
 
     if (sResult == "") {
@@ -365,7 +365,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
 
         VIEWSTRUCT viewStruct = _getViewStructByViewPos(nViewPos);
 
-        if (g_viewMethod == VIEWMETHOD_NONE) {
+        if (m_viewMethod == VIEWMETHOD_NONE) {
             qint64 nOffset = -1;
 
             if (viewStruct.nOffset != -1) {
@@ -376,8 +376,8 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 qint64 nStartOffset = 0;
                 qint64 nEndOffset = 0;
 
-                nStartOffset = nOffset - 5 * g_nOpcodeSize;
-                nEndOffset = nOffset + 5 * g_nOpcodeSize;
+                nStartOffset = nOffset - 5 * m_nOpcodeSize;
+                nEndOffset = nOffset + 5 * m_nOpcodeSize;
 
                 if (getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_ARM)  // TODO Check
                 {
@@ -411,7 +411,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 while (nSize > 0) {
                     qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-                    XDisasmAbstract::DISASM_RESULT disasmResult = getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, g_disasmOptions);
+                    XDisasmAbstract::DISASM_RESULT disasmResult = getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
 
                     if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                         if (_nOffset == nOffset) {
@@ -432,7 +432,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                     nSize -= disasmResult.nSize;
                 }
             }
-        } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
+        } else if (m_viewMethod == VIEWMETHOD_ANALYZED) {
             XADDR nAddress = -1;
 
             if (viewStruct.nAddress != -1) {
@@ -532,7 +532,7 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
 void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult,
                                  TEXT_OPTION *pTextOption)
 {
-    if (g_bIsHighlight) {
+    if (m_bIsHighlight) {
         if (pTextOption->bIsSelected) {
             pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colSelected);
         }
@@ -617,7 +617,7 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
 
     MENU_STATE mstate = getMenuState();
     STATE state = getState();
-    XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
+    XDisasmView::RECORD record = _getRecordByViewPos(&m_listRecords, state.nSelectionViewPos);
 
     getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
     getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
@@ -854,11 +854,11 @@ QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewPos, q
 
 void XDisasmView::getRecords()
 {
-    g_listRecords.clear();
+    m_listRecords.clear();
 
     XInfoDB::STATE *pState = 0;
 
-    // if (getXInfoDB() && (g_viewMethod == VIEWMETHOD_ANALYZED)) {
+    // if (getXInfoDB() && (m_viewMethod == VIEWMETHOD_ANALYZED)) {
     //     pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
     // }
 
@@ -893,8 +893,8 @@ void XDisasmView::getRecords()
                 }
 
                 if (record.nDeviceOffset != -1) {
-                    if (g_viewMethod == VIEWMETHOD_NONE) {
-                        nBufferSize = qMin(g_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
+                    if (m_viewMethod == VIEWMETHOD_NONE) {
+                        nBufferSize = qMin(m_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
 
                         baBuffer = read_array(record.nDeviceOffset, nBufferSize);
                         nBufferSize = baBuffer.size();
@@ -903,14 +903,14 @@ void XDisasmView::getRecords()
                             break;
                         }
 
-                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, g_disasmOptions);
+                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
 
                         nBufferSize = record.disasmResult.nSize;
                         baBuffer.resize(nBufferSize);
                         record.sBytes = baBuffer.toHex().data();
 
                         nDataSize = nBufferSize;
-                    } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
+                    } else if (m_viewMethod == VIEWMETHOD_ANALYZED) {
                         if (pState) {
                             qint32 nIndex = getXInfoDB()->_searchXRecordByAddress(pState, nVirtualAddress, false);
 
@@ -922,7 +922,7 @@ void XDisasmView::getRecords()
                                 if ((record.nDeviceOffset != -1) && (nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
                                         QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
-                                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, g_disasmOptions);
+                                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
 
                                         nDataSize = showRecord.nSize;
@@ -940,7 +940,7 @@ void XDisasmView::getRecords()
                                 record.disasmResult.sMnemonic = "db";
                                 record.disasmResult.sOperands = record.sBytes;
 
-                                if (g_disasmOptions.bIsUppercase) {
+                                if (m_disasmOptions.bIsUppercase) {
                                     record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
                                     record.disasmResult.sOperands = record.disasmResult.sOperands.toUpper();
                                 }
@@ -956,7 +956,7 @@ void XDisasmView::getRecords()
                     record.disasmResult.sMnemonic = "db";
                     record.disasmResult.sOperands = "1 dup(?)";
 
-                    if (g_disasmOptions.bIsUppercase) {
+                    if (m_disasmOptions.bIsUppercase) {
                         record.disasmResult.sMnemonic = record.disasmResult.sMnemonic.toUpper();
                         record.disasmResult.sOperands = record.disasmResult.sOperands.toUpper();
                     }
@@ -986,7 +986,7 @@ void XDisasmView::getRecords()
             //             QList<HIGHLIGHTREGION> listHighLightRegions;
 
             //             if (record.nDeviceOffset != -1) {
-            //                 listHighLightRegions = getHighlightRegion(&g_listHighlightsRegion, record.nDeviceOffset, XBinary::LT_OFFSET);
+            //                 listHighLightRegions = getHighlightRegion(&m_listHighlightsRegion, record.nDeviceOffset, XBinary::LT_OFFSET);
             //             }
 
             //             if (listHighLightRegions.count()) {
@@ -997,7 +997,7 @@ void XDisasmView::getRecords()
             //                 record.colBytesBackgroundSelected = getColor(TCLOLOR_SELECTED);
             //             }
 
-            g_listRecords.append(record);
+            m_listRecords.append(record);
 
             nCurrentViewPos += nDataSize;
         } else {
@@ -1010,12 +1010,12 @@ void XDisasmView::getRecords()
 
 void XDisasmView::updateArrows()
 {
-    qint32 nNumberOfRecords = g_listRecords.count();
+    qint32 nNumberOfRecords = m_listRecords.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if (g_listRecords.at(i).disasmResult.relType) {
-            XADDR nXrefTo = g_listRecords.at(i).disasmResult.nXrefToRelative;
-            XADDR nCurrentAddress = g_listRecords.at(i).disasmResult.nAddress;
+        if (m_listRecords.at(i).disasmResult.relType) {
+            XADDR nXrefTo = m_listRecords.at(i).disasmResult.nXrefToRelative;
+            XADDR nCurrentAddress = m_listRecords.at(i).disasmResult.nAddress;
 
             qint32 nStart = 0;
             qint32 nEnd = nNumberOfRecords - 1;
@@ -1024,47 +1024,47 @@ void XDisasmView::updateArrows()
             if (nCurrentAddress > nXrefTo) {
                 nEnd = i;
 
-                g_listRecords[i].nArraySize = nEnd;
+                m_listRecords[i].nArraySize = nEnd;
 
                 for (qint32 j = i; j >= nStart; j--) {
-                    nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
+                    nMaxLevel = qMax(m_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) &&
-                        (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= m_listRecords.at(j).disasmResult.nAddress) &&
+                        (nXrefTo < (m_listRecords.at(j).disasmResult.nAddress + m_listRecords.at(j).disasmResult.nSize))) {
                         nStart = j;
-                        g_listRecords[i].nArraySize = nEnd - nStart;
-                        g_listRecords[i].bIsEnd = true;
+                        m_listRecords[i].nArraySize = nEnd - nStart;
+                        m_listRecords[i].bIsEnd = true;
 
                         break;
                     }
                 }
 
-                g_listRecords[i].array = ARROW_UP;
+                m_listRecords[i].array = ARROW_UP;
             } else if (nCurrentAddress < nXrefTo) {
                 nStart = i;
 
-                g_listRecords[i].nArraySize = nNumberOfRecords - nStart;
+                m_listRecords[i].nArraySize = nNumberOfRecords - nStart;
 
                 for (qint32 j = i; j <= nEnd; j++) {
-                    nMaxLevel = qMax(g_listRecords.at(j).nMaxLevel, nMaxLevel);
+                    nMaxLevel = qMax(m_listRecords.at(j).nMaxLevel, nMaxLevel);
 
-                    if ((nXrefTo >= g_listRecords.at(j).disasmResult.nAddress) &&
-                        (nXrefTo < (g_listRecords.at(j).disasmResult.nAddress + g_listRecords.at(j).disasmResult.nSize))) {
+                    if ((nXrefTo >= m_listRecords.at(j).disasmResult.nAddress) &&
+                        (nXrefTo < (m_listRecords.at(j).disasmResult.nAddress + m_listRecords.at(j).disasmResult.nSize))) {
                         nEnd = j;
-                        g_listRecords[i].nArraySize = nEnd - nStart;
-                        g_listRecords[i].bIsEnd = true;
+                        m_listRecords[i].nArraySize = nEnd - nStart;
+                        m_listRecords[i].bIsEnd = true;
 
                         break;
                     }
                 }
 
-                g_listRecords[i].array = ARROW_DOWN;
+                m_listRecords[i].array = ARROW_DOWN;
             }
 
-            g_listRecords[i].nArrayLevel = nMaxLevel + 1;
+            m_listRecords[i].nArrayLevel = nMaxLevel + 1;
 
             for (qint32 j = nStart; j <= nEnd; j++) {
-                g_listRecords[j].nMaxLevel = nMaxLevel + 1;
+                m_listRecords[j].nMaxLevel = nMaxLevel + 1;
             }
         }
     }
@@ -1072,83 +1072,83 @@ void XDisasmView::updateArrows()
 
 void XDisasmView::updateLocations()
 {
-    XBinary::MODE mode = XBinary::getWidthModeFromByteSize(g_nAddressWidth);
+    XBinary::MODE mode = XBinary::getWidthModeFromByteSize(m_nAddressWidth);
 
-    qint32 nNumberOfRecords = g_listRecords.count();
+    qint32 nNumberOfRecords = m_listRecords.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
         if (getlocationMode() == LOCMODE_THIS) {
             qint64 nDelta = 0;
             XADDR _nCurrent = 0;
 
-            if (g_nThisBaseVirtualAddress != (XADDR)-1) {
-                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
-                nDelta = (qint64)_nCurrent - (qint64)g_nThisBaseVirtualAddress;
-            } else if (g_nThisBaseDeviceOffset != -1) {
-                _nCurrent = g_listRecords.at(i).nDeviceOffset;
-                nDelta = (qint64)_nCurrent - (qint64)g_nThisBaseDeviceOffset;
+            if (m_nThisBaseVirtualAddress != (XADDR)-1) {
+                _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
+                nDelta = (qint64)_nCurrent - (qint64)m_nThisBaseVirtualAddress;
+            } else if (m_nThisBaseDeviceOffset != -1) {
+                _nCurrent = m_listRecords.at(i).nDeviceOffset;
+                nDelta = (qint64)_nCurrent - (qint64)m_nThisBaseDeviceOffset;
             }
 
-            g_listRecords[i].sLocation = XBinary::thisToString(nDelta);
+            m_listRecords[i].sLocation = XBinary::thisToString(nDelta);
         } else if (getlocationMode() == LOCMODE_ADDRESS) {
             QString sPrefix;
-            XADDR _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
+            XADDR _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
 
             if (_nCurrent == (XADDR)-1) {
                 sPrefix = QString("%1: ").arg(tr("Offset"));
-                _nCurrent = g_listRecords.at(i).nDeviceOffset;
+                _nCurrent = m_listRecords.at(i).nDeviceOffset;
             }
 
-            if (g_bIsLocationColon) {
-                g_listRecords[i].sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
+            if (m_bIsLocationColon) {
+                m_listRecords[i].sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
             } else {
-                g_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
+                m_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
             }
         } else if (getlocationMode() == LOCMODE_OFFSET) {
             QString sPrefix;
-            XADDR _nCurrent = g_listRecords.at(i).nDeviceOffset;
+            XADDR _nCurrent = m_listRecords.at(i).nDeviceOffset;
 
             if (_nCurrent == (XADDR)-1) {
                 sPrefix = QString("%1: ").arg(tr("Address"));
-                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
+                _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
             }
 
-            if (g_bIsLocationColon) {
-                g_listRecords[i].sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
+            if (m_bIsLocationColon) {
+                m_listRecords[i].sLocation = sPrefix + XBinary::valueToHexColon(mode, _nCurrent);
             } else {
-                g_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
+                m_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
             }
         } else if (getlocationMode() == LOCMODE_RELADDRESS) {
             QString sPrefix;
             QString sSymbol;
             XADDR _nCurrent = 0;
 
-            if (g_listRecords.at(i).nDeviceOffset != -1) {
-                sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), g_listRecords.at(i).nDeviceOffset);
-                _nCurrent = g_listRecords.at(i).nDeviceOffset;
-            } else if (g_listRecords.at(i).disasmResult.nAddress != (XADDR)-1) {
-                sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), g_listRecords.at(i).disasmResult.nAddress);
-                _nCurrent = g_listRecords.at(i).disasmResult.nAddress;
+            if (m_listRecords.at(i).nDeviceOffset != -1) {
+                sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), m_listRecords.at(i).nDeviceOffset);
+                _nCurrent = m_listRecords.at(i).nDeviceOffset;
+            } else if (m_listRecords.at(i).disasmResult.nAddress != (XADDR)-1) {
+                sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), m_listRecords.at(i).disasmResult.nAddress);
+                _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
             }
 
-            // if (g_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
+            // if (m_listRecords.at(i).nVirtualAddress != (XADDR)-1) {
             //     if (getXInfoDB()) {
-            //         sSymbol = getXInfoDB()->getSymbolStringByAddress(g_listRecords.at(i).nVirtualAddress);
+            //         sSymbol = getXInfoDB()->getSymbolStringByAddress(m_listRecords.at(i).nVirtualAddress);
             //     }
             // }
 
-            if (g_bIsLocationColon) {
-                g_listRecords[i].sLocation = XBinary::valueToHexColon(mode, _nCurrent);
+            if (m_bIsLocationColon) {
+                m_listRecords[i].sLocation = XBinary::valueToHexColon(mode, _nCurrent);
             } else {
-                g_listRecords[i].sLocation = XBinary::valueToHex(mode, _nCurrent);
+                m_listRecords[i].sLocation = XBinary::valueToHex(mode, _nCurrent);
             }
 
             if (sPrefix != "") {
-                g_listRecords[i].sLocation = QString("%1:%2").arg(sPrefix, g_listRecords.at(i).sLocation);
+                m_listRecords[i].sLocation = QString("%1:%2").arg(sPrefix, m_listRecords.at(i).sLocation);
             }
 
             if (sSymbol != "") {
-                g_listRecords[i].sLocation = QString("%1.%2").arg(g_listRecords.at(i).sLocation, sSymbol);
+                m_listRecords[i].sLocation = QString("%1.%2").arg(m_listRecords.at(i).sLocation, sSymbol);
             }
         }
     }
@@ -1160,16 +1160,16 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(const XAbstractTableView:
     osResult.nViewPos = -1;
 
     if ((cursorPosition.bIsValid) && (cursorPosition.ptype == PT_CELL)) {
-        if (cursorPosition.nRow < g_listRecords.count()) {
-            qint64 nBlockOffset = g_listRecords.at(cursorPosition.nRow).nViewPos;
+        if (cursorPosition.nRow < m_listRecords.count()) {
+            qint64 nBlockOffset = m_listRecords.at(cursorPosition.nRow).nViewPos;
             qint64 nBlockSize = 0;
 
-            // if (g_viewMethod == VIEWMETHOD_NONE) {
-            //     nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
-            // } else if (g_viewMethod == VIEWMETHOD_ANALYZED) {
+            // if (m_viewMethod == VIEWMETHOD_NONE) {
+            //     nBlockSize = m_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            // } else if (m_viewMethod == VIEWMETHOD_ANALYZED) {
             //     nBlockSize = 1;
             // }
-            nBlockSize = g_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
+            nBlockSize = m_listRecords.at(cursorPosition.nRow).disasmResult.nSize;
             // nBlockSize = 1;
 
             osResult.nViewPos = nBlockOffset;
@@ -1206,7 +1206,7 @@ void XDisasmView::updateData()
 #endif
         }
 
-        // g_listHighlightsRegion.clear(); // TODO
+        // m_listHighlightsRegion.clear(); // TODO
         // if (getXInfoDB()) {
         //     QList<XDisasmView::TRANSRECORD> listTransRecords = _getTransRecords(nViewPosStart, nNumberLinesProPage * 16);  // TODO 16 const
 
@@ -1219,7 +1219,7 @@ void XDisasmView::updateData()
         //             listBookMarks = getXInfoDB()->getBookmarkRecords(listTransRecords.at(i).nOffset, XBinary::LT_OFFSET, listTransRecords.at(i).nSize);
         //         }
 
-        //         g_listHighlightsRegion.append(_convertBookmarksToHighlightRegion(&listBookMarks));
+        //         m_listHighlightsRegion.append(_convertBookmarksToHighlightRegion(&listBookMarks));
         //     }
         // }
 
@@ -1236,43 +1236,43 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
     qint32 nArrowDelta = 0;
 
     if (nColumn == COLUMN_ARROWS) {
-        qint32 nNumberOfRecords = g_listRecords.count();
+        qint32 nNumberOfRecords = m_listRecords.count();
 
         if (nNumberOfRecords) {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if ((g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP) ||
-                    (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND) ||
-                    (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_UNCOND)) {
-                    bool bIsSelected = isViewPosSelected(g_listRecords.at(i).nViewPos);
-                    bool bIsCond = (g_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND);
+                if ((m_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP) ||
+                    (m_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND) ||
+                    (m_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_UNCOND)) {
+                    bool bIsSelected = isViewPosSelected(m_listRecords.at(i).nViewPos);
+                    bool bIsCond = (m_listRecords.at(i).disasmResult.relType == XDisasmAbstract::RELTYPE_JMP_COND);
 
                     QPointF point1;
                     point1.setX(nLeft + nWidth - nArrowDelta);
                     point1.setY(nTop + ((i + 0.5) * getLineHeight()));
 
                     QPointF point2;
-                    point2.setX((nLeft + nWidth - nArrowDelta) - getCharWidth() * (g_listRecords.at(i).nArrayLevel));
+                    point2.setX((nLeft + nWidth - nArrowDelta) - getCharWidth() * (m_listRecords.at(i).nArrayLevel));
                     point2.setY(point1.y());
 
                     QPointF point3;
 
                     point3.setX(point2.x());
 
-                    qint32 nDelta = getLineHeight() * g_listRecords.at(i).nArraySize;
+                    qint32 nDelta = getLineHeight() * m_listRecords.at(i).nArraySize;
 
-                    if (!(g_listRecords.at(i).bIsEnd)) {
+                    if (!(m_listRecords.at(i).bIsEnd)) {
                         nDelta += 0.5 * getLineHeight();
                     }
 
-                    if (g_listRecords.at(i).array == ARROW_UP) {
+                    if (m_listRecords.at(i).array == ARROW_UP) {
                         point3.setY(point1.y() - nDelta);
-                    } else if (g_listRecords.at(i).array == ARROW_DOWN) {
+                    } else if (m_listRecords.at(i).array == ARROW_DOWN) {
                         point3.setY(point1.y() + nDelta);
                     }
 
                     drawArrowLine(pPainter, point1, point2, bIsSelected, bIsCond);
 
-                    if (g_listRecords.at(i).bIsEnd) {
+                    if (m_listRecords.at(i).bIsEnd) {
                         drawArrowLine(pPainter, point2, point3, bIsSelected, bIsCond);
 
                         QPointF point4;
@@ -1293,12 +1293,12 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
 void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight)
 {
-    qint32 nNumberOfRows = g_listRecords.count();
+    qint32 nNumberOfRows = m_listRecords.count();
 
     //    qint64 nCursorOffset = getState().nCursorViewPos;
 
     if (nRow < nNumberOfRows) {
-        qint64 nOffset = g_listRecords.at(nRow).nViewPos;
+        qint64 nOffset = m_listRecords.at(nRow).nViewPos;
 
         bool bIsDebugger = false;
         //        bool bIsCurrentIP = false;
@@ -1308,7 +1308,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             if (nColumn == COLUMN_BREAKPOINT) {
 #ifdef USE_XPROCESS
                 bIsDebugger = getXInfoDB()->isDebugger();
-                //                XADDR nAddress = g_listRecords.at(nRow).disasmResult.nAddress;
+                //                XADDR nAddress = m_listRecords.at(nRow).disasmResult.nAddress;
                 //                XADDR nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
 
                 //                bIsCurrentIP = ((nCurrentIP != -1) && (nAddress == nCurrentIP));
@@ -1326,23 +1326,23 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
         if (isViewPosSelected(nOffset)) {
             textOption.bIsSelected = true;
 
-            if (g_listRecords.at(nRow).bIsBytesHighlighted && (nColumn == COLUMN_BYTES)) {
-                textOption.colSelected = g_listRecords.at(nRow).colBytesBackgroundSelected;
+            if (m_listRecords.at(nRow).bIsBytesHighlighted && (nColumn == COLUMN_BYTES)) {
+                textOption.colSelected = m_listRecords.at(nRow).colBytesBackgroundSelected;
             } else {
                 textOption.colSelected = getColor(TCLOLOR_SELECTED);
             }
         }
 #ifdef USE_XPROCESS
-        if ((g_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION)) {
+        if ((m_listRecords.at(nRow).bIsCurrentIP) && (nColumn == COLUMN_LOCATION)) {
             textOption.bIsCurrentIP = true;
         }
 
-        if ((g_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) && (nColumn == COLUMN_LOCATION)) {
+        if ((m_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) && (nColumn == COLUMN_LOCATION)) {
             textOption.bIsBreakpoint = true;
             textOption.colBreakpoint = getColor(TCLOLOR_BREAKPOINT);
         }
 #endif
-        if ((g_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE)) {
+        if ((m_listRecords.at(nRow).bIsAnalysed) && (nColumn == COLUMN_OPCODE)) {
             textOption.bIsAnalysed = true;
             textOption.colAnalyzed = getColor(TCLOLOR_ANALYSED);
         }
@@ -1359,11 +1359,11 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 
                 pPainter->save();
 
-                if (g_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) {
+                if (m_listRecords.at(nRow).breakpointType != XInfoDB::BPT_UNKNOWN) {
                     // TODO
                     pPainter->setBrush(Qt::red);
                     pPainter->setPen(Qt::red);
-                } else if (g_listRecords.at(nRow).bIsCurrentIP) {
+                } else if (m_listRecords.at(nRow).bIsCurrentIP) {
                     pPainter->setBrush(Qt::green);  // TODO consts
                     pPainter->setPen(Qt::green);
                 } else {
@@ -1377,24 +1377,24 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
             }
             // TODO
         } else if (nColumn == COLUMN_LOCATION) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLocation, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).sLocation, &textOption);
         } else if (nColumn == COLUMN_LABEL) {
             //            QString sInfoText;
-            //            if (g_listRecords.at(nRow).nInfo) {
-            //                sInfoText = QString::number(g_listRecords.at(nRow).nInfo);
+            //            if (m_listRecords.at(nRow).nInfo) {
+            //                sInfoText = QString::number(m_listRecords.at(nRow).nInfo);
             //            }
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sLabel, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).sLabel, &textOption);
         } else if (nColumn == COLUMN_BYTES) {
-            if (g_listRecords.at(nRow).bIsBytesHighlighted) {
-                pPainter->fillRect(nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).colBytesBackground);
+            if (m_listRecords.at(nRow).bIsBytesHighlighted) {
+                pPainter->fillRect(nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).colBytesBackground);
             }
 
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sBytes, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).sBytes, &textOption);
         } else if (nColumn == COLUMN_OPCODE) {
-            // QString sOpcode = QString("%1|%2").arg(g_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(g_listRecords.at(nRow).disasmResult));
-            drawDisasmText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).disasmResult, &textOption);
+            // QString sOpcode = QString("%1|%2").arg(m_listRecords.at(nRow).disasmResult.sMnemonic, convertOpcodeString(m_listRecords.at(nRow).disasmResult));
+            drawDisasmText(pPainter, nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).disasmResult, &textOption);
         } else if (nColumn == COLUMN_COMMENT) {
-            drawText(pPainter, nLeft, nTop, nWidth, nHeight, g_listRecords.at(nRow).sComment, &textOption);
+            drawText(pPainter, nLeft, nTop, nWidth, nHeight, m_listRecords.at(nRow).sComment, &textOption);
         }
     }
 }
@@ -1404,7 +1404,7 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
 //     if (isContextMenuEnable()) {
 //         MENU_STATE mstate = getMenuState();
 //         STATE state = getState();
-//         XDisasmView::RECORD record = _getRecordByViewPos(&g_listRecords, state.nSelectionViewPos);
+//         XDisasmView::RECORD record = _getRecordByViewPos(&m_listRecords, state.nSelectionViewPos);
 
 //         QMenu contextMenu(this);  // TODO
 
@@ -1692,12 +1692,12 @@ qint64 XDisasmView::getCurrentViewPosFromScroll()
 
     if (getTotalScrollCount() > (quint64)nMaxValue) {  // TODO a flag for large files
         if (nValue == getMaxScrollValue()) {
-            nResult = getViewSize() - g_nBytesProLine;
+            nResult = getViewSize() - m_nBytesProLine;
         } else {
             nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
         }
     } else {
-        nResult = (qint64)nValue * g_nBytesProLine;
+        nResult = (qint64)nValue * m_nBytesProLine;
     }
 
     qint64 _nViewPosStart = getViewPosStart();
@@ -1718,14 +1718,14 @@ void XDisasmView::setCurrentViewPosToScroll(qint64 nViewPos)
 
     qint32 nValue = 0;
 
-    if (getViewSize() > (getMaxScrollValue() * g_nBytesProLine)) {
-        if (nViewPos == getViewSize() - g_nBytesProLine) {
+    if (getViewSize() > (getMaxScrollValue() * m_nBytesProLine)) {
+        if (nViewPos == getViewSize() - m_nBytesProLine) {
             nValue = getMaxScrollValue();
         } else {
             nValue = ((double)(nViewPos) / ((double)getViewSize())) * (double)getMaxScrollValue();
         }
     } else {
-        nValue = (nViewPos) / g_nBytesProLine;
+        nValue = (nViewPos) / m_nBytesProLine;
     }
 
     verticalScrollBar()->setValue(nValue);
@@ -1740,17 +1740,17 @@ void XDisasmView::adjustColumns()
     const QFontMetricsF fm(getTextFont());
 
     if (XBinary::getWidthModeFromSize(m_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
-        g_nAddressWidth = 16;
+        m_nAddressWidth = 16;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
     } else {
-        g_nAddressWidth = 8;
+        m_nAddressWidth = 8;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("0000:0000").width());
     }
 
-    if (g_viewDisasm == VIEWDISASM_FULL) {
+    if (m_viewDisasm == VIEWDISASM_FULL) {
         QString sBytes;
 
-        for (qint32 i = 0; i < g_nOpcodeSize; i++) {
+        for (qint32 i = 0; i < m_nOpcodeSize; i++) {
             sBytes += "00";
         }
 
@@ -1762,7 +1762,7 @@ void XDisasmView::adjustColumns()
 
         setColumnEnabled(COLUMN_LABEL, true);
         setColumnEnabled(COLUMN_COMMENT, true);
-    } else if (g_viewDisasm == VIEWDISASM_COMPACT) {
+    } else if (m_viewDisasm == VIEWDISASM_COMPACT) {
         setColumnWidth(COLUMN_BYTES, 10 * getCharWidth());
         setColumnWidth(COLUMN_ARROWS, 2 * getCharWidth());
         setColumnWidth(COLUMN_OPCODE, 40 * getCharWidth());
@@ -1853,20 +1853,20 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
         setColumnTitle(COLUMN_LOCATION, "");
         setLocationMode(LOCMODE_THIS);
 
-        if (nRow < g_listRecords.count()) {
-            g_nThisBaseVirtualAddress = g_listRecords.at(nRow).nViewPos;
-            g_nThisBaseDeviceOffset = g_listRecords.at(nRow).nDeviceOffset;
+        if (nRow < m_listRecords.count()) {
+            m_nThisBaseVirtualAddress = m_listRecords.at(nRow).nViewPos;
+            m_nThisBaseDeviceOffset = m_listRecords.at(nRow).nDeviceOffset;
         }
 
         adjust(true);
     } else if (nColumn == COLUMN_OPCODE) {
-        if (nRow < g_listRecords.count()) {
+        if (nRow < m_listRecords.count()) {
             XADDR nAddress = -1;
 
-            if (g_listRecords.at(nRow).disasmResult.relType) {
-                nAddress = g_listRecords.at(nRow).disasmResult.nXrefToRelative;
-            } else if (g_listRecords.at(nRow).disasmResult.memType) {
-                nAddress = g_listRecords.at(nRow).disasmResult.nXrefToMemory;
+            if (m_listRecords.at(nRow).disasmResult.relType) {
+                nAddress = m_listRecords.at(nRow).disasmResult.nXrefToRelative;
+            } else if (m_listRecords.at(nRow).disasmResult.memType) {
+                nAddress = m_listRecords.at(nRow).disasmResult.nXrefToMemory;
             }
 
             if (nAddress != (XADDR)-1) {
