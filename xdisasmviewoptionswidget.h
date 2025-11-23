@@ -61,7 +61,7 @@ protected:
 
 private:
     Ui::XDisasmViewOptionsWidget *ui;
-    XOptions *g_pOptions;
+    XOptions *m_pOptions;
     MODE m_mode;
 };
 

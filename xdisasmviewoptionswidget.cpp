@@ -26,7 +26,7 @@ XDisasmViewOptionsWidget::XDisasmViewOptionsWidget(QWidget *pParent) : XShortcut
 {
     ui->setupUi(this);
 
-    g_pOptions = nullptr;
+    m_pOptions = nullptr;
     m_mode = MODE_ALL;
 
     setProperty("GROUPID", XOptions::GROUPID_DISASM);
@@ -44,7 +44,7 @@ void XDisasmViewOptionsWidget::adjustView()
 
 void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 {
-    g_pOptions = pOptions;
+    m_pOptions = pOptions;
     m_mode = mode;
 
     reload();
@@ -52,10 +52,10 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 
 void XDisasmViewOptionsWidget::save()
 {
-    g_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
-    g_pOptions->getCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
-    g_pOptions->getCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
-    g_pOptions->getCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
+    m_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
+    m_pOptions->getCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
+    m_pOptions->getCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
+    m_pOptions->getCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
 }
 
 void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
@@ -264,12 +264,12 @@ void XDisasmViewOptionsWidget::reloadData(bool bSaveSelection)
 
 void XDisasmViewOptionsWidget::reload()
 {
-    g_pOptions->setCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
-    g_pOptions->setCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
-    g_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
+    m_pOptions->setCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
+    m_pOptions->setCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
+    m_pOptions->setCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
 
     if ((m_mode == MODE_ALL) || (m_mode == MODE_X86)) {
-        g_pOptions->setComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
+        m_pOptions->setComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
     } else {
         ui->groupBoxDisasmSyntax->hide();
     }
@@ -282,7 +282,7 @@ void XDisasmViewOptionsWidget::on_pushButtonDisasmColors_clicked()
 
     QList<DialogViewColors::RECORD> listRecords = getRecords(m_mode);
 
-    dialogColors.setOptions(g_pOptions, listRecords, tr("Colors"));
+    dialogColors.setOptions(m_pOptions, listRecords, tr("Colors"));
 
     dialogColors.exec();
 }
