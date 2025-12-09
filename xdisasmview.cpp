@@ -1682,9 +1682,9 @@ void XDisasmView::keyPressEvent(QKeyEvent *pEvent)
     XAbstractTableView::keyPressEvent(pEvent);
 }
 
-qint64 XDisasmView::getCurrentViewPosFromScroll()
+XVPOS XDisasmView::getCurrentViewPosFromScroll()
 {
-    qint64 nResult = 0;
+    XVPOS nResult = 0;
 
     qint32 nValue = verticalScrollBar()->value();
 
@@ -1697,11 +1697,11 @@ qint64 XDisasmView::getCurrentViewPosFromScroll()
             nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
         }
     } else {
-        nResult = (qint64)nValue * m_nBytesProLine;
+        nResult = (XVPOS)nValue * m_nBytesProLine;
     }
 
-    qint64 _nViewPosStart = getViewPosStart();
-    qint64 _nResult = getDisasmViewPos(nResult, _nViewPosStart);  // TODO Convert
+    XVPOS _nViewPosStart = getViewPosStart();
+    XVPOS _nResult = getDisasmViewPos(nResult, _nViewPosStart);  // TODO Convert
 
     if (_nResult != nResult) {
         nResult = _nResult;
@@ -1712,7 +1712,7 @@ qint64 XDisasmView::getCurrentViewPosFromScroll()
     return nResult;
 }
 
-void XDisasmView::setCurrentViewPosToScroll(qint64 nViewPos)
+void XDisasmView::setCurrentViewPosToScroll(XVPOS nViewPos)
 {
     setViewPosStart(nViewPos);  // TODO Check
 

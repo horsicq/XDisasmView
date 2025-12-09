@@ -174,8 +174,8 @@ protected:
     virtual void paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight);
     virtual void wheelEvent(QWheelEvent *pEvent);
     virtual void keyPressEvent(QKeyEvent *pEvent);
-    virtual qint64 getCurrentViewPosFromScroll();
-    virtual void setCurrentViewPosToScroll(qint64 nViewPos);
+    virtual XVPOS getCurrentViewPosFromScroll();
+    virtual void setCurrentViewPosToScroll(XVPOS nViewPos);
     virtual void adjustColumns();
     virtual void _headerClicked(qint32 nColumn);
     virtual void _cellDoubleClicked(qint32 nRow, qint32 nColumn);
