@@ -862,9 +862,9 @@ void XDisasmView::getRecords()
     //     pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
     // }
 
-    qint64 nViewPosStart = getViewPosStart();
+    XVPOS nViewPosStart = getViewPosStart();
     qint32 nNumberLinesProPage = getLinesProPage();
-    qint64 nCurrentViewPos = nViewPosStart;
+    XVPOS nCurrentViewPos = nViewPosStart;
 
     for (qint32 i = 0; i < nNumberLinesProPage; i++) {
         if (nCurrentViewPos < getViewSize()) {
@@ -1999,7 +1999,7 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
         XADDR nAddress = 0;
 
         if (nAddress != (XADDR)-1) {
-            qint64 nViewStart = getViewPosStart();
+            XVPOS nViewStart = getViewPosStart();
 
             XInfoDBTransfer::OPTIONS options = {};
             options.pDevice = getDevice();
