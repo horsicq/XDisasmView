@@ -40,7 +40,6 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     // TODO click on Address -> Offset
     m_nBytesProLine = 1;
 
-    m_options = OPTIONS();
     m_disasmOptions = XDisasmAbstract::DISASM_OPTIONS();
     m_viewMethod = VIEWMETHOD_NONE;
     m_viewDisasm = VIEWDISASM_COMPACT;
@@ -66,7 +65,7 @@ XDisasmView::XDisasmView(QWidget *pParent) : XDeviceTableEditView(pParent)
     //    setLastColumnStretch(true);
 
     setTextFont(XOptions::getMonoFont());
-    setLocationMode(LOCMODE_ADDRESS);
+    setLocationMode(XBinaryView::LOCMODE_ADDRESS);
 
     _qTextOptions.setWrapMode(QTextOption::NoWrap);
 
@@ -96,25 +95,25 @@ void XDisasmView::adjustView()
     // }
 
     // g_pDisasmCore->setMode(disasmMode);
-    getDisasmCore()->setOptions(getGlobalOptions());
+    getBinaryView()->getDisasmCore()->setOptions(getGlobalOptions());
 
     reload(true);
     viewport()->update();
 }
 
-void XDisasmView::setData(QIODevice *pDevice, const OPTIONS &options, bool bReload)
+void XDisasmView::setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload)
 {
-    m_options = options;
+    XDeviceTableView::setData(pDevice, options);
 
     m_listRecords.clear();
 
-    setDevice(pDevice, 0, -1);  // TODO
-    setMode(options.fileType, options.disasmMode, true);
-    // setMemoryMap(g_options.memoryMapRegion);
+    // setDevice(pDevice, 0, -1);  // TODO
+    // setMode(options.fileType, options.disasmMode, true);
+    // // setMemoryMap(g_options.memoryMapRegion);
 
-    if (m_options.disasmMode == XBinary::DM_UNKNOWN) {
-        m_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
-    }
+    // if (m_options.disasmMode == XBinary::DM_UNKNOWN) {
+    //     m_options.disasmMode = XBinary::getDisasmMode(getMemoryMap());
+    // }
 
     adjustView();
 
@@ -164,14 +163,9 @@ void XDisasmView::setViewDisasm(VIEWDISASM viewDisasm)
     viewport()->update();
 }
 
-XDisasmView::OPTIONS XDisasmView::getOptions()
-{
-    return m_options;
-}
-
 XBinary::DM XDisasmView::getDisasmMode()
 {
-    return m_options.disasmMode;
+    return getBinaryView()->getDisasmCore()->getDisasmMode();
 }
 
 XADDR XDisasmView::getSelectionInitAddress()
@@ -181,7 +175,7 @@ XADDR XDisasmView::getSelectionInitAddress()
     qint64 nOffset = getSelectionInitOffset();
 
     if (nOffset != -1) {
-        nResult = XBinary::offsetToAddress(getMemoryMap(), nOffset);
+        nResult = XBinary::offsetToAddress(getBinaryView()->getMemoryMap(), nOffset);
     }
 
     return nResult;
@@ -249,8 +243,8 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
     DEVICESTATE result = {};
     STATE state = getState();
 
-    result.nSelectionDeviceOffset = viewPosToDeviceOffset(state.nSelectionViewPos);
-    result.nStartDeviceOffset = viewPosToDeviceOffset(getViewPosStart());
+    result.nSelectionDeviceOffset = getBinaryView()->viewPosToDeviceOffset(state.nSelectionViewPos);
+    result.nStartDeviceOffset = getBinaryView()->viewPosToDeviceOffset(getViewPosStart());
 
     if (result.nSelectionDeviceOffset != (quint64)-1) {
         result.nSelectionSize = state.nSelectionViewSize;
@@ -262,8 +256,8 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 
 void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset)
 {
-    _goToViewPos(deviceOffsetToViewPos(deviceState.nStartDeviceOffset));
-    _initSetSelection(deviceOffsetToViewPos(deviceState.nSelectionDeviceOffset), deviceState.nSelectionSize);
+    _goToViewPos(getBinaryView()->deviceOffsetToViewPos(deviceState.nStartDeviceOffset));
+    _initSetSelection(getBinaryView()->deviceOffsetToViewPos(deviceState.nSelectionDeviceOffset), deviceState.nSelectionSize);
 
     adjust();
     viewport()->update();
@@ -329,7 +323,7 @@ void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOff
 
 void XDisasmView::adjustScrollCount()
 {
-    setTotalScrollCount(getViewSize());
+    setTotalScrollCount(getBinaryView()->getViewSize());
 }
 
 qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
@@ -363,7 +357,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
             nOldViewPos = nViewPos;
         }
 
-        VIEWSTRUCT viewStruct = _getViewStructByViewPos(nViewPos);
+        XBinaryView::VIEWSTRUCT viewStruct = getBinaryView()->_getViewStructByViewPos(nViewPos);
 
         if (m_viewMethod == VIEWMETHOD_NONE) {
             qint64 nOffset = -1;
@@ -379,14 +373,14 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 nStartOffset = nOffset - 5 * m_nOpcodeSize;
                 nEndOffset = nOffset + 5 * m_nOpcodeSize;
 
-                if (getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_ARM)  // TODO Check
+                if (getBinaryView()->getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_ARM)  // TODO Check
                 {
                     nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                } else if (getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_ARM64) {
+                } else if (getBinaryView()->getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_ARM64) {
                     nStartOffset = S_ALIGN_DOWN(nStartOffset, 4);
-                } else if (getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_M68K) {
+                } else if (getBinaryView()->getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_M68K) {
                     nStartOffset = S_ALIGN_DOWN(nStartOffset, 2);
-                } else if (getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_X86) {
+                } else if (getBinaryView()->getDisasmCore()->getDisasmFamily() == XBinary::DMFAMILY_X86) {
                     //                QByteArray _baData = read_array(nStartOffset, 2);  // TODO optimize
 
                     //                if (*((quint16 *)_baData.data()) == 0)  // 0000
@@ -411,7 +405,7 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 while (nSize > 0) {
                     qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-                    XDisasmAbstract::DISASM_RESULT disasmResult = getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
+                    XDisasmAbstract::DISASM_RESULT disasmResult = getBinaryView()->getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
 
                     if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                         if (_nOffset == nOffset) {
@@ -483,7 +477,7 @@ XDisasmView::MENU_STATE XDisasmView::getMenuState()
         result.bSize = true;
     }
 
-    if (m_options.bMenu_Hex) {
+    if (getBinaryView()->getOptions()->bMenu_Hex) {
         result.bHex = true;
     }
 
@@ -543,7 +537,7 @@ void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, 
         rectText.setWidth(nWidth);
         rectText.setHeight(nHeight - getLineDelta());
 
-        getDisasmCore()->drawDisasmText(pPainter, rectText, disasmResult);
+        getBinaryView()->getDisasmCore()->drawDisasmText(pPainter, rectText, disasmResult);
         // TODO
     } else {
         QString sText = XDisasmAbstract::getOpcodeFullString(disasmResult);
@@ -558,9 +552,9 @@ void XDisasmView::drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF 
     QPen pen;
 
     if (bIsSelected) {
-        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
+        pen.setColor(XOptions::stringToColor(getBinaryView()->getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
     } else {
-        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
+        pen.setColor(XOptions::stringToColor(getBinaryView()->getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
     }
 
     pPainter->setPen(pen);
@@ -591,9 +585,9 @@ void XDisasmView::drawArrowLine(QPainter *pPainter, QPointF pointStart, QPointF 
     QPen pen;
 
     if (bIsSelected) {
-        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
+        pen.setColor(XOptions::stringToColor(getBinaryView()->getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS_SELECTED).sColorMain));
     } else {
-        pen.setColor(XOptions::stringToColor(getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
+        pen.setColor(XOptions::stringToColor(getBinaryView()->getDisasmCore()->getColorRecord(XDisasmCore::OG_ARROWS).sColorMain));
     }
 
     if (bIsCond) {
@@ -629,7 +623,7 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
         menuItem.pRecv = this;
         menuItem.pMethod = SLOT(_goToEntryPointSlot());
         menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-        menuItem.sText = QString("0x%1").arg(m_options.nEntryPointAddress, 0, 16);
+        menuItem.sText = QString("0x%1").arg(getBinaryView()->getOptions()->nEntryPointAddress, 0, 16);
 
         listResult.append(menuItem);
     }
@@ -867,7 +861,7 @@ void XDisasmView::getRecords()
     XVPOS nCurrentViewPos = nViewPosStart;
 
     for (qint32 i = 0; i < nNumberLinesProPage; i++) {
-        if (nCurrentViewPos < getViewSize()) {
+        if (nCurrentViewPos < getBinaryView()->getViewSize()) {
             qint64 nDataSize = 0;
 
             RECORD record = {};
@@ -875,7 +869,7 @@ void XDisasmView::getRecords()
 
             qint32 nBufferSize = 0;
             QByteArray baBuffer;  // mb TODO fix buffer
-            VIEWSTRUCT viewStruct = _getViewStructByViewPos(nCurrentViewPos);
+            XBinaryView::VIEWSTRUCT viewStruct = getBinaryView()->_getViewStructByViewPos(nCurrentViewPos);
 
             if (viewStruct.nSize) {
                 if (viewStruct.nOffset != -1) {
@@ -903,7 +897,7 @@ void XDisasmView::getRecords()
                             break;
                         }
 
-                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
+                        record.disasmResult = getBinaryView()->getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
 
                         nBufferSize = record.disasmResult.nSize;
                         baBuffer.resize(nBufferSize);
@@ -922,7 +916,7 @@ void XDisasmView::getRecords()
                                 if ((record.nDeviceOffset != -1) && (nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
                                         QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
-                                        record.disasmResult = getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
+                                        record.disasmResult = getBinaryView()->getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
 
                                         nDataSize = showRecord.nSize;
@@ -1077,7 +1071,7 @@ void XDisasmView::updateLocations()
     qint32 nNumberOfRecords = m_listRecords.count();
 
     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-        if (getlocationMode() == LOCMODE_THIS) {
+        if (getlocationMode() == XBinaryView::LOCMODE_THIS) {
             qint64 nDelta = 0;
             XADDR _nCurrent = 0;
 
@@ -1090,7 +1084,7 @@ void XDisasmView::updateLocations()
             }
 
             m_listRecords[i].sLocation = XBinary::thisToString(nDelta);
-        } else if (getlocationMode() == LOCMODE_ADDRESS) {
+        } else if (getlocationMode() == XBinaryView::LOCMODE_ADDRESS) {
             QString sPrefix;
             XADDR _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
 
@@ -1104,7 +1098,7 @@ void XDisasmView::updateLocations()
             } else {
                 m_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
             }
-        } else if (getlocationMode() == LOCMODE_OFFSET) {
+        } else if (getlocationMode() == XBinaryView::LOCMODE_OFFSET) {
             QString sPrefix;
             XADDR _nCurrent = m_listRecords.at(i).nDeviceOffset;
 
@@ -1118,16 +1112,16 @@ void XDisasmView::updateLocations()
             } else {
                 m_listRecords[i].sLocation = sPrefix + XBinary::valueToHex(mode, _nCurrent);
             }
-        } else if (getlocationMode() == LOCMODE_RELADDRESS) {
+        } else if (getlocationMode() == XBinaryView::LOCMODE_RELADDRESS) {
             QString sPrefix;
             QString sSymbol;
             XADDR _nCurrent = 0;
 
             if (m_listRecords.at(i).nDeviceOffset != -1) {
-                sPrefix = XBinary::getMemoryRecordInfoByOffset(getMemoryMap(), m_listRecords.at(i).nDeviceOffset);
+                sPrefix = XBinary::getMemoryRecordInfoByOffset(getBinaryView()->getMemoryMap(), m_listRecords.at(i).nDeviceOffset);
                 _nCurrent = m_listRecords.at(i).nDeviceOffset;
             } else if (m_listRecords.at(i).disasmResult.nAddress != (XADDR)-1) {
-                sPrefix = XBinary::getMemoryRecordInfoByAddress(getMemoryMap(), m_listRecords.at(i).disasmResult.nAddress);
+                sPrefix = XBinary::getMemoryRecordInfoByAddress(getBinaryView()->getMemoryMap(), m_listRecords.at(i).disasmResult.nAddress);
                 _nCurrent = m_listRecords.at(i).disasmResult.nAddress;
             }
 
@@ -1176,7 +1170,7 @@ XAbstractTableView::OS XDisasmView::cursorPositionToOS(const XAbstractTableView:
             osResult.nSize = nBlockSize;
         } else {
             if (!isViewPosValid(osResult.nViewPos)) {
-                osResult.nViewPos = getViewSize();  // TODO Check
+                osResult.nViewPos = getBinaryView()->getViewSize();  // TODO Check
                 osResult.nSize = 0;
             }
         }
@@ -1692,9 +1686,9 @@ XVPOS XDisasmView::getCurrentViewPosFromScroll()
 
     if (getTotalScrollCount() > (quint64)nMaxValue) {  // TODO a flag for large files
         if (nValue == getMaxScrollValue()) {
-            nResult = getViewSize() - m_nBytesProLine;
+            nResult = getBinaryView()->getViewSize() - m_nBytesProLine;
         } else {
-            nResult = ((double)nValue / (double)getMaxScrollValue()) * getViewSize();
+            nResult = ((double)nValue / (double)getMaxScrollValue()) * getBinaryView()->getViewSize();
         }
     } else {
         nResult = (XVPOS)nValue * m_nBytesProLine;
@@ -1718,11 +1712,11 @@ void XDisasmView::setCurrentViewPosToScroll(XVPOS nViewPos)
 
     qint32 nValue = 0;
 
-    if (getViewSize() > (getMaxScrollValue() * m_nBytesProLine)) {
-        if (nViewPos == getViewSize() - m_nBytesProLine) {
+    if (getBinaryView()->getViewSize() > (getMaxScrollValue() * m_nBytesProLine)) {
+        if (nViewPos == getBinaryView()->getViewSize() - m_nBytesProLine) {
             nValue = getMaxScrollValue();
         } else {
-            nValue = ((double)(nViewPos) / ((double)getViewSize())) * (double)getMaxScrollValue();
+            nValue = ((double)(nViewPos) / ((double)getBinaryView()->getViewSize())) * (double)getMaxScrollValue();
         }
     } else {
         nValue = (nViewPos) / m_nBytesProLine;
@@ -1739,7 +1733,7 @@ void XDisasmView::adjustColumns()
 
     const QFontMetricsF fm(getTextFont());
 
-    if (XBinary::getWidthModeFromSize(m_options.nInitAddress + getViewSize()) == XBinary::MODE_64) {
+    if (XBinary::getWidthModeFromSize(getBinaryView()->getOptions()->nInitAddress + getBinaryView()->getViewSize()) == XBinary::MODE_64) {
         m_nAddressWidth = 16;
         setColumnWidth(COLUMN_LOCATION, 2 * getCharWidth() + fm.boundingRect("00000000:00000000").width());
     } else {
@@ -1782,18 +1776,18 @@ void XDisasmView::adjustColumns()
 void XDisasmView::_headerClicked(qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
-        if (getlocationMode() == LOCMODE_ADDRESS) {
+        if (getlocationMode() == XBinaryView::LOCMODE_ADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Offset"));
-            setLocationMode(LOCMODE_OFFSET);
-        } else if (getlocationMode() == LOCMODE_OFFSET) {
+            setLocationMode(XBinaryView::LOCMODE_OFFSET);
+        } else if (getlocationMode() == XBinaryView::LOCMODE_OFFSET) {
             setColumnTitle(COLUMN_LOCATION, tr("Relative address"));
-            setLocationMode(LOCMODE_RELADDRESS);
-        } else if (getlocationMode() == LOCMODE_RELADDRESS) {
+            setLocationMode(XBinaryView::LOCMODE_RELADDRESS);
+        } else if (getlocationMode() == XBinaryView::LOCMODE_RELADDRESS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setLocationMode(LOCMODE_ADDRESS);
-        } else if (getlocationMode() == LOCMODE_THIS) {
+            setLocationMode(XBinaryView::LOCMODE_ADDRESS);
+        } else if (getlocationMode() == XBinaryView::LOCMODE_THIS) {
             setColumnTitle(COLUMN_LOCATION, tr("Address"));
-            setLocationMode(LOCMODE_ADDRESS);
+            setLocationMode(XBinaryView::LOCMODE_ADDRESS);
         }
 
         adjust(true);
@@ -1851,7 +1845,7 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
 {
     if (nColumn == COLUMN_LOCATION) {
         setColumnTitle(COLUMN_LOCATION, "");
-        setLocationMode(LOCMODE_THIS);
+        setLocationMode(XBinaryView::LOCMODE_THIS);
 
         if (nRow < m_listRecords.count()) {
             m_nThisBaseVirtualAddress = m_listRecords.at(nRow).nViewPos;
@@ -1887,7 +1881,7 @@ qint64 XDisasmView::getFixViewPos(qint64 nViewPos)
 
 void XDisasmView::_goToEntryPointSlot()
 {
-    goToAddress(m_options.nEntryPointAddress, false, false, true);
+    goToAddress(getBinaryView()->getOptions()->nEntryPointAddress, false, false, true);
     setFocus();
     viewport()->update();
 }
@@ -1912,7 +1906,7 @@ void XDisasmView::_signatureSlot()
     if (state.nSelectionSize) {
         DialogMultiDisasmSignature dmds(this);
         dmds.setGlobal(getShortcuts(), getGlobalOptions());
-        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getMemoryMap(), getDisasmCore());
+        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getBinaryView()->getMemoryMap(), getBinaryView()->getDisasmCore());
 
         dmds.exec();
     }
@@ -1920,7 +1914,7 @@ void XDisasmView::_signatureSlot()
 
 void XDisasmView::_hexSlot()
 {
-    if (m_options.bMenu_Hex) {
+    if (getBinaryView()->getOptions()->bMenu_Hex) {
         DEVICESTATE state = getDeviceState();
 
         if (state.nSelectionDeviceOffset != (quint64)-1) {

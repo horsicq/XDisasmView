@@ -77,7 +77,8 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
     if (pDevice) {
         XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_EXECUTABLE);
     } else {
-        ui->scrollAreaDisasm->setDevice(nullptr, 0, -1);
+        XBinaryView::OPTIONS _options = {};
+        ui->scrollAreaDisasm->setData(nullptr, _options);
     }
 
     adjustVisitedState();
@@ -87,7 +88,8 @@ void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
 
 void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
 {
-    ui->scrollAreaDisasm->setDevice(pDevice, 0, -1);
+    XBinaryView::OPTIONS _options = {};
+    ui->scrollAreaDisasm->setData(pDevice, _options);
 }
 
 void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
@@ -148,7 +150,7 @@ void XMultiDisasmWidget::reloadFileType()
     if (m_pDevice) {
         m_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
-        XDisasmView::OPTIONS options = {};
+        XBinaryView::OPTIONS options = {};
         options.nInitAddress = m_options.nInitAddress;
         options.nEntryPointAddress = XFormats::getEntryPointAddress(m_options.fileType, m_pDevice);
         options.bMenu_Hex = m_options.bMenu_Hex;
@@ -201,7 +203,7 @@ void XMultiDisasmWidget::reloadMethod()
 
 void XMultiDisasmWidget::adjustMode()
 {
-    XDisasmView::OPTIONS options = ui->scrollAreaDisasm->getOptions();
+    XBinaryView::OPTIONS options = *(ui->scrollAreaDisasm->getBinaryView()->getOptions());
     options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
 
     ui->scrollAreaDisasm->setData(m_pDevice, options);

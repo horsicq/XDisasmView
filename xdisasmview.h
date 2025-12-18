@@ -55,24 +55,13 @@ public:
         VIEWDISASM_FULL
     };
 
-    struct OPTIONS {
-        XADDR nInitAddress;
-        XADDR nEntryPointAddress;  // TODO move to xdb
-        XBinary::FT fileType;
-        XBinary::DM disasmMode;
-        bool bAprox;
-        bool bMenu_Hex;
-        bool bHideReadOnly;
-    };
-
     explicit XDisasmView(QWidget *pParent = nullptr);
     ~XDisasmView();
 
     virtual void adjustView();
-    void setData(QIODevice *pDevice, const OPTIONS &options, bool bReload = true);
+    void setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload = true);
     void setViewMethod(VIEWMETHOD viewMethod);
     void setViewDisasm(VIEWDISASM viewDisasm);
-    OPTIONS getOptions();
     XBinary::DM getDisasmMode();  // TODO Check -> remove
     XADDR getSelectionInitAddress();
     DEVICESTATE getDeviceState(bool bGlobalOffset = false);
@@ -196,7 +185,6 @@ protected slots:
     void _transfer(XInfoDBTransfer::COMMAND command);
 
 private:
-    OPTIONS m_options;
     qint32 m_nBytesProLine;
     QList<RECORD> m_listRecords;
     qint32 m_nAddressWidth;
