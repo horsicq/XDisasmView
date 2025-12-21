@@ -405,7 +405,8 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
                 while (nSize > 0) {
                     qint64 _nOffset = nStartOffset + _nCurrentOffset;
 
-                    XDisasmAbstract::DISASM_RESULT disasmResult = getBinaryView()->getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
+                    XDisasmAbstract::DISASM_RESULT disasmResult =
+                        getBinaryView()->getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
 
                     if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                         if (_nOffset == nOffset) {
@@ -916,7 +917,8 @@ void XDisasmView::getRecords()
                                 if ((record.nDeviceOffset != -1) && (nVirtualAddress != -1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
                                         QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
-                                        record.disasmResult = getBinaryView()->getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
+                                        record.disasmResult =
+                                            getBinaryView()->getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
 
                                         nDataSize = showRecord.nSize;
