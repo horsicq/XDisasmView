@@ -181,6 +181,14 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
             listResult.append(record);
         }
         {
+            DialogViewColors::RECORD record = {sGroup, QString("YMM %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_YMM};
+            listResult.append(record);
+        }
+        {
+            DialogViewColors::RECORD record = {sGroup, QString("ZMM %1").arg(tr("Registers")), XOptions::ID_DISASM_COLOR_X86_REGS_ZMM};
+            listResult.append(record);
+        }
+        {
             DialogViewColors::RECORD record = {sGroup, "CALL", XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL};
             listResult.append(record);
         }
