@@ -102,8 +102,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         // ARM
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS_GENERAL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_REGS_STACK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_B, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
-        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BRANCH, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
+        pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_BRANCHLINK, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_PUSH, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_ARM_OPCODE_POP, QString("%1|%2").arg(QColor(Qt::blue).name(), ""));
@@ -237,11 +237,11 @@ QList<DialogViewColors::RECORD> XDisasmViewOptionsWidget::getRecords(MODE mode)
             listResult.append(record);
         }
         {
-            DialogViewColors::RECORD record = {sGroup, "B", XOptions::ID_DISASM_COLOR_ARM_OPCODE_B};
+            DialogViewColors::RECORD record = {sGroup, "Branch (B)", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BRANCH};
             listResult.append(record);
         }
         {
-            DialogViewColors::RECORD record = {sGroup, "BL", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BL};
+            DialogViewColors::RECORD record = {sGroup, "Branch with Link (BL)", XOptions::ID_DISASM_COLOR_ARM_OPCODE_BRANCHLINK};
             listResult.append(record);
         }
         {
