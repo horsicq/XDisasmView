@@ -256,6 +256,8 @@ XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 
 void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOffset)
 {
+    Q_UNUSED(bGlobalOffset)
+
     _goToViewPos(getBinaryView()->deviceOffsetToViewPos(deviceState.nStartDeviceOffset));
     _initSetSelection(getBinaryView()->deviceOffsetToViewPos(deviceState.nSelectionDeviceOffset), deviceState.nSelectionSize);
 
@@ -1035,7 +1037,7 @@ void XDisasmView::updateArrows()
                     }
                 }
 
-                m_listRecords[i].array = ARROW_UP;
+                m_listRecords[i].arrow = ARROW_UP;
             } else if (nCurrentAddress < nXrefTo) {
                 nStart = i;
 
@@ -1054,7 +1056,7 @@ void XDisasmView::updateArrows()
                     }
                 }
 
-                m_listRecords[i].array = ARROW_DOWN;
+                m_listRecords[i].arrow = ARROW_DOWN;
             }
 
             m_listRecords[i].nArrayLevel = nMaxLevel + 1;
@@ -1260,9 +1262,9 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
                         nDelta += 0.5 * getLineHeight();
                     }
 
-                    if (m_listRecords.at(i).array == ARROW_UP) {
+                    if (m_listRecords.at(i).arrow == ARROW_UP) {
                         point3.setY(point1.y() - nDelta);
-                    } else if (m_listRecords.at(i).array == ARROW_DOWN) {
+                    } else if (m_listRecords.at(i).arrow == ARROW_DOWN) {
                         point3.setY(point1.y() + nDelta);
                     }
 
@@ -1850,7 +1852,7 @@ void XDisasmView::_cellDoubleClicked(qint32 nRow, qint32 nColumn)
         setLocationMode(XBinaryView::LOCMODE_THIS);
 
         if (nRow < m_listRecords.count()) {
-            m_nThisBaseVirtualAddress = m_listRecords.at(nRow).nViewPos;
+            m_nThisBaseVirtualAddress = m_listRecords.at(nRow).disasmResult.nAddress;
             m_nThisBaseDeviceOffset = m_listRecords.at(nRow).nDeviceOffset;
         }
 

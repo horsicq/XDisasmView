@@ -105,7 +105,7 @@ private:
         bool bIsCurrentIP;
 #endif
         bool bIsAnalysed;
-        ARROW array;
+        ARROW arrow;
         qint32 nArrayLevel;
         qint32 nMaxLevel;
         qint32 nArraySize;
