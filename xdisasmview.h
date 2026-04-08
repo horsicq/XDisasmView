@@ -21,7 +21,7 @@
 #ifndef XDISASMVIEW_H
 #define XDISASMVIEW_H
 
-#include <QTextDocument>
+#include <QTextOption>
 
 #include "dialoghexedit.h"
 #include "Widgets/dialogmultidisasmsignature.h"
