@@ -183,63 +183,6 @@ XADDR XDisasmView::getSelectionInitAddress()
 
 XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 {
-    //    DEVICESTATE result = {};
-
-    //    if (isAnalyzed()) {
-    //        // TODO
-    //        STATE state = getState();
-
-    //        if (state.nSelectionViewSize == 0) {
-    //            state.nSelectionViewSize = 1;
-    //        }
-
-    //        qint64 nShowOffset = getViewPosStart();  // TODO convert
-
-    //        //        XInfoDB::SHOWRECORD showRecordCursor = getXInfoDB()->getShowRecordByLine(state.nCursorViewPos);
-    //        XInfoDB::SHOWRECORD showRecordStartSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewPos);
-    //        XInfoDB::SHOWRECORD showRecordEndSelection = getXInfoDB()->getShowRecordByLine(state.nSelectionViewPos + state.nSelectionViewSize - 1);
-    //        XInfoDB::SHOWRECORD showRecordShowStart = getXInfoDB()->getShowRecordByLine(nShowOffset);
-
-    //        //        if (showRecordCursor.nOffset != -1 ) {
-    //        //            result.nCursorOffset = showRecordCursor.nOffset;
-    //        //        }
-
-    //        XADDR nStartSelectionAddress = showRecordStartSelection.nAddress;
-    //        qint64 nSelectionSize = showRecordEndSelection.nAddress + showRecordEndSelection.nSize - nStartSelectionAddress;
-
-    //        if (!getXInfoDB()->isAnalyzedRegionVirtual(nStartSelectionAddress, nSelectionSize)) {
-    //            result.nSelectionLocation = showRecordStartSelection.nOffset;
-    //            result.nSelectionSize = nSelectionSize;
-    //        }
-
-    //        if (showRecordShowStart.nOffset == -1) {
-    //            result.nShowLocation = getXInfoDB()->getShowRecordPrevOffsetByAddress(showRecordShowStart.nAddress);
-    //        } else {
-    //            result.nShowLocation = showRecordShowStart.nOffset;
-    //        }
-
-    //        if (bGlobalOffset) {
-    //            XIODevice *pSubDevice = dynamic_cast<XIODevice *>(getDevice());
-
-    //            if (pSubDevice) {
-    //                quint64 nInitOffset = pSubDevice->getInitLocation();
-    //                result.nSelectionLocation += nInitOffset;
-    //                //                result.nCursorOffset += nInitOffset;
-    //                result.nShowLocation += nInitOffset;
-    //            }
-    //        }
-    //    } else {
-    //        DEVICESTATE result = {};
-    //        STATE state = getState();
-
-    //        result.nSelectionLocation = viewPosToDeviceOffset(state.nSelectionViewPos, bGlobalOffset);
-    //        result.nSelectionSize = state.nSelectionViewSize; // TODO Check
-    //        result.nShowLocation = viewPosToDeviceOffset(state.nSelectionViewPos, bGlobalOffset);
-
-    //        return result;
-    //    }
-
-    //    return result;
     DEVICESTATE result = {};
     STATE state = getState();
 
@@ -265,64 +208,6 @@ void XDisasmView::setDeviceState(const DEVICESTATE &deviceState, bool bGlobalOff
     viewport()->update();
 }
 
-// qint64 XDisasmView::deviceOffsetToViewPos(qint64 nOffset, bool bGlobalOffset)
-// {
-//     qint64 nResult = 0;
-
-//     //    if (isAnalyzed()) {
-//     //        qint64 _nOffset = XDeviceTableView::deviceOffsetToViewPos(nOffset, bGlobalOffset);
-
-//     //        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffset);
-//     //    } else {
-//     //        nResult = XDeviceTableView::deviceOffsetToViewPos(nOffset, bGlobalOffset);
-//     //    }
-//     qint64 _nOffset = XDeviceTableView::deviceOffsetToViewPos(nOffset, bGlobalOffset);
-
-//     VIEWSTRUCT viewStruct = _getViewStructByOffset(_nOffset);
-
-//     if (viewStruct.nSize) {
-//         nResult = viewStruct.nViewPos + (nOffset - viewStruct.nOffset);
-//     }
-
-//     return nResult;
-// }
-
-// qint64 XDisasmView::deviceSizeToViewSize(qint64 nOffset, qint64 nSize, bool bGlobalOffset)
-// {
-//     Q_UNUSED(bGlobalOffset)
-
-//     qint64 nResult = 0;
-
-//     //    if (isAnalyzed()) {
-//     //        qint64 _nOffsetStart = XDeviceTableView::deviceOffsetToViewPos(nOffset, bGlobalOffset);
-//     //        qint64 _nOffsetEnd = XDeviceTableView::deviceOffsetToViewPos(nOffset + nSize, bGlobalOffset);
-
-//     //        nResult = getXInfoDB()->getShowRecordLineByOffset(_nOffsetEnd) - getXInfoDB()->getShowRecordLineByOffset(_nOffsetStart);
-
-//     //        nResult = nResult + 1;
-//     //    } else {
-//     //        nResult = XDeviceTableView::deviceOffsetToViewPos(nOffset, nSize);
-//     //    }
-
-//     nResult = XDeviceTableView::deviceSizeToViewSize(nOffset, nSize);
-
-//     return nResult;
-// }
-
-// qint64 XDisasmView::viewPosToDeviceOffset(qint64 nViewPos, bool bGlobalOffset)
-// {
-//     qint64 nResult = -1;
-
-//     VIEWSTRUCT viewStruct = _getViewStructByViewPos(nViewPos);
-
-//     if (viewStruct.nSize && (viewStruct.nOffset != -1)) {
-//         nResult = viewStruct.nOffset + (nViewPos - viewStruct.nViewPos);
-//         nResult = XDeviceTableView::viewPosToDeviceOffset(nResult, bGlobalOffset);
-//     }
-
-//     return nResult;
-// }
-
 void XDisasmView::adjustScrollCount()
 {
     setTotalScrollCount(getBinaryView()->getViewSize());
@@ -330,6 +215,7 @@ void XDisasmView::adjustScrollCount()
 
 qint64 XDisasmView::getViewSizeByViewPos(qint64 nViewPos)
 {
+    Q_UNUSED(nViewPos)
     return 1;
 }
 
@@ -343,7 +229,7 @@ QString XDisasmView::convertOpcodeString(const XDisasmAbstract::DISASM_RESULT &d
         sResult = getXInfoDB()->convertOpcodeString(disasmResult, riType, m_disasmOptions);
     }
 
-    if (sResult == "") {
+    if (sResult.isEmpty()) {
         sResult = disasmResult.sOperands;
     }
 
@@ -496,34 +382,11 @@ void XDisasmView::drawText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32
     rectText.setWidth(nWidth);
     rectText.setHeight(nHeight - getLineDelta());
 
-    bool bSave = false;
-
-    //    if (pTextOption->bIsCursor) {
-    //        bSave = true;
-    //    }
-
-    if (bSave) {
-        pPainter->save();
-    }
-
     if (pTextOption->bIsSelected) {
         pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colSelected);
     }
 
-    // if (pTextOption->bIsBreakpoint) {
-    //     pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colBreakpoint);
-    // } else if (pTextOption->bIsAnalysed) {
-    //     pPainter->fillRect(nLeft, nTop, nWidth, nHeight, pTextOption->colAnalyzed);
-    // } else if (pTextOption->bIsCursor) {
-    //     pPainter->fillRect(nLeft, nTop, nWidth, nHeight, viewport()->palette().color(QPalette::WindowText));
-    //     pPainter->setPen(viewport()->palette().color(QPalette::Base));
-    // }
-
     pPainter->drawText(rectText, sText, _qTextOptions);
-
-    if (bSave) {
-        pPainter->restore();
-    }
 }
 
 void XDisasmView::drawDisasmText(QPainter *pPainter, qint32 nLeft, qint32 nTop, qint32 nWidth, qint32 nHeight, const XDisasmAbstract::DISASM_RESULT &disasmResult,
@@ -683,10 +546,10 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
         getShortcuts()->_addMenuItem(&listResult, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()), XShortcuts::GROUPID_COPY);
     }
 
-    if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
+    if (!record.sLocation.isEmpty() || !record.sBytes.isEmpty() || !record.disasmResult.sMnemonic.isEmpty() || !record.sComment.isEmpty()) {
         getShortcuts()->_addMenuSeparator(&listResult, XShortcuts::GROUPID_COPY);
 
-        if (record.sLocation != "") {
+        if (!record.sLocation.isEmpty()) {
             XShortcuts::MENUITEM menuItem = {};
 
             menuItem.pRecv = getShortcuts();
@@ -699,7 +562,7 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
             listResult.append(menuItem);
         }
 
-        if (record.sBytes != "") {
+        if (!record.sBytes.isEmpty()) {
             XShortcuts::MENUITEM menuItem = {};
 
             menuItem.pRecv = getShortcuts();
@@ -712,10 +575,10 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
             listResult.append(menuItem);
         }
 
-        if (record.disasmResult.sMnemonic != "") {
+        if (!record.disasmResult.sMnemonic.isEmpty()) {
             QString sString = record.disasmResult.sMnemonic;
 
-            if (record.disasmResult.sOperands != "") {
+            if (!record.disasmResult.sOperands.isEmpty()) {
                 sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
             }
 
@@ -731,7 +594,7 @@ QList<XShortcuts::MENUITEM> XDisasmView::getMenuItems()
             listResult.append(menuItem);
         }
 
-        if (record.sComment != "") {
+        if (!record.sComment.isEmpty()) {
             XShortcuts::MENUITEM menuItem = {};
 
             menuItem.pRecv = getShortcuts();
@@ -804,56 +667,18 @@ XDisasmView::RECORD XDisasmView::_getRecordByVirtualAddress(QList<RECORD> *pList
     return result;
 }
 
-// XDisasmView::VIEWSTRUCT XDisasmView::_getViewStructByScroll(qint64 nValue)
-// {
-//     VIEWSTRUCT result = {};
-
-//     qint32 nNumberOfRecords = g_listViewStruct.count();
-
-//     for (qint32 i = 0; i < nNumberOfRecords; i++) {
-//         if ((g_listViewStruct.at(i).nScrollStart <= nValue) && (nValue < (g_listViewStruct.at(i).nScrollStart + g_listViewStruct.at(i).nScrollCount))) {
-//             result = g_listViewStruct.at(i);
-//             break;
-//         }
-//     }
-
-//     return result;
-// }
-
 QList<XDisasmView::TRANSRECORD> XDisasmView::_getTransRecords(qint64 nViewPos, qint64 nSize)
 {
-    QList<XDisasmView::TRANSRECORD> listResult;
-
-    // qint32 nNumberOfRecords = g_listViewStruct.count();
-
-    // for (qint32 i = 0; i < nNumberOfRecords; i++) {
-    //     // TODO Check
-    //     if ((((nViewPos + nSize) > g_listViewStruct.at(i).nViewPos) &&
-    //          ((g_listViewStruct.at(i).nViewPos >= nViewPos) || ((nViewPos + nSize) < (g_listViewStruct.at(i).nViewPos + g_listViewStruct.at(i).nSize)))) ||
-    //         (((g_listViewStruct.at(i).nViewPos + g_listViewStruct.at(i).nSize) > nViewPos) &&
-    //          ((nViewPos >= g_listViewStruct.at(i).nViewPos) || ((g_listViewStruct.at(i).nViewPos + g_listViewStruct.at(i).nSize) < (nViewPos + nSize))))) {
-    //         qint64 nNewViewPos = qMax(g_listViewStruct.at(i).nViewPos, nViewPos);
-    //         qint64 nNewViewSize = qMin(g_listViewStruct.at(i).nViewPos + g_listViewStruct.at(i).nSize, nViewPos + nSize) - nNewViewPos;
-    //         qint64 nDelta = nNewViewPos - g_listViewStruct.at(i).nViewPos;
-
-    //         XDisasmView::TRANSRECORD record = {};
-    //         record.nViewPos = nNewViewPos;
-    //         record.nSize = nNewViewSize;
-    //         record.nAddress = g_listViewStruct.at(i).nAddress + nDelta;
-    //         record.nOffset = g_listViewStruct.at(i).nOffset + nDelta;
-
-    //         listResult.append(record);
-    //     }
-    // }
-
-    return listResult;
+    Q_UNUSED(nViewPos)
+    Q_UNUSED(nSize)
+    return {};
 }
 
 void XDisasmView::getRecords()
 {
     m_listRecords.clear();
 
-    XInfoDB::STATE *pState = 0;
+    XInfoDB::STATE *pState = nullptr;
 
     // if (getXInfoDB() && (m_viewMethod == VIEWMETHOD_ANALYZED)) {
     //     pState = getXInfoDB()->getState(g_options.memoryMapRegion.fileType);
@@ -1141,11 +966,11 @@ void XDisasmView::updateLocations()
                 m_listRecords[i].sLocation = XBinary::valueToHex(mode, _nCurrent);
             }
 
-            if (sPrefix != "") {
+            if (!sPrefix.isEmpty()) {
                 m_listRecords[i].sLocation = QString("%1:%2").arg(sPrefix, m_listRecords.at(i).sLocation);
             }
 
-            if (sSymbol != "") {
+            if (!sSymbol.isEmpty()) {
                 m_listRecords[i].sLocation = QString("%1.%2").arg(m_listRecords.at(i).sLocation, sSymbol);
             }
         }
@@ -1397,279 +1222,6 @@ void XDisasmView::paintCell(QPainter *pPainter, qint32 nRow, qint32 nColumn, qin
     }
 }
 
-// void XDisasmView::contextMenu(const QPoint &pos)
-// {
-//     if (isContextMenuEnable()) {
-//         MENU_STATE mstate = getMenuState();
-//         STATE state = getState();
-//         XDisasmView::RECORD record = _getRecordByViewPos(&m_listRecords, state.nSelectionViewPos);
-
-//         QMenu contextMenu(this);  // TODO
-
-//         QList<XShortcuts::MENUITEM> listMenuItems;
-
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_ADDRESS, this, SLOT(_goToAddressSlot()), XShortcuts::GROUPID_GOTO);
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_GOTO_OFFSET, this, SLOT(_goToOffsetSlot()), XShortcuts::GROUPID_GOTO);
-
-//         {
-//             XShortcuts::MENUITEM menuItem = {};
-
-//             menuItem.nShortcutId = X_ID_DISASM_GOTO_ENTRYPOINT;
-//             menuItem.pRecv = this;
-//             menuItem.pMethod = SLOT(_goToEntryPointSlot());
-//             menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-//             menuItem.sText = QString("0x%1").arg(g_options.nEntryPointAddress, 0, 16);
-
-//             listMenuItems.append(menuItem);
-//         }
-
-//         if (record.disasmResult.relType || record.disasmResult.memType) {
-//             getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_GOTO);
-
-//             if (record.disasmResult.relType) {
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = this;
-//                 menuItem.pMethod = SLOT(_goToXrefSlot());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-//                 menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToRelative, 0, 16);
-//                 menuItem.iconType = XOptions::ICONTYPE_GOTO;
-//                 menuItem.sPropertyName = "ADDRESS";
-//                 menuItem.varProperty = record.disasmResult.nXrefToRelative;
-
-//                 listMenuItems.append(menuItem);
-//             }
-
-//             if (record.disasmResult.memType) {
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = this;
-//                 menuItem.pMethod = SLOT(_goToXrefSlot());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-//                 menuItem.sText = QString("0x%1").arg(record.disasmResult.nXrefToMemory, 0, 16);
-//                 menuItem.iconType = XOptions::ICONTYPE_GOTO;
-//                 menuItem.sPropertyName = "ADDRESS";
-//                 menuItem.varProperty = record.disasmResult.nXrefToMemory;
-
-//                 listMenuItems.append(menuItem);
-//             }
-//         }
-
-//         if (record.bHasRefFrom) {
-//             XShortcuts::MENUITEM menuItem = {};
-
-//             menuItem.pRecv = this;
-//             menuItem.pMethod = SLOT(_referencesSlot());
-//             menuItem.nSubgroups = XShortcuts::GROUPID_GOTO;
-//             menuItem.nShortcutId = X_ID_DISASM_GOTO_REFERENCES;
-//             menuItem.sPropertyName = "ADDRESS";
-//             menuItem.varProperty = record.disasmResult.nAddress;
-
-//             listMenuItems.append(menuItem);
-//         }
-
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_ADDRESS, this, SLOT(_copyAddressSlot()), XShortcuts::GROUPID_COPY);
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_OFFSET, this, SLOT(_copyOffsetSlot()), XShortcuts::GROUPID_COPY);
-
-//         if (mstate.bPhysicalSize) {
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_COPY_DATA, this, SLOT(_copyDataSlot()), XShortcuts::GROUPID_COPY);
-//         }
-
-//         if ((record.sLocation != "") || (record.sBytes != "") || (record.disasmResult.sMnemonic != "") || (record.sComment != "")) {
-//             getShortcuts()->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_COPY);
-
-//             if (record.sLocation != "") {
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = getShortcuts();
-//                 menuItem.pMethod = SLOT(copyRecord());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-//                 menuItem.sText = record.sLocation;
-//                 menuItem.sPropertyName = "VALUE";
-//                 menuItem.varProperty = record.sLocation;
-
-//                 listMenuItems.append(menuItem);
-//             }
-
-//             if (record.sBytes != "") {
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = getShortcuts();
-//                 menuItem.pMethod = SLOT(copyRecord());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-//                 menuItem.sText = record.sBytes;
-//                 menuItem.sPropertyName = "VALUE";
-//                 menuItem.varProperty = record.sBytes;
-
-//                 listMenuItems.append(menuItem);
-//             }
-
-//             if (record.disasmResult.sMnemonic != "") {
-//                 QString sString = record.disasmResult.sMnemonic;
-
-//                 if (record.disasmResult.sOperands != "") {
-//                     sString.append(QString(" %1").arg(convertOpcodeString(record.disasmResult)));
-//                 }
-
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = getShortcuts();
-//                 menuItem.pMethod = SLOT(copyRecord());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-//                 menuItem.sText = sString;
-//                 menuItem.sPropertyName = "VALUE";
-//                 menuItem.varProperty = sString;
-
-//                 listMenuItems.append(menuItem);
-//             }
-
-//             if (record.sComment != "") {
-//                 XShortcuts::MENUITEM menuItem = {};
-
-//                 menuItem.pRecv = getShortcuts();
-//                 menuItem.pMethod = SLOT(copyRecord());
-//                 menuItem.nSubgroups = XShortcuts::GROUPID_COPY;
-//                 menuItem.sText = record.sComment;
-//                 menuItem.sPropertyName = "VALUE";
-//                 menuItem.varProperty = record.sComment;
-
-//                 listMenuItems.append(menuItem);
-//             }
-//         }
-
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_STRING, this, SLOT(_findStringSlot()), XShortcuts::GROUPID_FIND);
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_SIGNATURE, this, SLOT(_findSignatureSlot()), XShortcuts::GROUPID_FIND);
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_VALUE, this, SLOT(_findValueSlot()), XShortcuts::GROUPID_FIND);
-//         getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FIND_NEXT, this, SLOT(_findNextSlot()), XShortcuts::GROUPID_FIND);
-
-//         if (mstate.bPhysicalSize) {
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_DUMPTOFILE, this, SLOT(_dumpToFileSlot()), XShortcuts::GROUPID_NONE);
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_SIGNATURE, this, SLOT(_signatureSlot()), XShortcuts::GROUPID_NONE);
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_HEX_SIGNATURE, this, SLOT(_hexSignatureSlot()), XShortcuts::GROUPID_HEX);
-//         }
-
-//         if (mstate.bHex) {
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_FOLLOWIN_HEX, this, SLOT(_hexSlot()), XShortcuts::GROUPID_FOLLOWIN);
-//         }
-
-//         if (!isReadonly()) {
-//             if (mstate.bPhysicalSize) {
-//                 getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()), XShortcuts::GROUPID_EDIT);
-//             }
-//             getShortcuts()->_addMenuItem(&listMenuItems, X_ID_DISASM_EDIT_PATCH, this, SLOT(_editPatch()), XShortcuts::GROUPID_EDIT);
-//         }
-
-//         getShortcuts()->adjustContextMenu(&contextMenu, &listMenuItems);
-
-//         contextMenu.exec(pos);
-
-//         XOptions::deleteQObjectList(&listObjects);
-
-//         return;
-
-//         QMenu menuAnalyze(tr("Analyze"), this);
-//         QMenu menuBookmarks(tr("Bookmarks"), this);
-//         QAction actionAnalyzeAll(tr("All"), this);
-//         QAction actionAnalyzeAnalyze(tr("Analyze"), this);
-//         QAction actionAnalyzeDisasm(tr("Disasm"), this);
-//         QAction actionAnalyzeRemove(tr("Remove"), this);
-//         QAction actionAnalyzeSymbols(tr("Symbols"), this);
-//         QAction actionAnalyzeFunctions(tr("Functions"), this);
-//         QAction actionAnalyzeClear(tr("Clear"), this);
-//         QAction actionBookmarkNew(tr("New"), this);
-//         QAction actionBookmarkList(tr("List"), this);
-
-//         QMenu menuEdit(this);
-//         QAction actionEditHex(this);
-
-//         if (!(g_options.bHideReadOnly)) {
-//             if (mstate.bPhysicalSize) {
-//                 menuEdit.setEnabled(!isReadonly());
-//                 getShortcuts()->adjustMenu(&contextMenu, &menuEdit, XShortcuts::GROUPID_EDIT);
-//                 getShortcuts()->adjustAction(&menuEdit, &actionEditHex, X_ID_DISASM_EDIT_HEX, this, SLOT(_editHex()));
-//             }
-//         }
-
-//         QMenu menuSelect(this);
-//         QAction actionSelectAll(this);
-
-//         {
-//             getShortcuts()->adjustMenu(&contextMenu, &menuSelect, XShortcuts::GROUPID_SELECT);
-//             getShortcuts()->adjustAction(&menuSelect, &actionSelectAll, X_ID_DISASM_SELECT_ALL, this, SLOT(_selectAllSlot()));
-//         }
-
-//         if ((mstate.bSize) && (getXInfoDB())) {
-//             {
-//                 actionAnalyzeAll.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ALL));
-//                 connect(&actionAnalyzeAll, SIGNAL(triggered()), this, SLOT(_analyzeAll()));
-//                 menuAnalyze.addAction(&actionAnalyzeAll);
-//             }
-//             {
-//                 menuAnalyze.addSeparator();
-//             }
-//             {
-//                 actionAnalyzeAnalyze.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_ANALYZE));
-//                 connect(&actionAnalyzeAnalyze, SIGNAL(triggered()), this, SLOT(_analyzeAnalyze()));
-//                 menuAnalyze.addAction(&actionAnalyzeAnalyze);
-//             }
-//             {
-//                 actionAnalyzeDisasm.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_DISASM));
-//                 connect(&actionAnalyzeDisasm, SIGNAL(triggered()), this, SLOT(_analyzeDisasm()));
-//                 menuAnalyze.addAction(&actionAnalyzeDisasm);
-//             }
-//             {
-//                 actionAnalyzeRemove.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_REMOVE));
-//                 connect(&actionAnalyzeRemove, SIGNAL(triggered()), this, SLOT(_analyzeRemove()));
-//                 menuAnalyze.addAction(&actionAnalyzeRemove);
-//             }
-//             {
-//                 menuAnalyze.addSeparator();
-//             }
-//             {
-//                 actionAnalyzeSymbols.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_SYMBOLS));
-//                 connect(&actionAnalyzeSymbols, SIGNAL(triggered()), this, SLOT(_analyzeSymbols()));
-//                 menuAnalyze.addAction(&actionAnalyzeSymbols);
-//             }
-//             {
-//                 actionAnalyzeFunctions.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_FUNCTIONS));
-//                 connect(&actionAnalyzeFunctions, SIGNAL(triggered()), this, SLOT(_analyzeFunctions()));
-//                 menuAnalyze.addAction(&actionAnalyzeFunctions);
-//             }
-//             {
-//                 menuAnalyze.addSeparator();
-//             }
-//             {
-//                 actionAnalyzeClear.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_ANALYZE_CLEAR));
-//                 connect(&actionAnalyzeClear, SIGNAL(triggered()), this, SLOT(_analyzeClear()));
-//                 menuAnalyze.addAction(&actionAnalyzeClear);
-//             }
-
-//             contextMenu.addMenu(&menuAnalyze);
-
-//             {
-//                 actionBookmarkNew.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_NEW));
-//                 connect(&actionBookmarkNew, SIGNAL(triggered()), this, SLOT(_bookmarkNew()));
-//             }
-//             {
-//                 actionBookmarkList.setShortcut(getShortcuts()->getShortcut(X_ID_DISASM_BOOKMARKS_LIST));
-//                 if (getViewWidgetState(VIEWWIDGET_BOOKMARKS)) {
-//                     actionBookmarkList.setCheckable(true);
-//                     actionBookmarkList.setChecked(true);
-//                 }
-//                 connect(&actionBookmarkList, SIGNAL(triggered()), this, SLOT(_bookmarkList()));
-//             }
-
-//             menuBookmarks.addAction(&actionBookmarkNew);
-//             menuBookmarks.addAction(&actionBookmarkList);
-//             contextMenu.addMenu(&menuBookmarks);
-//         }
-
-//         // TODO reset select
-
-//         contextMenu.exec(pos);
-//     }
-// }
-
 void XDisasmView::wheelEvent(QWheelEvent *pEvent)
 {
     XAbstractTableView::wheelEvent(pEvent);
@@ -1795,51 +1347,6 @@ void XDisasmView::_headerClicked(qint32 nColumn)
         }
 
         adjust(true);
-    } else if (nColumn == COLUMN_OPCODE) {
-        // QMenu contextMenu(this); // TODO
-        // QMenu menuWidth(tr("Width"), this);
-
-        // QAction action8(QString("8"), this);
-        // action8.setProperty("width", 8);
-        // connect(&action8, SIGNAL(triggered()), this, SLOT(changeWidth()));
-        // menuWidth.addAction(&action8);
-        // QAction action16(QString("16"), this);
-        // action16.setProperty("width", 16);
-        // connect(&action16, SIGNAL(triggered()), this, SLOT(changeWidth()));
-        // menuWidth.addAction(&action16);
-        // QAction action32(QString("32"), this);
-        // action32.setProperty("width", 32);
-        // connect(&action32, SIGNAL(triggered()), this, SLOT(changeWidth()));
-        // menuWidth.addAction(&action32);
-
-        // contextMenu.addMenu(&menuWidth);
-
-        // contextMenu.exec(QCursor::pos());
-
-        // if (g_opcodeMode == OPCODEMODE_SYMBOLADDRESS) {
-        //     setColumnTitle(COLUMN_OPCODE, tr("Opcode"));
-        //     g_opcodeMode = OPCODEMODE_ORIGINAL;
-        // } else if (g_opcodeMode == OPCODEMODE_ORIGINAL) {
-        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Symbol")));
-        //     g_opcodeMode = OPCODEMODE_SYMBOL;
-        // } else if (g_opcodeMode == OPCODEMODE_SYMBOL) {
-        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2)").arg(tr("Opcode"), tr("Address")));
-        //     g_opcodeMode = OPCODEMODE_ADDRESS;
-        // } else if (g_opcodeMode == OPCODEMODE_ADDRESS) {
-        //     setColumnTitle(COLUMN_OPCODE, QString("%1(%2->%3)").arg(tr("Opcode"), tr("Symbol"), tr("Address")));
-        //     g_opcodeMode = OPCODEMODE_SYMBOLADDRESS;
-        // }
-        // adjust(true);
-        //    } else if (nColumn == COLUMN_BYTES) {
-        //        if (g_bytesMode == BYTESMODE_RAW) {
-        //            setColumnTitle(COLUMN_BYTES, tr("Label"));
-        //            g_bytesMode = BYTESMODE_LABEL;
-        //        } else if (g_bytesMode == BYTESMODE_LABEL) {
-        //            setColumnTitle(COLUMN_BYTES, tr("Bytes"));
-        //            g_bytesMode = BYTESMODE_RAW;
-        //        }
-
-        //        adjust(true);
     }
 
     XAbstractTableView::_headerClicked(nColumn);
@@ -1940,10 +1447,6 @@ void XDisasmView::_referencesSlot()
 
 void XDisasmView::_analyzeAll()
 {
-    // if (getXInfoDB()) {
-    //     getXInfoDB()->addAddressForAnalyze();
-    // }
-
     _transfer(XInfoDBTransfer::COMMAND_ANALYZEALL);
 }
 
