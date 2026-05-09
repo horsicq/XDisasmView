@@ -52,13 +52,13 @@ public:
     void setDevice(QIODevice *pDevice);
     void setXInfoDB(XInfoDB *pXInfoDB);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
-    virtual void setReadonly(bool bState);
+    void setReadonly(bool bState) override;
     void setReadonlyVisible(bool bState);
     void setEdited(qint64 nDeviceOffset, qint64 nDeviceSize);
-    virtual void setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize);
-    virtual void adjustView();
+    void setLocation(quint64 nLocation, qint32 nLocationType, qint64 nSize) override;
+    void adjustView() override;
     void setWidgetFocus();
-    virtual void reloadData(bool bSaveSelection);
+    void reloadData(bool bSaveSelection) override;
 
 private:
     void reloadFileType();
@@ -76,7 +76,7 @@ private slots:
     void on_comboBoxView_currentIndexChanged(int nIndex);
 
 protected:
-    virtual void registerShortcuts(bool bState);
+    void registerShortcuts(bool bState) override;
 
 signals:
     void deviceSizeChanged(qint64 nOldSize, qint64 nNewSize);

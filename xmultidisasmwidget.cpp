@@ -148,7 +148,7 @@ void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
 void XMultiDisasmWidget::reloadFileType()
 {
     if (m_pDevice) {
-        m_options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
+        m_options.fileType = static_cast<XBinary::FT>(ui->comboBoxType->currentData().toInt());
 
         XBinaryView::OPTIONS options = {};
         options.nInitAddress = m_options.nInitAddress;
@@ -176,8 +176,8 @@ void XMultiDisasmWidget::reloadFileType()
 
         XFormats::setDisasmModeComboBox(disasmMode, ui->comboBoxMode);
 
-        options.fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
-        options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
+        options.fileType = static_cast<XBinary::FT>(ui->comboBoxType->currentData().toInt());
+        options.disasmMode = static_cast<XBinary::DM>(ui->comboBoxMode->currentData().toInt());
 
         // // TODO Check
         // if (ui->scrollAreaDisasm->getXInfoDB()) {
@@ -204,7 +204,7 @@ void XMultiDisasmWidget::reloadMethod()
 void XMultiDisasmWidget::adjustMode()
 {
     XBinaryView::OPTIONS options = *(ui->scrollAreaDisasm->getBinaryView()->getOptions());
-    options.disasmMode = (XBinary::DM)(ui->comboBoxMode->currentData().toInt());
+    options.disasmMode = static_cast<XBinary::DM>(ui->comboBoxMode->currentData().toInt());
 
     ui->scrollAreaDisasm->setData(m_pDevice, options);
     ui->scrollAreaDisasm->reload(true);
@@ -258,12 +258,12 @@ void XMultiDisasmWidget::on_comboBoxMethod_currentIndexChanged(int nIndex)
 {
     Q_UNUSED(nIndex)
 
-    ui->scrollAreaDisasm->setViewMethod((XDisasmView::VIEWMETHOD)(ui->comboBoxMethod->currentData().toInt()));
+    ui->scrollAreaDisasm->setViewMethod(static_cast<XDisasmView::VIEWMETHOD>(ui->comboBoxMethod->currentData().toInt()));
 }
 
 void XMultiDisasmWidget::on_comboBoxView_currentIndexChanged(int nIndex)
 {
     Q_UNUSED(nIndex)
 
-    ui->scrollAreaDisasm->setViewDisasm((XDisasmView::VIEWDISASM)(ui->comboBoxView->currentData().toInt()));
+    ui->scrollAreaDisasm->setViewDisasm(static_cast<XDisasmView::VIEWDISASM>(ui->comboBoxView->currentData().toInt()));
 }
