@@ -967,11 +967,11 @@ void XDisasmView::updateLocations()
             }
 
             if (!sPrefix.isEmpty()) {
-                m_listRecords[i].sLocation = QString("%1:%2").arg(sPrefix, m_listRecords.at(i).sLocation);
+                m_listRecords[i].sLocation = QString("%1:%2").arg(sPrefix).arg(m_listRecords.at(i).sLocation);
             }
 
             if (!sSymbol.isEmpty()) {
-                m_listRecords[i].sLocation = QString("%1.%2").arg(m_listRecords.at(i).sLocation, sSymbol);
+                m_listRecords[i].sLocation = QString("%1.%2").arg(m_listRecords.at(i).sLocation).arg(sSymbol);
             }
         }
     }
