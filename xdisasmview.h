@@ -59,6 +59,7 @@ public:
     ~XDisasmView();
 
     virtual void adjustView();
+    void setData(const XBinary::INDATA &inData, const XBinaryView::OPTIONS &options, bool bReload = true);
     void setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload = true);
     void setViewMethod(VIEWMETHOD viewMethod);
     void setViewDisasm(VIEWDISASM viewDisasm);

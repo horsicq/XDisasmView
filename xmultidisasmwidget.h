@@ -48,7 +48,10 @@ public:
     explicit XMultiDisasmWidget(QWidget *pParent = nullptr);
     ~XMultiDisasmWidget();
 
+    void setData(const XBinary::INDATA &inData, const OPTIONS &options);
     void setData(QIODevice *pDevice, const OPTIONS &options);
+    QIODevice *getDevice();
+    void cleanup();
     void setDevice(QIODevice *pDevice);
     void setXInfoDB(XInfoDB *pXInfoDB);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
@@ -84,7 +87,7 @@ signals:
 
 private:
     Ui::XMultiDisasmWidget *ui;
-    QIODevice *m_pDevice;
+    XBinary::INDATA m_inData;
     XInfoDB *m_pXInfoDB;
     OPTIONS m_options;
 };

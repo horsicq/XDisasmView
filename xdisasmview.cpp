@@ -101,9 +101,9 @@ void XDisasmView::adjustView()
     viewport()->update();
 }
 
-void XDisasmView::setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload)
+void XDisasmView::setData(const XBinary::INDATA &inData, const XBinaryView::OPTIONS &options, bool bReload)
 {
-    XDeviceTableView::setData(pDevice, options);
+    XDeviceTableView::setData(inData, options);
 
     m_listRecords.clear();
 
@@ -137,6 +137,11 @@ void XDisasmView::setData(QIODevice *pDevice, const XBinaryView::OPTIONS &option
     if (bReload) {
         reload(true);
     }
+}
+
+void XDisasmView::setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload)
+{
+    setData(XFormats::createINDATA(options.fileType, pDevice, options.bIsImage, options.nModuleAddress), options, bReload);
 }
 
 void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
