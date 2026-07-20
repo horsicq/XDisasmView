@@ -29,6 +29,7 @@ DialogMultiDisasmSignature::DialogMultiDisasmSignature(QWidget *pParent) : XShor
     this->m_pDevice = nullptr;
     this->m_nOffset = 0;
     this->m_pMemoryMap = nullptr;
+    this->m_pDisasmCore = nullptr;
 
     //    ui->tableWidgetSignature->setFont(XAbstractTableView::getMonoFont(10));
     ui->textEditSignature->setFont(XOptions::getMonoFont());
@@ -67,6 +68,10 @@ void DialogMultiDisasmSignature::setData(QIODevice *pDevice, qint64 nOffset, XBi
 
 void DialogMultiDisasmSignature::reload()
 {
+    if (!m_pDisasmCore) {
+        return;
+    }
+
     qint32 nCount = ui->spinBoxCount->value();
     qint32 nMethod = ui->comboBoxMethod->currentData().toInt();
 

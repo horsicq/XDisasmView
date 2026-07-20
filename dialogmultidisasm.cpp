@@ -43,7 +43,7 @@ void DialogMultiDisasm::adjustView()
 
 void DialogMultiDisasm::setData(QIODevice *pDevice, const XMultiDisasmWidget::OPTIONS &options)
 {
-    ui->widgetDisasm->setData(pDevice, options);
+    ui->widgetDisasm->setData(XFormats::createINDATA(options.fileType, pDevice), options);
 
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);

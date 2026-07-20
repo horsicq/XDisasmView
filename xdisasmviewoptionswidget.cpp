@@ -52,7 +52,9 @@ void XDisasmViewOptionsWidget::setOptions(XOptions *pOptions, MODE mode)
 
 void XDisasmViewOptionsWidget::save()
 {
-    m_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
+    if ((m_mode == MODE_ALL) || (m_mode == MODE_X86)) {  // Combo box is only populated for these modes
+        m_pOptions->getComboBox(ui->comboBoxDisasmSyntax, XOptions::ID_DISASM_SYNTAX);
+    }
     m_pOptions->getCheckBox(ui->checkBoxDisasmLocationColon, XOptions::ID_DISASM_LOCATIONCOLON);
     m_pOptions->getCheckBox(ui->checkBoxDisasmUppercase, XOptions::ID_DISASM_UPPERCASE);
     m_pOptions->getCheckBox(ui->groupBoxDisasmHighlight, XOptions::ID_DISASM_HIGHLIGHT);
@@ -87,6 +89,8 @@ void XDisasmViewOptionsWidget::setDefaultValues(XOptions *pOptions, MODE mode)
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FLAGS, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));    // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_FPU, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));      // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_XMM, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));      // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_YMM, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));      // TODO color
+        pOptions->addID(XOptions::ID_DISASM_COLOR_X86_REGS_ZMM, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));      // TODO color
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_CALL, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_RET, QString("%1|%2").arg(QColor(Qt::red).name()).arg(""));
         pOptions->addID(XOptions::ID_DISASM_COLOR_X86_OPCODE_NOP, QString("%1|%2").arg(QColor(Qt::gray).name()).arg(""));
