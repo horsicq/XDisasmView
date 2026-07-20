@@ -49,10 +49,6 @@ public:
     ~XMultiDisasmWidget();
 
     void setData(const XBinary::INDATA &inData, const OPTIONS &options);
-    void setData(QIODevice *pDevice, const OPTIONS &options);
-    QIODevice *getDevice();
-    void cleanup();
-    void setDevice(QIODevice *pDevice);
     void setXInfoDB(XInfoDB *pXInfoDB);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
     void setReadonly(bool bState) override;
@@ -64,6 +60,7 @@ public:
     void reloadData(bool bSaveSelection) override;
 
 private:
+    void cleanup();
     void reloadFileType();
     void reloadMethod();
     void adjustMode();

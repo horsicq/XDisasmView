@@ -139,11 +139,6 @@ void XDisasmView::setData(const XBinary::INDATA &inData, const XBinaryView::OPTI
     }
 }
 
-void XDisasmView::setData(QIODevice *pDevice, const XBinaryView::OPTIONS &options, bool bReload)
-{
-    setData(XFormats::createINDATA(options.fileType, pDevice, options.bIsImage, options.nModuleAddress), options, bReload);
-}
-
 void XDisasmView::setViewMethod(VIEWMETHOD viewMethod)
 {
     m_viewMethod = viewMethod;
@@ -188,6 +183,8 @@ XADDR XDisasmView::getSelectionInitAddress()
 
 XDeviceTableView::DEVICESTATE XDisasmView::getDeviceState(bool bGlobalOffset)
 {
+    Q_UNUSED(bGlobalOffset)
+
     DEVICESTATE result = {};
     STATE state = getState();
 
@@ -300,6 +297,10 @@ qint64 XDisasmView::getDisasmViewPos(qint64 nViewPos, qint64 nOldViewPos)
 
                     XDisasmAbstract::DISASM_RESULT disasmResult =
                         getBinaryView()->getDisasmCore()->disAsm(baData.data() + _nCurrentOffset, nSize, _nCurrentOffset, m_disasmOptions);
+
+                    if (disasmResult.nSize == 0) {  // Invalid disasm; prevent an endless loop
+                        break;
+                    }
 
                     if ((nOffset >= _nOffset) && (nOffset < _nOffset + disasmResult.nSize)) {
                         if (_nOffset == nOffset) {
@@ -429,6 +430,7 @@ void XDisasmView::drawArrowHead(QPainter *pPainter, QPointF pointStart, QPointF 
     }
 
     pPainter->setPen(pen);
+    pPainter->setBrush(pen.color());  // Solid arrow head
 
     QPolygonF arrowHead;
     qreal arrowSize = 8;
@@ -721,7 +723,7 @@ void XDisasmView::getRecords()
 
                 if (record.nDeviceOffset != -1) {
                     if (m_viewMethod == VIEWMETHOD_NONE) {
-                        nBufferSize = qMin(m_nOpcodeSize, qint32((getDevice()->size()) - record.nDeviceOffset));
+                        nBufferSize = (qint32)qMin((qint64)m_nOpcodeSize, getBinaryView()->getInData().pDevice->size() - record.nDeviceOffset);  // qint64 to avoid overflow on large files
 
                         baBuffer = read_array(record.nDeviceOffset, nBufferSize);
                         nBufferSize = baBuffer.size();
@@ -746,9 +748,9 @@ void XDisasmView::getRecords()
                                 nVirtualAddress = XInfoDB::getAddress(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
                                 record.nDeviceOffset = XInfoDB::getOffset(pState, showRecord.nRegionIndex, showRecord.nRelOffset);
 
-                                if ((record.nDeviceOffset != -1) && (nVirtualAddress != -1)) {
+                                if ((record.nDeviceOffset != -1) && (nVirtualAddress != (XADDR)-1)) {
                                     if (showRecord.nFlags & XInfoDB::XRECORD_FLAG_CODE) {
-                                        QByteArray baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
+                                        baBuffer = read_array(record.nDeviceOffset, showRecord.nSize);
                                         record.disasmResult =
                                             getBinaryView()->getDisasmCore()->disAsm(baBuffer.data(), baBuffer.size(), nVirtualAddress, m_disasmOptions);
                                         record.sBytes = baBuffer.toHex().data();
@@ -759,7 +761,7 @@ void XDisasmView::getRecords()
 
                                 record.sLabel = QString::number(showRecord.nBranch);
                             } else {
-                                QByteArray baBuffer = read_array(record.nDeviceOffset, 1);
+                                baBuffer = read_array(record.nDeviceOffset, 1);
                                 nDataSize = 1;
                                 record.sBytes = baBuffer.toHex().data();
                                 record.disasmResult.bIsValid = true;
@@ -1017,7 +1019,7 @@ void XDisasmView::updateData()
 {
     //    g_listArrows.clear();
 
-    if (getDevice()) {
+    if (getBinaryView()->getInData().pDevice) {
         // QList<XInfoDB::SHOWRECORD> listShowRecords;
 
 //        if (isAnalyzed()) {
@@ -1030,7 +1032,9 @@ void XDisasmView::updateData()
         if (getXInfoDB()) {
 #ifdef USE_XPROCESS
             nCurrentIP = getXInfoDB()->getCurrentInstructionPointerCache();
+#ifdef QT_DEBUG
             qDebug("Current IP %s", XBinary::valueToHex(nCurrentIP).toLatin1().data());
+#endif
 #endif
         }
 
@@ -1086,7 +1090,7 @@ void XDisasmView::paintColumn(QPainter *pPainter, qint32 nColumn, qint32 nLeft, 
 
                     point3.setX(point2.x());
 
-                    qint32 nDelta = getLineHeight() * m_listRecords.at(i).nArraySize;
+                    qreal nDelta = (qreal)getLineHeight() * m_listRecords.at(i).nArraySize;
 
                     if (!(m_listRecords.at(i).bIsEnd)) {
                         nDelta += 0.5 * getLineHeight();
@@ -1422,7 +1426,7 @@ void XDisasmView::_signatureSlot()
     if (state.nSelectionSize) {
         DialogMultiDisasmSignature dmds(this);
         dmds.setGlobal(getShortcuts(), getGlobalOptions());
-        dmds.setData(getDevice(), state.nSelectionDeviceOffset, getBinaryView()->getMemoryMap(), getBinaryView()->getDisasmCore());
+        dmds.setData(getBinaryView()->getInData().pDevice, state.nSelectionDeviceOffset, getBinaryView()->getMemoryMap(), getBinaryView()->getDisasmCore());
 
         dmds.exec();
     }
@@ -1508,7 +1512,7 @@ void XDisasmView::_transfer(XInfoDBTransfer::COMMAND command)
             XVPOS nViewStart = getViewPosStart();
 
             XInfoDBTransfer::OPTIONS options = {};
-            options.pDevice = getDevice();
+            options.pDevice = getBinaryView()->getInData().pDevice;
 
             XInfoDBTransfer infoTransfer;
             XDialogProcess dialogTransfer(this, &infoTransfer);

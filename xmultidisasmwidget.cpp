@@ -82,42 +82,28 @@ void XMultiDisasmWidget::setData(const XBinary::INDATA &inData, const OPTIONS &o
         XFormats::setFileTypeComboBox(options.fileType, pDevice, ui->comboBoxType, XBinary::TL_OPTION_EXECUTABLE);
 
         XBinaryView::OPTIONS viewOptions = {};
-        ui->scrollAreaDisasm->setData(pDevice, viewOptions, false);
+        viewOptions.bIsImage = m_inData.bIsImage;
+        viewOptions.nModuleAddress = m_inData.nModuleAddress;
+        ui->scrollAreaDisasm->setData(XFormats::createINDATA(viewOptions.fileType, pDevice, viewOptions.bIsImage, viewOptions.nModuleAddress), viewOptions, false);
     } else {
         XBinaryView::OPTIONS viewOptions = {};
-        ui->scrollAreaDisasm->setData(nullptr, viewOptions);
+        ui->scrollAreaDisasm->setData(XFormats::createINDATA(viewOptions.fileType, nullptr, viewOptions.bIsImage, viewOptions.nModuleAddress), viewOptions);
     }
 
     adjustVisitedState();
     reloadFileType();
 }
 
-void XMultiDisasmWidget::setData(QIODevice *pDevice, const OPTIONS &options)
-{
-    setData(XFormats::createINDATA(options.fileType, pDevice), options);
-}
-
-QIODevice *XMultiDisasmWidget::getDevice()
-{
-    return ui->scrollAreaDisasm->getDevice();
-}
-
 void XMultiDisasmWidget::cleanup()
 {
-    QIODevice *pDevice = ui->scrollAreaDisasm->getDevice();
+    QIODevice *pDevice = ui->scrollAreaDisasm->getBinaryView()->getInData().pDevice;
     XBinaryView::OPTIONS options = {};
-    ui->scrollAreaDisasm->setData(nullptr, options);
+    ui->scrollAreaDisasm->setData(XFormats::createINDATA(options.fileType, nullptr, options.bIsImage, options.nModuleAddress), options);
     ui->scrollAreaDisasm->setXInfoDB(nullptr);
     m_pXInfoDB = nullptr;
     XFormats::removeDevice(pDevice, m_inData);
     m_inData = {};
     m_options = {};
-}
-
-void XMultiDisasmWidget::setDevice(QIODevice *pDevice)
-{
-    XBinaryView::OPTIONS _options = {};
-    ui->scrollAreaDisasm->setData(pDevice, _options);
 }
 
 void XMultiDisasmWidget::setXInfoDB(XInfoDB *pXInfoDB)
@@ -175,7 +161,7 @@ void XMultiDisasmWidget::setEdited(qint64 nDeviceOffset, qint64 nDeviceSize)
 
 void XMultiDisasmWidget::reloadFileType()
 {
-    QIODevice *pDevice = ui->scrollAreaDisasm->getDevice();
+    QIODevice *pDevice = ui->scrollAreaDisasm->getBinaryView()->getInData().pDevice;
 
     if (pDevice) {
         m_options.fileType = static_cast<XBinary::FT>(ui->comboBoxType->currentData().toInt());
@@ -185,13 +171,15 @@ void XMultiDisasmWidget::reloadFileType()
         options.nEntryPointAddress = XFormats::getEntryPointAddress(m_options.fileType, pDevice);
         options.bMenu_Hex = m_options.bMenu_Hex;
         options.bHideReadOnly = m_options.bHideReadOnly;
+        options.bIsImage = m_inData.bIsImage;
+        options.nModuleAddress = m_inData.nModuleAddress;
 
         XBinary::FILEFORMATINFO fileFormatInfo = {};
 
         if (m_options.fileType == XBinary::FT_REGION) {
             fileFormatInfo = XFormats::getFileFormatInfo(m_options.fileType, pDevice, true, m_options.nStartAddress);
         } else {
-            fileFormatInfo = XFormats::getFileFormatInfo(m_options.fileType, pDevice);
+            fileFormatInfo = XFormats::getFileFormatInfo(m_options.fileType, pDevice, m_inData.bIsImage, m_inData.nModuleAddress);
         }
 
         // if (m_options.sArch != "") {
@@ -215,7 +203,7 @@ void XMultiDisasmWidget::reloadFileType()
         //     //            getSymbols();
         // }
 
-        ui->scrollAreaDisasm->setData(pDevice, options);
+        ui->scrollAreaDisasm->setData(XFormats::createINDATA(options.fileType, pDevice, options.bIsImage, options.nModuleAddress), options);
         ui->scrollAreaDisasm->reload(true);
         reloadMethod();
     }
@@ -233,11 +221,11 @@ void XMultiDisasmWidget::reloadMethod()
 
 void XMultiDisasmWidget::adjustMode()
 {
-    QIODevice *pDevice = ui->scrollAreaDisasm->getDevice();
+    QIODevice *pDevice = ui->scrollAreaDisasm->getBinaryView()->getInData().pDevice;
     XBinaryView::OPTIONS options = *(ui->scrollAreaDisasm->getBinaryView()->getOptions());
     options.disasmMode = static_cast<XBinary::DM>(ui->comboBoxMode->currentData().toInt());
 
-    ui->scrollAreaDisasm->setData(pDevice, options);
+    ui->scrollAreaDisasm->setData(XFormats::createINDATA(options.fileType, pDevice, options.bIsImage, options.nModuleAddress), options);
     ui->scrollAreaDisasm->reload(true);
 
     // if (ui->scrollAreaDisasm->getXInfoDB()) {
